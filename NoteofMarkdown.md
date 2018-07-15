@@ -55,7 +55,7 @@ This is an h2
 
 	[Where did I learn a about this damn thing ?](https://www.jianshu.com/p/e4a544741fe0)
 
-###(2) pictures
+### (2) pictures
 
 ![baidu search](https://www.baidu.com/img/bd_logo1.png))
 
@@ -78,7 +78,9 @@ This is an h2
 	1. insertion
 	2. merge
 	3. buble
-###(2) unordered list###
+
+### (2) unordered list
+
 - int
 - double
 - char
@@ -87,8 +89,10 @@ This is an h2
 	- int
 	- double
 	- char
-##5. Others###
-###(1) Segamentation###
+## 5. Others
+
+### (1) Segamentation
+
 paragraph1
 
 paragraph2
@@ -97,24 +101,27 @@ paragraph2
 	//space line
 	paragraph2
 	
-###(2) Divid line###
+###  (2) Divid line
+
 ***
 ___
 
 	***
 	___
-###(3) Block###
+### (3) Block
+
 	dffasdfd
 	asdfasdfs
 	//tab + dffasdfd
 	//tab + asdfasdfs
 
-###(4) inline-block###
+### (4) inline-block
+
 Use the recursive `merge()` function
 
 	Use the recursive `merge()` function
 
-###(5) Table###
+### (5) Table
 
 | Header1 | Header2                          |
 |---------|----------------------------------|
@@ -123,17 +130,18 @@ Use the recursive `merge()` function
 	| Header1 | Header2                          |
 	|---------|----------------------------------|
 	| item 1  | 1. one<br />2. two<br />3. three |
-###(6) emoji###
+### (6) emoji
 :smile:
 
 	:smile:
 
-###(7) 行首缩进###
+### (7) 行首缩进
 
 &emsp;&emsp;fuck
 
 	&emsp;&emsp;fuck
-###(8) Math formula###
+### (8) Math formula
+
 [在 Github.Page渲染数学公式](http://wanguolin.github.io/mathmatics_rending/)
 
 [贴图]( https://www.codecogs.com/latex/eqneditor.php) 网页上部的输入框里输入 LaTeX 公式，比如 `$$x=\frac{-b\pm\sqrt{b^2-4ac}}{2a}$$`
@@ -141,15 +149,19 @@ Use the recursive `merge()` function
 ![](https://latex.codecogs.com/png.latex?%24%24x%3D%5Cfrac%7B-b%5Cpm%5Csqrt%7Bb%5E2-4ac%7D%7D%7B2a%7D%24%24)
 
 	![](https://latex.codecogs.com/png.latex?%24%24x%3D%5Cfrac%7B-b%5Cpm%5Csqrt%7Bb%5E2-4ac%7D%7D%7B2a%7D%24%24)
-###(9) Task list###
+### (9) Task list
 
 **list**
 
--[] algorithm
--[x] java
--[] math
-
-	** list
-	-[] algorithm
-	-[x] java
-	-[] math
+- [ ] 一次性水杯
+- [x] 西瓜
+- [ ] 豆浆
+- [x] 可口可乐
+- [ ] 小茗同学
+- 
+	**list**
+	- [ ] 一次性水杯
+	- [x] 西瓜
+	- [ ] 豆浆
+	- [x] 可口可乐
+	- [ ] 小茗同学
