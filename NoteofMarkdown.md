@@ -1,5 +1,11 @@
 # Markdown的正确打开方式
 
+* [Header](#1)
+* [referance](#2)
+* [Emphasize](#3)
+* [Import](#4)
+* [Others](#5)
+
 ## 1. Header
 
 This is an h1
