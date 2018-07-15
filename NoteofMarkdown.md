@@ -1,55 +1,75 @@
-#Markdown的正确打开方式
+# Markdown的正确打开方式
 
-##1. Header##
+## 1. Header
+
 This is an h1
 =============
 	This is an h1
 	=============
 	or
-	#This is an h1
+	# //space + This is an h1
+
 This is an h2
 -------------
 	This is an h2
 	-------------
-##2. reference##
+
+## 2. reference
+
 >This is referance
 
 	>This is referance
 	//one space line for next text
-##3. Emphasize##
-###(1) Bold###
+
+## 3. Emphasize
+
+### (1) Bold
+
 **I am important**
 
 	**I am important**
 	//also a space line
 
-###(2) Italic###
+### (2) Italic
+
 *I am Italic*
 
 	*I am Italic*
-###(3) Underline###
+
+### (3) Underline
+
 <u>emmm important</u>
 
 	<u>emmm important<\u>
-###(4) Delete###
+
+### (4) Delete
+
 ~I am sorry I am wrong~
 
 	~I am sorry I am wrong~
-##4. Import##
-###(1) link###
+## 4. Import
+
+### (1) link
+
 [Where did I learn a about this damn thing ?](https://www.jianshu.com/p/e4a544741fe0)
 
 	[Where did I learn a about this damn thing ?](https://www.jianshu.com/p/e4a544741fe0)
-###(2) pictures###
+
+###(2) pictures
+
 ![baidu search](https://www.baidu.com/img/bd_logo1.png))
 
 	![baidu search](https://www.baidu.com/img/bd_logo1.png))
-###addjusted picture###
+
+### addjusted picture
+
 <div align="center"><img width="65" height="75" src="https://raw.githubusercontent.com/mzlogin/mzlogin.github.io/master/images/posts/markdown/demo.png"/></div>
+
 	<div align="center"><img width="65" height="75" src="https://raw.githubusercontent.com/mzlogin/mzlogin.github.io/master/images/posts/markdown/demo.png"/></div>
 
-##4. List##
-###(1) ordered list###
+## 4. List
+
+### (1) ordered list
 1. insertion
 2. merge
 3. buble
