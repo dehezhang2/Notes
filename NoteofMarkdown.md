@@ -6,7 +6,7 @@
 * [Import](#4)
 * [Others](#5)
 
-## 1. Header
+<h2 id = "1"> 1. Header </h2>
 
 This is an h1
 =============
@@ -20,14 +20,14 @@ This is an h2
 	This is an h2
 	-------------
 
-## 2. reference
+<h2 id = "2" >2. reference </h2>
 
 >This is referance
 
 	>This is referance
 	//one space line for next text
 
-## 3. Emphasize
+<h2 id = "3" >3. Emphasize</h2>
 
 ### (1) Bold
 
@@ -53,7 +53,7 @@ This is an h2
 ~I am sorry I am wrong~
 
 	~I am sorry I am wrong~
-## 4. Import
+<h2 id = "4">4. Import</h2>
 
 ### (1) link
 
@@ -95,7 +95,7 @@ This is an h2
 	- int
 	- double
 	- char
-## 5. Others
+<h2 id ="5">5. Others</h2>
 
 ### (1) Segamentation
 
