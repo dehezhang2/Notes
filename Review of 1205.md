@@ -6,6 +6,7 @@
 
 > assumption -> logical deduction -> Deriving implication -> Hypothesis testing
 
+------------------------------
 ### Assumption
 
 **People are rational**
@@ -18,16 +19,19 @@
 
 * Marginal cost: -- cost ---------------
 
+----------------------------
 ### Opportunity Cost
 
 > Value of waht must be forgone or drop in order to undertake the activity
 
+--------------------------------
 ### Incentive Principle
 
 * A person is more likely to take an action if its benefit rises
 
 * use relevant costs and benefits to predict behavior
 
+-----------------------------
 ### Demand & Supply
 
 *How market allocate resources?*
@@ -108,6 +112,8 @@
 	
 	* Horizontal summation
 	
+-----------------------------
+	
 ### Equilibrium
 
 	* Equilibrium is a situation that both price and quantity have no tendency to change.  
@@ -117,7 +123,8 @@
 	* The equilibrium tells the producers how many they can sell.
 	
 	* The equilibrium tells the consumers how many they can buy.
-	
+
+-------------------------------
 ### Equilibrium Analysis
 
 * Decide whether the event shifts the supply or demand curve (or both)
@@ -125,25 +132,28 @@
 * Decide whether the curve(s) shift(s) to the left or to the right
 	
 * upply-and-demand diagram to see how the shift affects (Qx & Quatity)
-	
+
+----------------------------------	
 ### Market Equilibrium
 
 > Efficient: MB = MC
 > Underproduction: MB > MC
 > Overproduction: MB < MC
 	
+-------------------------------------
 ### Profit Maximization
 
 	Profit(PI the area) = Total revenue + Total Cost
 
 > a company will produce as long as MC < Price of the product
 	
+------------------------------------
 ### Technical efficiency
 
 > production decisions that generate **maximum output** given some stock of resources
 
 
-
+-----------------------------------------
 ### Evaluating the Market Equilibrium 
 
 1. Competitive markets allocate the supply to buyers pay highly
@@ -151,7 +161,53 @@
 3. Competitive markets produce allocatively efficient quantity of goods
 4. Maximize **social welfare**
 
+-------------------------------------------
 ### Is First-Come-First-Served-Efficient?
 
 * No, it's not
 * But, fair
+
+------------------------------
+# Lecture 03
+
+## Social Welfare and Market Failiure
+
+### Social Welfare
+
+A market is efficient if the total economic welfare of all participants is maximized.
+
+Social welfare= Consumer's surplus + producer's surplus
+> Consumer's gain: Consumer Surplus
+> 
+> Producer's gain: Producer Surplus
+
+-------------------
+### Consumer Surplus
+
+* Difference between the consumer's willingness to pay(demand price) and need to pay(actual price) for *an amount of products*(The area)
+ 
+* Total consumer surplus= sum(consumer surplus from each unit) 
+
+------------------
+### Producer Surplus
+
+* Difference between the money received by the produver and the cost of production (MC) and price of product (The area)
+
+* Total producer surplus= Sum(producter surplus from each unit)
+
+-----------------
+### How a Tax Affects the Market
+
+* A tax places a tax wedge between the price buyers pay and the price sellers receive
+> Buyer pay more
+> 
+> Seller receive less
+
+* Tax wage -> quatity falls
+* Goverment's tax revenue= T(tax)*Q(quantity sold)
+* [picture](https://canvas.cityu.edu.hk/courses/23036/files?preview=3297687)
+* Step to find the shifted curve
+	1. down-shift the demand curve  or up-shift the supply curve
+	2. Find the new quantity and draw a line down to the q-axis
+	3. Find the two intersection of the line and the two curves 
+	4. Find tax revenue CS PS and DDL
