@@ -211,3 +211,166 @@ Social welfare= Consumer's surplus + producer's surplus
 	2. Find the new quantity and draw a line down to the q-axis
 	3. Find the two intersection of the line and the two curves 
 	4. Find tax revenue CS PS and DDL
+
+-------------------
+### Market Failure
+
+* When markets are inefficient, there are
+missed opportunities.
+
+* Reasons for market failure
+	> Imperfect information (Asymmetric information)
+	> Icomplete property rights(Common property)
+	> Market Power (Monopoly)(long duan)
+	
+---------------
+### Economic of Pollution
+
+* Modeled as public goods or externalities
+
+> public goods: Market(Good for sell) defined as *environmental quality* , then source of market failure is a public good
+
+> externality: Market defined as *good generates environmental damage*, then the market failure is due to  a negative externality
+
+------------------------
+### Important Characteristic of Goods
+
+* excludable: if person can be prevented from using it(subjective)
+
+> Excludable: food, movies, Internet access
+> 
+> Not excludable: TV and radio broadcast, national defense, good weather
+
+* rival: A good is rival in consumption if one person’s
+use of it diminishes others’ use.
+
+> Rival: fish, drinking water, ice-cream
+> 
+> Not rival: Music MP3 file, fresh air, outdoor concert
+
+<table>
+<tr><th colspan="2" rowspan="2"></th><th colspan="2">Rival?</th></tr>
+<tr><td>Yes</td><td>No</td></tr>
+<tr><td rowspan="2">Excludable?</td><td>Yes</td><td>Pure private goods:<br/> Candy bars<br/>Hair cuts<br/>electricity<br/></td><td>Club good(Artificially scarce goods):<br/>country clubs<br/>Cable TV<br/></td></tr>
+<tr><td>No</td><td>Open-access Common
+Resources:<br/>
+
+Ocean fisheries<br/>
+
+Groundwater aquifers<br/>
+
+Public roads*</td><td>Pure public goods:<br/>
+
+Biodiversity<br/>
+
+Broadcast Radio<br/>
+
+National Defense</td></tr>
+</table>
+	
+----------------------------------
+### Market analysis for public good
+> Supply: MC
+> 
+> Demand: **Vertical summation**(at the same level of quantity add the price)
+
+-----------
+### Market Failure: Public goods
+
+* No one want to pay for the public goods(due to nonexcludability characteristics)
+
+* Result is that market demand is  	undefined(property)
+
+* nonrevelation of preferences arises due to free-ridership 
+
+----------------------
+### Externalities
+
+* Def: effect associated
+with production or consumption that extends
+to a third party outside the market
+
+> Negative externalities: generate cost to third party
+> 
+> Positive externalities: generate benefits to a third party
+>
+> MPC: cost for producer
+>
+> MPB: benefit for consumers
+> 
+> MSC: MPC + MEC(negative externalities)
+> 
+> MSB: MPB + MEB(positive externalities)
+> 
+> [picture](https://drive.google.com/drive/folders/1FtLAJACwXcf1uNRVGpRFNl23pEHPDvnC)
+>
+> MEC -> turn of the curve -> DDL + EC(external cost)
+>
+> If Q reduced to the efficient quantity -> Society gain = DDL in the prevent case
+> 
+> public good: for large scope<br/>Externality: for small scope 
+
+------------------------
+### Property rights
+
+* Underlying source of failure is absence of
+property rights.
+
+* Property Rights: Valid claims to a good or
+resource that permits sale and use
+
+* If property right exist in some form but are ill
+defined, the outcome will also be an inefficient
+one.
+
+--------------------
+### Market failure: common resources
+
+* Each person’s use reduces
+
+others’ ability to use
+
+* Role for government to ensure
+
+that they are not overused
+
+* Tragedy : The private incentives (using the land for free)
+outweigh the social incentives (using it carefully).
+
+-----------------------------
+### Coase Theorem(bargin)
+
+* Assume: 
+
+> Costless transactions
+
+> Costless coordination and organization of groups
+
+> Damages are observable and measurable
+
+* Three cases
+> Case 1: benefit for polluter to pollute < damage to third party -> third party pay polluter for not polluting
+> 
+> Case 2: benefit for polluter to pollute > damage to third party && no monitor -> no one pay, pollute stays
+> 
+> Case 3: benefit for polluter to pollute > damage to third party && monitor exist -> polluter pay for pollute
+> 
+> [picture](https://drive.google.com/drive/folders/1FtLAJACwXcf1uNRVGpRFNl23pEHPDvnC)
+
+* Analysis
+
+> In the graph: MEC = MSC -MPC >= third party willing to pay
+> 
+> MPI = MPB - MPC when MEC > MPT i.e. MSC > MPB bargin exist
+> 
+> Limitation: 
+
+	1. assumption is hard to achieve(transacation cost & coordination cost & hard to measure)
+
+	2. Fails when there are more than a few individuals are involved on each side of the market
+	
+	3. Irrational antagonism and stubbornness
+	
+------------------------
+# Lecture 04
+ 
