@@ -1,4 +1,11 @@
-# Lecture 2 
+# GE 1205
+ 
+## Green economics 
+* [Lec2](#2)
+* [Lec3](#3)
+* [Lec4](#4)
+* [Lec5](#5)
+<h1 id="2">Lecture 02</h1> 
 
 ## suply and demand
 
@@ -168,7 +175,7 @@
 * But, fair
 
 ------------------------------
-# Lecture 03
+<h1 id="3">Lecture 03</h1>
 
 ## Social Welfare and Market Failiure
 
@@ -327,15 +334,12 @@ one.
 ### Market failure: common resources
 
 * Each person’s use reduces
-
-others’ ability to use
+  others’ ability to use
 
 * Role for government to ensure
+  that they are not overused
 
-that they are not overused
-
-* Tragedy : The private incentives (using the land for free)
-outweigh the social incentives (using it carefully).
+* Tragedy : The private incentives (using the land for free) outweigh the social incentives (using it carefully).
 
 -----------------------------
 ### Coase Theorem(bargin)
@@ -372,5 +376,206 @@ outweigh the social incentives (using it carefully).
 	3. Irrational antagonism and stubbornness
 	
 ------------------------
-# Lecture 04
+<h1 id ="4">Lecture 04</h1>
+
+## Conventional Solutions to Environmental Problems: The Command-and-Control Approach
+
+### Policy solutions
+
+Two broad defined approaches:
+
+* The command and control approach (using **standards and rules** to control pollution)
+
+* The market approach (using incentive and market force to motivate or encourage abatement and conservaton 
+
+--------------------------
+### Standards
+
+> **Ambient(general) standards**: designates
+the quality of the environment to be achieved.
+>
+> **Technology-based standard**: a standard that
+designates the equipment or method to be
+used to achieve some abatement level (method define)
+>
+> **Performance-based standard**: a standard that
+specifies a pollution limit for residuals from a
+plant(focus on output) 
+
+----------------------------
+### Economic Implication of Standards
+
+Two key questions: <br/>
+1. Are standards set to achieve *allocatively efficiency*(i.e. MC = MB)?
+2. Given some environmental objective, is that objective being achieved in a manner that is *technically efficient*(cost effective lower the cost by using another strategy)	
+
+-------------------------------
+### Abatement
+
+* MSB for abatement: additional social gain as pollution abatement increase. MSB = sum(all the reductions in MEC across markets where pollution is reduced)
+
+> negative sloped: MSB is reduction of MEC, as MEC is increasing as Q increase. For start point reduce a unit of product reduce more MEC
+
+* MSC for abatement: increase with Abatement (A), hard to enforce
+
+* MAC= polluters' abatement cost (Equals forgone Mπ if the **least-cost** abatement method is to reduce output) (Not the area)
+* MCE= Goverment's cost of enforcement
+
+	MSC = MSC + MCE
+
+* allocatively efficient level of abatement: Ae occurs when MSB = MSC
+
+------------------------
+### Why Standards May Not Be Efficient
+
+* Political Constraints
+	* standards may be benefit based(benefit society consider the MCE)
+	* Regulator may captured by the industry
+	
+* Regional difference: Ae good for national level, but not for regional level
+	* (MSBx < MSB <MSBy) -> Aex< Ae <Aey 
+	
+* Imperfect information
+	* Inability to identify MSB or MSC
+
+	* MSB − Consumers’ problem of non-revelation of
+      preferences
+
+	* MSC − Difficulty in identifying each firm’s MAC,
+	  including non-monetary costs
+* Non-uniformity of pollutants
+
+----------------------------
+### Cost Effectiveness
+
+If allocatively efficient standards are unlikely, we use cost-effectiveness to evaluate how standards are
+implemented
+
+* identify the cheapest method(But **command-and-control decisions may violate this criterion**)
+
+* **Performance standard > Technology standard**(select the most cost efficient way)
+
+* Uniform performance-based standards are
+inefficient if abatement costs differ among
+polluting sources **(low-abatement-cost can do more)**
+
+> for n polluter uniform performance = Ast/n
+> 
+> But it may not equal to all polluters MAC
+> 
+> [picture](https://drive.google.com/drive/folders/1FtLAJACwXcf1uNRVGpRFNl23pEHPDvnC)
+> 
+> geverment don't know MAC of each polluter
+> 
+> Efficient result is possible using market-based approach
+
+<h1 id = "5">Lecture 05</h1>
+
+## Economic Solutions to Environment Problems: The Market Approach
+
+### Examples: 
+
+1. pollution charge
+2. subsides
+3. Deposit/refund systems
+4. Pollution permit trading systems
+
+---------------------
+### pollution charge
+
+* product charge & User charge
+	* **Pigouvian tax** is when tax equals the marginal external cost (MEC) at the efficient quantity, QE (in order to shift the quantity from Qc to Qe)
+	* Pros: can achieve an efficient outcome
+	* Cons:<br/> 1. in practice it is difficult to identify<br/>
+			2.  can only achieve abatement but cannot achieve better abatement technology
+			
+* Emission charge
+	* imposed directly on the discharge of pollution
+	* implemented through a tax.
+	* producer faced the choice
+	
+		1. case of a single polluter
+			Marginal tax (MT) = t
+			Total Tax Revenue = t*(Ast-A0)(A0 is actual pollute beyond Ast) when (A = A0) -> MAC = MT
+			[picture](https://canvas.cityu.edu.hk/courses/23036/files?preview=3297688)
+
+		2. case of multiple polluter
+			Achieve low-abatement-cost do more because of the tax (choose pay tax or abate)
+	
+		3. **Notice**: 
+			* Ast depends on the MSC and MSB curve of externality. MT is depends on MAC and Ast to achieve when MT = MAC, A0 = Ast
+			* tax for emission charge is also a pigovian tax ((MSC-MPC=MEC)=(MPB-MPC=MAC)=MT)
+	
+	*  pros: (2 static 1 dynamic)
+		*  Abatement standard is met at a least-cost method.
+		* Generates $40 in tax revenues from high-cost abater and $10 from low-cost abater
+		* Encourage firms to advance its abatement technology.
+		
+	* cons: 
+		* Environmental authority will not know what level of tax will achieve abatement goals
+		* Monitoring costs are potentially higher
+		* Firms might evade tax by illegally disposing pollutants
+		* Distributional implications(tax affect different firm differently)
+* Administrative charge
+
+------------------------
+### Abatement Subsidies
+
+* Abatement equipment Subsidies
+	* * **Pigouvian subsidy** is when subsidy equals the marginal external benefit (MEB) at the efficient quantity, QE (in order to shift the quantity from Qc to Qe)
+	* cons: <br/>
+		* Difficult to measure the MEB
+		* May bias polluters’ decisions about how best to abate
+		* Income distribution effect(tax provide money of subsidy)
+		
+* Per-unit subsidy on pollution reduction
+	s*(Zst-Z0)(Z is level of pollution)
+
+--------------------------
+### Refundable User Charge
+
+A deposit/refund system is a market-based instrument to reduce waste
+
+* Target: *potential* vs. actual polluter
+
+* the deposit is intended to capture the MEC of 
+**improper waste disposal (IW)** in advance
+
+* Preventive scheme
+
+* graph--similar to tax but the money will be back if you abatement
+
+* pros: 
+	* Promotes responsible behavior
+	* Requires minimal supervision by government
+	* Can help slow the use of virgin raw materials by improving availability of recycled materials
+	
+-----------------------------------------
+### Pollution Permit Trading Systems
+
+Establishes a **market for rights to pollute** by issuing **tradable** pollution credits(uniformed Ast/n but tradable) or allowances
+
+* two components
+	* fixed number of permits
+	* tradable
+	
+* **Bargaining** gives rise to a market for pollution rights
+
+* How it works?(remind the question MACx<MACy)
+
+	> Higher polluter buy permits from lower
+	> when MAcx = MACy stop
+	> the MAC at the end point is the trade price
+	
+* Pollution permits vs Pigovian tax
+	* Pogovian set the price of pollution 
+	* Permit set the quantity of pollution
+	* Assessing Pollution Permits: Trading establishes the price of a right to pollute **without government having to “search” for a price**
+	* Trading system is flexible (goverment simply change the standard)
+	* No tax revenues are generated
+
+
+
+
  
+
