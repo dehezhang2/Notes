@@ -151,7 +151,7 @@ number of edges on a node
 
 > **Degree sequence**: An ordered list of the degree of each node (from large to small)
 > e.g.
-	
+
 	in: [2,2,2,1,1,1,1,0]
 	distribution :[(2,3)(1,4)(0,1)]->3 nodes with degree 2, 4 nodes with degree 1, 1 node with degree 0
 	out: [2,2,2,1,1,1,1,0]
@@ -191,7 +191,7 @@ number of edges on a node
 	> 
 	> maximal clique: a clique cannot be extended by including one more adjacent vertex
 	
-2.	(1) n-cliques
+	.	(1) n-cliques
 	
 	* two actors in a subnet have a shortest path length at n (n does not have to be part of the subnet i.e. not have to be diameter)
 	
@@ -233,9 +233,9 @@ number of edges on a node
 		(min(dis(i,c1),dis(i,c2)....))
 		distance = sqrt (delta x^2+delta y^2…)(maybe other defination)
 
-	3.	refine the center by taking average of all members at that group 
+		.	refine the center by taking average of all members at that group 
 
-	4.	repeat the step 2 & 3 using the new centers until there’s *no change* in the membership (after shift of center there may be new center)
+		.	repeat the step 2 & 3 using the new centers until there’s *no change* in the membership (after shift of center there may be new center)
 	
 	5. problems: 
 	
@@ -261,9 +261,9 @@ number of edges on a node
 -------------------------------------
 ### Excel function
 	= IF(<condition>,yes_value,no_value)
-
+	
 	= IF(<condition>,yes_value,IF(<condition>,yes_value,no_value))
-
+	
 	= if(min(d1,d2,d3)==d1,”Group1”,if(min(d1,d2,d3)==d2,”Group2”,”Group3”))
 
 --------------------------------------
@@ -303,7 +303,6 @@ number of edges on a node
 ### De-convolute the Data
 
 ### Causality
- 
 
 ----------------------------
 
@@ -375,7 +374,7 @@ number of edges on a node
 
 	dist = sqrt(dx^2 + dy^2 + ....)
 
-* Manhattan Distance
+* Manhattan Distance ( MD<=ED )
 
 	dist = sum(abs(dx),abs(dy),....)
 
@@ -397,20 +396,25 @@ number of edges on a node
 ### Essential Techniques  for finding  similar  documents
 
 * Shingles(convert document)
-	> set: cannot be duplicated
-	> 
-	> bag: can be duplicated
+
+* K-gram: a sequence of k characters that appears in the doc
+
+  - E.g. doc = abcab, k = 2, then the set of all 2-gram is {ab,bc,ca}  
+
+  > set: cannot be duplicated
+  > 
+  > bag: can be duplicated
 
 * Minhashing/LSH(convert large sets to short signatures)
 
-	Document C1 = {e1, e3, e4, e5}
+  Document C1 = {e1, e3, e4, e5}
 
-	Document C2 = {e1, e4, e5}
-	
-	> use the table to calculate sim(a,b)=1 - (\# a and b)/(\# a or b)
-	> 
-	> use the signature(**radom** permutation and calculate **steps to reach "1"**) to calculate sim(siga,sigb)
-	
+  Document C2 = {e1, e4, e5}
+
+  > use the table to calculate sim(a,b)=1 - (\# a and b)/(\# a or b)
+  > 
+  > use the signature(**radom** permutation and calculate **steps to reach "1"**) to calculate sim(siga,sigb)
+
 * Locality Sensitive Hashing(focus on pairs of signatures likely to be **similar**)
 
 > Don't want to check all nC2(colum pairs)
@@ -420,11 +424,11 @@ number of edges on a node
  * Use minhash signatures+hashing t oarrange similar document into buckets. We can compare documents in the same bucket
 	
  * Use locality sensitive hasing
- 	
+		
 		> turn a line through origin to meet the point(recording you operation by clockwise or not (0,1))
 		> compare the operation (use hamming distance)
-			
+	
 			011100
 			011101	
-
+	
 		> distance = 1		
