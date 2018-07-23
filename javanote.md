@@ -34,21 +34,21 @@
 
 * import 
 
-character | meaning
-. | characters besides enter
-[] | type of characters
-[^]|inverse of []
-^ | start position
-$ | end position
-\b | words' boader
-\B | not words' boader
-() | group(cluster by the expression)
-\| | or
-\\ | 转义
-\* | 0 or more times
-\+ | 1 or more
-? | 0 or 1
-n | repeat
+| character | meaning |
+| . | characters besides enter|
+| [] | type of characters |
+| [^] | inverse of [] |
+| ^ | start position |
+| $ | end position |
+| \b | words' boader |
+| \B | not words' boader |
+| () | group(cluster by the expression) |
+| \| | or |
+| \\ | 转义 |
+| \* | 0 or more times |
+| \+ | 1 or more |
+| ? | 0 or 1 |
+| n | repeat |
 
 
 * tool: QRe
