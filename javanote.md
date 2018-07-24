@@ -103,6 +103,155 @@ get by the macher() method in Pattern object
 
 		> when replacing $0 is the whole cluster, $1 $2...means small () in ()
 
+### Crawler
+
+* Stream
+* Regular expression
+* Collection
+* Thread
+
+<h2 id = "10">week 10</h2>
+
+## GUI(Graphical user interface)
+
+> AWT (java.awt)
+
+	* Frame Button Label TextField TextArea Panel
+
+> Swing (javax.swing)
+
+	* JFrame JButton JLabel J...
+	
+### Component
+
+* not Container
+	
+	* Button label  textcomponent
+
+* Container(contain other components)
+
+	> * Window 
+		* Frame
+		* Dialog(对话框)
+		
+	> * Panel ScrollPane (面板)
+
+	* Component.add(sub_Componet)
+
+### Implement
+	
+	
+* Component	
+	
+* Layout
+	
+* Event
+
+* Eclipse
+		
+	New-Other-Windows Builder-Swing Designer-JFrame
+
+* setDefaultCloseOperation(EXIT_ON_CLOSE); 
+
+* for JFrame JDialog JApplet to add component: 
+	
+	* getContentPane().add();// or add()
+	
+	* getContentOane().setLayout();// or setLayout()
+	
+* Button(object).addActionListener();
+
+### Layout
+
+* Flowlayout(left right)
+
+* Borderlayout(north south west east center) ```frame.add(bt,north);```
+
+* gridlayout //4*5 table
+
+	frame.setLayout(new GridLayout(4,5));
+
+	frame.add(button);
+
+* Default
+
+	* J...: BoarderLayout
+	* Panel: FlowLayout
+
+* absolute
+
+	bt.setLocation(100,20);
+
+	bt.setSize(80,20);
+
+	frame.setLayout(null);
+	
+	frame.add(bt);	
+
+### Event Handler
+
+* ActionListener interface
+
+
+	class MyListener implements ActionListener{
+
+		@ Override
+
+		public void actionPerformed(ActionEvent e){
+			System.out.println("a button has been pressed");			
+		}
+	}
+
+
+* related method
+
+	// In MouseMotionListener
+	
+	void mouseDragged(MouseEvent e);
+	
+	void mouseMoved(MouseEvent e);
+	
+	//MouseEvent
+
+	getX(); getY();	//position of mouse
+
+	//KeyEvent
+	
+	getKeyChar();
+
+	//for all
+
+	getSourse() //get which button(or component) is operated
+
+* extends Adapter(easier) // don't have to overide all the abstract methods
+
+* implement 
+
+	* a new class to implements ActionListener(extends ActionAdaper)
+
+	* 匿名类
+	
+	b.addActionListener( new ActionListner(){
+
+		@ Override
+			
+		public void actionPerformed(ActionEvent e){
+			
+			((JButton)e.getSource()).setText(""+new java.util.Date());
+
+		}
+			 
+	});
+	
+	* Lamda
+	
+	b. addActionListener(e->{((JButton)e.getSource()).setText(""+new java.util.Date());});
+
+
+	
+
+
+
 
 
 

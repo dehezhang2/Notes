@@ -94,6 +94,42 @@
 
 ### Selection
 
+* Goal: Given an array of N items, find the k-th largest
+
+* Use theory as a guide:
+
+	* Upper bound: NlogN
+	* Upper bound for k = 1 ,2 ,3.:N How?
+	> go through the array
+	
+	* Lower bound : N Why?
+
+* Quick selection 
+	> Partition array until j == the k order you want (again shuffle before the partition)
+
+* proposition: Linear time on average
+
 ### Duplicate Keys
+
+* large array but small # of key values
+
+* Mergesort : Always between 1/2*NlgN and NlgN compares
+
+* QuickSort: quadratic times unless patition stops at equal keys
+
+	* recommend: stops scans on items equal to the partitioning item
+	
+* 3-way partitioning
+	* Entries between lt and gt: equal
+
+	v=a[lo];lt=lo;gt=hi;i=lo+1;
+	
+	(a[i]<v) swap(a[lt++],a[i++]]);
+	
+	(a[i]>v) swap(a[gt--],a[i]]);
+
+	(a[i]==v) i++;
+	
+	util i>= gt
 
 ### System sort
