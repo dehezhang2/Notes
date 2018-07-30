@@ -130,6 +130,40 @@
 
 	(a[i]==v) i++;
 	
-	util i>= gt
+	until i>= gt
 
 ### System sort
+
+* java system sorts: Array.sort();
+
+	* different methods for each primitive type
+	
+	* a method for data types that implements Comparable
+	
+	* a method uses COmparator
+	
+	* Uses tuned quicksort fpr primitive types, tuned mergesort for objects(stable, space is not that important)
+	
+	* import java.util.arrays
+	
+* Tukey's ninther
+
+	> small arrays: middle entry
+	>
+	> medium arrays: median of 3(3 ways partitioning)
+	> 
+	> large arrays: Tukey's ninther
+	
+	* pick 9 items out of the array
+	
+	* take the median of the mediums as a ninther
+
+	9 samples: RAM GXK BJE
+	
+
+	medians: MKE
+
+	ninther: K
+
+
+	
