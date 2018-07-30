@@ -165,5 +165,19 @@
 
 	ninther: K
 
+* Interview questions: 
+	
+* Decimal dominants. Given an array with nn keys, design an algorithm to find all values that occur more than n/10n/10 times. The expected running time of your algorithm should be linear.
+
+	Hint: determine the (n/10)th largest key using quickselect and check if it occurs more than n/10 times.
+
+	Alternate solution hint: use 9 counters.
+
+* Selection in sorted array: 2 arrays a[] b[], size n1, n2 find kth largest key. log(n1+n2) algorithm
+
+	Approach A: Compute the median in a[] and the median in b[]. Recur in a subproblem of roughly half the size.
+
+	Approach B: Design a constant-time algorithm to determine whether a[i] is the kth largest key. Use this subroutine and binary search.
+
 
 	
