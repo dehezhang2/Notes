@@ -63,16 +63,18 @@
 	* repeat 1-3 until j < i
 
 
-	for(int i = left + 1, j = right; i < = j; ){
-	
-		if(arr[i] <= arr[left])
-			i++	;	
-		if(arr[j] > arr[left])
-			j-- ;
-		if(arr[i] > arr[left]&&arr[j]<=arr[left]){
-			swap(arr[i],arr[j]);
-		}
+```java
+for(int i = left + 1, j = right; i < = j; ){
+
+	if(arr[i] <= arr[left])
+		i++	;	
+	if(arr[j] > arr[left])
+		j-- ;
+	if(arr[i] > arr[left]&&arr[j]<=arr[left]){
+		swap(arr[i],arr[j]);
 	}
+}
+```
 
 * Notice
 
@@ -130,7 +132,7 @@
 * 3-way partitioning
   * Entries between lt and gt: equal
 
-  ```
+  ```java
   v=a[lo];lt=lo;gt=hi;i=lo+1;
   
   (a[i]<v) swap(a[lt++],a[i++]]);
@@ -343,7 +345,7 @@
       while(2*k<=N){
           int j = 2*k;
           // find max child
-          if(j<N && less(j,j+1)) j++;
+          if(j<N && less(j,j+1)) j++;	//here are N entries, start from 1 so N is the last 
           if(!less(k,j)) break;
           swap(k.j);
           //check next
@@ -353,21 +355,279 @@
   public Key delMax(){
       Key max = pq[1];
       swap(1,N--);
-      sink(1);
       pq[N+1] = null;
+      sink(1);
       return max;
+  }
+  ```
+
+  ```java
+  public class MaxPQ<Key extends Comparable<Key>>{
+      private Key[] pq;
+      private int N;
+      public MaxPQ(int capacity){
+          pq = (Key[]) new Comparable[capacity+1];
+      }
+      public boolean isEmpty(){return N==0;}
+      public void insert(Key key);
+      public Key delMax();
+      public void swim(int k);
+      public void sink(int k);
+       public boolean less(int x,int y){
+          return pq[x].toCompare(pq[y])<0;
+      }
+      public void swap(int x,int y){
+          Key temp = pq[x];
+          pq[x] = pq[y];
+          pq[y] = temp;
+      }
   }
   ```
 
   
 
+* Immutability of keys
 
+  * Assumption: client doesn't change keys while they're on the PQ
+
+  * Best practice: use immutable keys
+
+  * Data type: set of values and operations on those values
+
+  * Immutable data type: Cannot change the data type value once created (String Integer Double Color Vector...)
+
+    
+
+  * ```java
+    public final class Vector{
+        private final int N;
+        private final double[] data;
+        public Vector(double[] data){
+            this.N = data.length;
+            this.data = new double[N];
+            for(int i=0;i<N;i++)
+                this.data[i]=data[i];
+        }
+    }
+    ```
+
+    
+
+* Underflow and overflow(exception)
+
+  * throw exception if deleting from emty
+  * add no-arg constructor and use resizing array
+
+* Minimum-oriented priority queue
+
+  * Replace less() with greater()
+  * Implement greater()
+
+* Other operations
+
+  * Remove an arbitrary item
+  * change the priority of an item //sink() and swim()
 
 ------------------
 
 ### Heapsort
 
+* Basic plan for in-place sort
+  * Create max-heap with all N-keys
+  * Repeatedly remove the maximum key
+* Heap construction
+  * Build max heap using bottom-up method (check all the 3-nodes heap from bottom)
+* remoce maximum
+  * swap(1, N--) then the largest one to the tail of the heap (array)
+
+```java
+public static void sort(Comparable[] pq){
+ 	int N = pq.length;
+	//from the second last layer to sink make the heap in order
+	for(int k = N/2; k >= 1; k--)
+    	sink(arr,k,N);
+	// remove the maximum, one at a time
+	while(N>1){
+    	swap(arr,1,N--);
+    	sink(arr,1,N);
+	}
+}
+// N*logN(<=2N compares and exchanges in heap construction,<= 2NlogN comparaes and exchanges for heapsort) In-place sorting with NlogN worst case
+```
+
+* bottom line (heapsort is not often used)
+  * Inner loop longer than quicksort's
+  * Makes poor use of cache memory(高速缓存)
+  * not stable
+
+-----
+
 ### Event-Driven Simulation
+
+* Goal: simulate the motion of N moving particles that behave according to the laws of elastic collision
+
+* Hard disc model
+
+  * moving particles via elastic collisions with each other and walls
+  * each particle is a disc(圆盘) with known position, velocity, mass and radius
+  * No other forces
+
+  ```java
+  public class BouncingBalls{
+      public static void main(String[] args){
+  		int N = Interger.parceInt(arg[0]);
+          Ball[] balls = new Ball[N];
+          for(int i=0;i<N;i++)
+              balls[i]=new Ball();
+          while(true){
+              StdDraw.clear();
+              for(int i=0;i<N;i++){
+                  balls[i].move(0.5);
+                  balls[i].draw();
+              }
+              StdDraw.show(50);
+          }
+      }
+  }
+  public class Ball{
+      private double rx,ry;
+      private double vx,vy;
+      private final double radius;
+      public Ball(){/*initialize position and velocity*/}
+      public void move(double dt){
+          //check collision with walls
+          if((rx+vx*dt<radius)||(rx+vx*dt>1.0-radius)){vx=-vx;}
+          if((ry+vy*dt<radius)||(ry+vy*dt>1.0-radius)){vy=-vy;}
+          rx+=(vx*dt);
+          ry+=(vy*dt);  
+      }
+      public void draw(){
+          StdDraw.filledCircle(rx,ry,radius);
+      }
+  }
+  ```
+
+  
+
+* Missing : collision between each other
+
+* Time-driven simulation
+
+  * Discretize time in quanta of size ***dt***
+  * Update the position of each particle after every ***dt*** units of time and check overlap
+  * If overlap, roll back the clock to the time of the collision, update the velocities of the colliding particles, and continue the simulation
+  * Drawbacks: quadratic slow 
+
+* Even-driven (Change state only when something happened)
+
+  * Between collisions, particles move in straight-line trajectories(弹道)
+  *  Focus only on times when collisions occur
+  * Maintain PQ of collision events, prioritized by time
+  * Remove the min = get next collision
+
+  > Prediction: at time ***t*** use position velocity and radius 
+  >
+  > Resolution: at time ***t + dt*** change the veocity 
+
+  ```java
+  public class Particle{
+      private double rx,ry;
+      private double vx,vy;
+      private final double radius;
+      private final double mass;
+      private int count;
+      public Particle(...){}
+      public void move(double dt){}
+      public void draw(){}
+      //predict collision with particle or wall
+     	public double timeToHit(Particle that){}
+      public double timeToHitVerticalWall(){}
+      public double timeToHitHorizontalWall(){}
+      //resolve collision with particle or wall
+     	public void bounceOff(Particle that){}
+     	public void bounceOffVerticalWall(){}
+      public void bounceOffHorizontalWall(){}
+  }
+  ```
+
+  * Initialization
+
+    * Fill PQ with all potential particle-wall collisions
+    * Fill PQ with all potential particle-particle collisions
+
+  * Main loop
+
+    * delete the impending(即将到来的) event from PQ
+    * If the event has been invalidated, ignore it
+    * Advance all particles to time t, on a straight-line trajectory
+    * Update the velocities of the colliding particles
+    * Predict future particle-wall and particle-particle collisions involving the colliding particles and insert events onto PQ
+
+    ```java
+    private class Event implements Comparable<Event>{
+        private double time;
+        private Particle a,b;
+        private int countA,countB;
+        public Event(double t,Particle a,Particle b){}
+        public int comparaTo(Event that){
+            return this.time-that.time;
+        }
+        public boolean isValid(){}
+    }
+    public class CollisionSystem{
+        private MinPQ<Event> pq;
+        private double t = 0.0;
+        private Particle[] particles;
+        public CollisionSystem(Particle[] particles){}
+        private void predict(Particle a){
+            if(a == null) return;
+            for(int i=0;i<N;i++){
+    			double dt = a.timeToHit(particles[i]);
+                pq.insert(new Event(t+dt,a,particles[i]));
+            }
+            pq.insert(new Event(t+a.timeToHitVerticalWall()),a,null);
+            pq.insert(new Event(t+a.timeToHitHorizontalWall()),null,a);
+        }
+        private void redraw(){}
+        public void simulate(){
+            pq = new MinPQ<Event>();
+            for(int i=0;i<N;i++)predict(particles[i]);
+            pq.insert(new Event(0,null,null));
+            while(!pq.isEmpty()){
+                Event event = pq.delMin();
+                if(!event.isValid())continue;
+                Particle a = event.a;
+                Particle b = event.b;
+                for(int i=0;i<N;i++)
+                    particles[i].move(event.time-t)
+                t=event.time;
+                if(a!=null&&b!=null)a.bounceOff(b);
+                else if(a!=null&&b==null)a.bounceOffVerticalWall();
+                else if(a==null&&b!=null)a.bounceOffHorizontalalWall();
+                else if(a==null&&b==null)redraw();
+                //predict new event
+                predict(a);
+                predict(b);
+            }
+        }
+    }
+    ```
+
+    
+
+
+
+
+
+-------------------
+
+### Interview questions
+
+* Dynamic median(insert and remove in logarithmic, find the median in constant )
+  * two heap one is max-oriented another is min-oriented
+* Taxocab numbers: find all numbers can be represneted in two forms of cubic: a^3+b^3=c^3+d^3=n
+  * form the sums a^3+b^3 and sort
+  * use a min-oriented priority queue with n items
 
 ### 8 Puzzle
 
