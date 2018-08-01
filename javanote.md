@@ -29,7 +29,7 @@
 ### Regular expression(匹配验证，分割，查找，替换 字符串)
 
 	字符{数量}位置
-
+	
 	[0-9]{2,4}\b	//0 to 9 character exists 2 to 4 times at board
 
 * import 
@@ -96,11 +96,11 @@
 get by the macher() method in Pattern object
 
 	* method: find() //find next | appendReplacement() //replace 
-
+	
 	* group: () in the regular expression
-
+	
 		> group() or group(0) represent the whole cluster, group(1) group(2)... means every small () in ()
-
+	
 		> when replacing $0 is the whole cluster, $1 $2...means small () in ()
 
 ### Crawler
@@ -121,7 +121,7 @@ get by the macher() method in Pattern object
 > Swing (javax.swing)
 
 	* JFrame JButton JLabel J...
-	
+
 ### Component
 
 * not Container
@@ -133,14 +133,14 @@ get by the macher() method in Pattern object
 	> * Window 
 		* Frame
 		* Dialog(对话框)
-		
+	
 	> * Panel ScrollPane (面板)
 
 	* Component.add(sub_Componet)
 
 ### Implement
-	
-	
+
+
 * Component	
 	
 * Layout
@@ -194,9 +194,9 @@ get by the macher() method in Pattern object
 
 
 	class MyListener implements ActionListener{
-
+	
 		@ Override
-
+	
 		public void actionPerformed(ActionEvent e){
 			System.out.println("a button has been pressed");			
 		}
@@ -205,50 +205,61 @@ get by the macher() method in Pattern object
 
 * related method
 
-	// In MouseMotionListener
-	
-	void mouseDragged(MouseEvent e);
-	
-	void mouseMoved(MouseEvent e);
-	
-	//MouseEvent
+  // In MouseMotionListener
 
-	getX(); getY();	//position of mouse
+  void mouseDragged(MouseEvent e);
 
-	//KeyEvent
-	
-	getKeyChar();
+  void mouseMoved(MouseEvent e);
 
-	//for all
+  //MouseEvent
 
-	getSourse() //get which button(or component) is operated
+  getX(); getY();	//position of mouse
+
+  //KeyEvent
+
+  getKeyChar();
+
+  //for all
+
+  getSourse() //get which button(or component) is operated
 
 * extends Adapter(easier) // don't have to overide all the abstract methods
 
 * implement 
 
-	* a new class to implements ActionListener(extends ActionAdaper)
+  * a new class to implements ActionListener(extends ActionAdaper)
 
-	* 匿名类
-	
-	b.addActionListener( new ActionListner(){
+  * 匿名类
 
-		@ Override
-			
-		public void actionPerformed(ActionEvent e){
-			
-			((JButton)e.getSource()).setText(""+new java.util.Date());
+  
 
-		}
-			 
-	});
-	
-	* Lamda
-	
-	b. addActionListener(e->{((JButton)e.getSource()).setText(""+new java.util.Date());});
+  ```java
+  b.addActionListener( new ActionListner(){
+  	@ Override
+  	public void actionPerformed(ActionEvent e){
+  		((JButton)e.getSource()).setText(""+new java.util.Date());
+  	}
+  });
+  ```
+
+  
+
+  * Lamda
+
+  
+
+  ```java
+  b. addActionListener(e->{((JButton)e.getSource()).setText(""+new java.util.Date());});
+  ```
+
+  
+
+### BlockMoveGame
 
 
-	
+
+
+​	
 
 
 
