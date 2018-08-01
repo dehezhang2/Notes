@@ -53,10 +53,10 @@
     * x -> h -> y
 
     * $$
-      h_{ /theta}(x) = {/theta}_0+{/theta}_1x
+      h_{ \theta}(x) = {\theta}_0+{\theta}_1x
       $$
 
-      
+    * $ \theta $ is parameter and the function represent a line
 
 
 
