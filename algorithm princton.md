@@ -6,7 +6,7 @@
 
 [week4](#4)
 
-
+[week5](#5)
 
 <h2 id = "3">Week 3 </h2>
 
@@ -206,7 +206,7 @@ for(int i = left + 1, j = right; i < = j; ){
 
 <h2 id = "4">Week 4</h2>
 
-### Priority Queues
+### 1. Priority Queues
 
 ------
 
@@ -630,4 +630,401 @@ public static void sort(Comparable[] pq){
   * use a min-oriented priority queue with n items
 
 ### 8 Puzzle
+
+-----------
+
+### 2. Elementary symbol tables
+
+---------
+
+### Symbol tables API
+
+(1) Key - value pair abstraction
+
+* Insert a value with specified key
+* Given a key, search for the corresponding value.
+
+```java
+public ckass ST<Key,Value>{
+    ST();	//create a symbol table
+    void put(Key key, Value val);	//put key-value pair into the table like arr[key] = value
+    Value get(Key key);	//like int val = arr[key]
+    void delete(Key key){
+        put(key,null);
+        size--;
+    }
+    boolean contains(Key key){
+        return get(key)!=null;
+    }
+    boolean isEmpty();
+    int size();
+    Iterable<Key> keys();
+}
+```
+
+
+
+(2) Conventions
+
+* Values are not ```null``` 
+* Method ```get()``` returns ```null``` if key not present
+* Method ```put()``` overwrites old value with new value
+
+(3) Keys and Values
+
+* Values: Any generic type
+* Keys: 
+  * Assume keys are ```Comparable``` , use ```compareTo()```. 
+    * more efficient implements by using the ordering of the keys to find ways around the data structure
+    * support broader symbol table operations
+  * Assume keys are any generic type, use ```eauals()``` to test equality
+  * Assume keys are any generic type, use ```eauals()``` to test equality, use ```hashCode()``` to test scarmble(争夺) key.
+
+* Best practices : immutable types for symbol table keys(String Integer Double java.io.File)
+
+  
+
+  (4) Equality test
+
+  * Reflexive: x.equals(x) is true
+  * Symmetric: x.equals(y) iff y.equals(x)
+  * Transitive: if x.equals(y) and y.equals(z), then x.equals(z)
+  * Non-null: x.equals(null) is false
+
+  ```java
+  public class Date implements Comparable<Date>{
+  	private final int month;
+      private final int day;
+      private final int year;
+      public boolean equals(Object y){
+          if(y==this) return true;	//if the reference is the same
+          if(y==null) return false;	//if y is null
+          if(y.getClass()!=this.getClass())	//same class?
+              return false;
+          Date that = (Date) y;
+          return (this.day==that.day)&&(this.month==that.month)&&(this.year==that.year);
+      }
+  }
+  ```
+
+(5) "Standard" recipe for user-defined types
+
+* Optimization for reference equality (use ```getClass()```)
+
+* Check against null
+
+* Check two objects are of the same type and cast
+
+* Compare each significant field
+
+  > if field is a primitive type use ==
+  >
+  > If field is an object, use equals()
+  >
+  > if field is an array, apply to each entry use ```Arrays.equals(a,b)``` or ```Array.deepEquals(a,b)``` 
+
+* Best practices
+
+  * No need to use calculated fields(dependent fields)
+  * Compare fields most likely to differ first
+  * Make ```compareTo()``` consistent with ```equals()``` (use first one if it is a Comparable type)
+
+  ```java
+  // example of find most frequent word using Symbol table
+  public class FrequencyCounter{
+      public static void main(String[] args){
+          int minlen = Integer.parseInt(args[0]);
+          ST<String, Integer> st = new ST<String,Integer>();
+          while(!StdIn.isEmpty()){
+              String word = StdIn.readString();
+              if(word.length()<minlen)continue;
+              if(!st.contains(word))st.put(word,1);
+              else st.put(word,st.get(word)+1);
+          }
+          String max="";
+          st.put(max,0);
+          for(String word:st.keys())
+              if(st.get(word)>st.get(max))
+                  max=word;
+          StdOut.println(max+" "+st.get(max));
+      }
+  }
+  ```
+
+------------------
+
+### Elementary Implementations
+
+* Linked list
+
+  * Data structure: linked list with key-value pairs
+  * Search: Scan through all keys until find a match
+  * Insert: Scan through all keys until find a match; if no add to front
+  * for keys only have interface ```equals()```
+  * Linearly time
+
+* Binary Search
+
+  * ordered array
+  * for keys have interface ```compareTo()```;
+  * Log search and linear insert
+
+  ```java
+  private Key[] keys;
+  private Value[] vals;
+  private int N;
+  public Value get(Key key){
+      if(isEmpty())return null;
+      int i = rank(key);
+      if(i<N && keys[i].compareTo(key)==0) return vals[i];
+      else return null;
+  }
+  private int rank(Key key){
+      int left = 0, right = N - 1; 
+      while(left<=right){
+          int mid = (left+right)/2;
+          int cmp = key.compareTo(keys[mid]);
+          if(cmp<0) right=mid-1;
+          else if(cmp>0) left = mid + 1;
+          else return mid;
+      }
+      return left;
+  }
+  public void insert(Key key,Value value){
+      if(isEmpty) {
+          keys[N++]=key;
+          vals[N++]=value;
+      }
+      else if(get(key)==null){
+      	int i = rank(key);
+          for(int j = N-1;j>=i;j--){
+              vals[j+1]=vals[j];
+              keys[j+1]=keys[j];
+          }
+          vals[i]=value;
+          keys[i]=key;
+      }
+      else{
+          int i = rank(key);
+          vals[i]=value;
+      }
+  }
+  ```
+
+  --------------
+
+  ### Ordered symbol table 
+
+  API
+
+  ```java
+  public class ST<Key extends Comparable<Key>,Value>{
+      ST
+      //...
+      Key min();
+      Key max();
+      Key floor(Key key);
+      Key ceiling(Key key);
+      
+  }
+  ```
+
+  -----------
+
+  ### Binary Search Trees
+
+  (1) Defination
+
+  * Binary Heap: implicit representation of trees with an array
+
+  * Binary search tree: explicit binary search tree in symmetric order
+
+  * ***Symmetric*** order: each node has a key, and every node's key is:
+
+    * **Larger** than all keys in its left subtree
+    * **Smaller** than all keys in its right subtree
+
+  * Java: A BST is a reference to a root Node
+
+  * A Node is comprised of four fields:
+
+    * A Key and a Value
+    * A reference to the left and right subtree
+
+    ```java
+    public class BST<Key extends Comparable<key>,Value>{
+        private Node root;	//root of BST
+    	private class Node{
+        	private Key key;
+        	private Value val;
+        	private Node left,right;
+        	public Node(Key key,Value val) {
+            	this.key = key;
+            	this.val=val;
+        	}
+    	}
+        
+        /*public void put(Key key,Value val){
+    		Node x = root;
+            while(x!=null){
+                int cmp = key.compareTo(x.key);
+                if(cmp<0) x = x.left;
+                else if(cmp>0) x = x.right;
+                else x.val = val;
+            }
+            if(x==null) x = new Node(key,val);
+        }*/
+        
+        //recursive implementation
+        public void put(Key key,Value val){
+            root = put(root,key,val);
+        }
+        private Node put(Node x,Key key,Value val){
+            if(x==null) return new Node(key,val);//for the new node
+            int cmp = key.compareTo(x.key);
+            if(cmp<0)
+                x.left = put(x.left,key,val);
+            else if(cmp>0)
+                x.right = put(x.right,key,val);
+            else
+                x.val = val;
+            return x;	//every time return the processed same node
+        }
+        
+        public Value get(Key key){
+           	Node x = root;
+            while(x!=null){
+                int cmp = key.compareTo(x.key);
+                if(cmp<0) x = x.left;
+                else if(cmp>0) x = x.right;
+                else return x.val;
+            }
+            return null;
+        }
+        
+        public void delete(Key key){
+    		
+        }
+        
+        public Iterable<Key> iterator(){
+            
+        }
+    }
+    
+    ```
+
+  (2) mathematical analysis
+
+  * Proposition: If N distinct keys are inserted into a BST in random order, the expected number of compares for a search/insert is ~2 $ln N$
+  * Pf: 1-1 correspondence with quicksort partitioning
+  * But for ordered key the time would be linear
+
+  (3) other methods
+
+  * Min: ```while(x!=null) x=x.left;```
+
+  * Max: ```while(x!=null) x=x.right;```
+
+  * Floor: largest key <= given key
+
+    * Case1: [key equals the key at root] -> the floor of $k$ is $k$
+    * Case2: [key is less than the key at root] -> The floor of k is in the left subtree
+    * Case3: [key is larger than the key at root] -> The floor of k is in the right otherwise the root
+
+    ```java
+    public Key floor(Key key){
+        Node x = floor(root,key);
+        if(x==null) return null;
+        return x.key;
+    }
+    private Node floor(Node x,Key key){
+        if(x==null) return null;
+        int cmp = key.compareTo(x.key);
+        if(cmp==0) return x;
+        if(cmp<0) return floor(x.left,key);
+        // right otherwise the root
+      	Node t = floor(x.right, key);
+        if(t!=null) return t;
+        else 		return x;
+    }
+    ```
+
+    
+
+  * Ceiling:  smallest key >= given key
+
+  * ```rank()```, ```select()``` what is the rank of a given key, what is the key of the given rank
+
+  * ```size()``` return the count at the root
+
+  * ```java
+    private class Node{
+        private Key key;
+        private Value val;
+        private Node left,right;
+        private int count;
+        public Node(Key key,Value val,int cnt) {
+            this.key = key;
+            this.val=val;
+            count = cnt;
+        }
+        public int size(){
+            return size(root);
+        }
+        private int size(Node x){
+            if(x==null) return 0;
+            return x.count;
+        }
+    }
+    public void put(Key key,Value val){
+    	root = put(root,key,val);
+    }
+    private Node put(Node x,Key key,Value val){
+    	if(x==null) return new Node(key,val,1);//for the new node
+        int cmp = key.compareTo(x.key);
+        if(cmp<0)
+           x.left = put(x.left,key,val);
+        else if(cmp>0)
+           x.right = put(x.right,key,val);
+        else
+           x.val = val;
+        x.count = 1 + size(x.left) + size(x.right);	//1 is the node itself
+        return x;	//every time return the processed same node
+    }
+    public int rank(Key key){
+        return rank(key,root);
+    }
+    private int rank(Key key,Node x){
+        if(x==null) return 0;
+        int cmp = key.compareTo(x.key);
+        if(cmp<0) return rank(key,x.left);
+        //the current node and left nodes all less than the key
+        else if(cmp>0) return 1 + size(x.left) + rank(key,x.right);	
+        else return size(x.left);
+    }
+    ```
+
+    
+
+  * Inorder traversal
+
+    * Traverse left subtree
+    * Enqueue key
+    * Traverse right subtree
+
+    ```java
+    public Iterable<Key> keys(){
+        Queue<Key> q = new Queue<Key>();
+        inorder(root,q);
+        return q;
+    }
+    private void inorder(Node x, Queue<Key> q){
+        if(x==null) return;
+        inorder(x.left,q);
+        q.enqueue(x.key);
+        inorder(x.right,q);
+    }
+    ```
+
+    
 

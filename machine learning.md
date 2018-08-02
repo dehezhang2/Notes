@@ -1,3 +1,9 @@
+
+
+
+
+
+
 # Machine Learning
 
 ---------------
@@ -84,6 +90,8 @@
 
 ### Parameter Learning
 
+----------
+
 #### 1. Algorithm to calculate $ J_{min} $ : Gradient descent(梯度下降)
 
 * Outline
@@ -113,8 +121,139 @@
   theta1 = temp1;
   ```
 
+------------
+
 #### 2. Gradient Descent Intuition
 
 * first suppose $ \theta_0 = 0 $
+
   * Use $  \alpha {\delta\over\delta\theta_j }J(\theta_0 , \theta_1)  $ if delta \<(\>) 0 then go right(left) , when =0 stop
   * $\alpha$: small->slow large->fail to converge
+
+* Used in Linear Regression
+  $$
+  {\delta\over\delta\theta_j }J(\theta_0 , \theta_1) = {\delta\over\delta\theta_j }{{1\over{2m}}\sum_{i=1}^m(h_\theta(x^i)-y^i)^2 } = {\delta\over\delta\theta_j }{{1\over{2m}}\sum_{i=1}^m(\theta_0+\theta_1x^i-y^i)^2 }
+  $$
+
+  $$
+  j=0:{\delta\over\delta\theta_0 }J(\theta_0 , \theta_1)={{1\over{m}}\sum_{i=1}^m(h_\theta(x^i)-y^i)^2 }
+  $$
+
+  $$
+  j=1:{\delta\over\delta\theta_1 }J(\theta_0 , \theta_1)={{1\over{m}}\sum_{i=1}^m(h_\theta(x^i)-y^i)^2 }*x^i
+  $$
+
+  * J is Convex function 
+
+* "Batch" Gradient Descent: Batch is each step of gradient descent uses **all** the training examples
+
+-------------
+
+#### 3. Linear Algebra
+
+* Matrix in Matlab/Octave 
+
+  ```matlab
+  % The ; denotes we are going back to a new row.
+  A = [1, 2, 3; 4, 5, 6; 7, 8, 9; 10, 11, 12]
+  
+  % Initialize a vector 
+  v = [1;2;3] 
+  
+  % Get the dimension of the matrix A where m = rows and n = columns
+  [m,n] = size(A)
+  
+  % You could also store it this way
+  dim_A = size(A)
+  
+  % Get the dimension of the vector v 
+  dim_v = size(v)
+  
+  % Now let's index into the 2nd row 3rd column of matrix A
+  A_23 = A(2,3)
+  % Initialize matrix A and B 
+  A = [1, 2, 4; 5, 3, 2]
+  B = [1, 3, 4; 1, 1, 1]
+  
+  % Initialize constant s 
+  s = 2
+  
+  % See how element-wise addition works
+  add_AB = A + B 
+  
+  % See how element-wise subtraction works
+  sub_AB = A - B
+  
+  % See how scalar multiplication works
+  mult_As = A * s
+  
+  % Divide A by s
+  div_As = A / s
+  
+  % What happens if we have a Matrix + scalar?
+  add_As = A + s
+  
+  % The ; denotes we are going back to a new row.
+  A = [1, 2, 3; 4, 5, 6; 7, 8, 9; 10, 11, 12]
+  
+  % Initialize a vector 
+  v = [1;2;3] 
+  
+  % Get the dimension of the matrix A where m = rows and n = columns
+  [m,n] = size(A)
+  
+  % You could also store it this way
+  dim_A = size(A)
+  
+  % Get the dimension of the vector v 
+  dim_v = size(v)
+  
+  % Now let's index into the 2nd row 3rd column of matrix A
+  A_23 = A(2,3)
+  
+  B=A*v
+  % Initialize a 3 by 2 matrix 
+  A = [1, 2; 3, 4;5, 6]
+  
+  % Initialize a 2 by 1 matrix 
+  B = [1; 2] 
+  
+  % We expect a resulting matrix of (3 by 2)*(2 by 1) = (3 by 1) 
+  mult_AB = A*B
+  
+  % Make sure you understand why we got that result
+  
+  % Initialize random matrices A and B 
+  A = [1,2;4,5]
+  B = [1,1;0,2]
+  
+  % Initialize a 2 by 2 identity matrix
+  I = eye(2)
+  
+  % The above notation is the same as I = [1,0;0,1]
+  
+  % What happens when we multiply I*A ? 
+  IA = I*A 
+  
+  % How about A*I ? 
+  AI = A*I 
+  
+  % Compute A*B 
+  AB = A*B 
+  
+  % Is it equal to B*A? 
+  BA = B*A 
+  
+  % Note that IA = AI but AB != BA
+  
+  %transpose and invert
+  A_trans = A'
+  A_invA = inv(A)
+  ```
+
+* for $ \vec{x}=[x_1;x_2;...;x_n] $ , we use matrix to find $\theta_0, \theta_1$
+  $$
+  \begin{bmatrix}1&x_1\\1&x_2\\\vdots&\vdots\\1&x_n\\\end{bmatrix}\cdot\begin{bmatrix}\theta_0\\\theta_1\end{bmatrix}=\begin{bmatrix}y_1\\y_2\\\vdots\\y_n\end{bmatrix}
+  $$
+  
+
