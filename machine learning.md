@@ -253,7 +253,25 @@
 
 * for $ \vec{x}=[x_1;x_2;...;x_n] $ , we use matrix to find $\theta_0, \theta_1$
   $$
-  \begin{bmatrix}1&x_1\\1&x_2\\\vdots&\vdots\\1&x_n\\\end{bmatrix}\cdot\begin{bmatrix}\theta_0\\\theta_1\end{bmatrix}=\begin{bmatrix}y_1\\y_2\\\vdots\\y_n\end{bmatrix}
+  \begin{bmatrix}1&x_1\\1&x_2\\\vdots&\vdots\\1&x_m\\\end{bmatrix}\cdot\begin{bmatrix}\theta_0\\\theta_1\end{bmatrix}=\begin{bmatrix}y_1\\y_2\\\vdots\\y_m\end{bmatrix}
   $$
-  
 
+  -------
+
+  ## Week 2
+
+  --------------
+
+  ### 1. Multivariate Linear Regression
+
+  ------------
+
+  #### (1) Multiple Features
+
+* Features -> {$x_1,x_2,...,x_n$} -> $y$ -> Price
+
+* Notation:
+
+  * $n$ = number of features
+  * $x^{(i)}$ = input (features) of $i^{th}$ training example
+  * ${x^{(i)}}_j$ = value of feature $i$ in $i^{th}$ training example

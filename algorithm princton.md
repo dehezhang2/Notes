@@ -1028,3 +1028,263 @@ public ckass ST<Key,Value>{
 
     
 
+  * Delete key-value pairs from table
+
+    * Set its value to null
+    * Leave key in tree to guide searches (but don't consider it equal in search)
+    * ~lnN -> memory overload
+
+  * Deleting the minimum
+
+    * Go left until finding a node with a null left link
+    * Replace that node by its right link
+    * Update subtree counts
+
+    ```java
+    public void deleteMin(){
+        root = deleteMin(root);	//root = root; x=x recursion pattern
+    }
+    private Node deleteMin(Node x){
+        //if it is null replace by its right link
+        if(x.left == null) return x.right;
+        x.left = deleteMin(x.left);
+        //recalculate the size of the BST
+        x.count = 1+size(x.left)+size(x.right);
+        return x;
+    }
+    ```
+
+    
+
+  * Hubbard deletion: To delete a node with key ***k*** : search for node ***t*** containing key ***k*** 
+
+    * Case 0: [0 children] Delete ***t*** by setting parent link to null (```return null;```)
+    * Case 1: [1 child] Delete ***t*** by replacing parent link (```return children;```)
+    * Case 2: [2 children] 
+      * Find successor ***x*** of ***t*** 
+      * Delete the minimum in t's right subtree
+      * put ***x*** in ***t***'s spot (replace x by t)
+
+    ```java
+    public void delete(Key key){
+        root = delete(root,key);
+    }
+    private Node delete(Node x,Key key){
+    	if(x==null)return null;
+        int cmp = key.compareTo(x.key);
+        if(cmp<0) delete(x.left,key);
+        else if(cmp>0) delete(x.right,key);
+        else{
+            //if it has only one child or zero child
+            if(x.right==null) return x.left;
+            else if(x.left==null) return x.right;
+            Node t = x;	//now t is the one should be deleted
+            //find the minimum of the right tree
+            x = min(t.right);
+            //right of x is the right tree deleted x
+            x.right = deleteMin(t.right);
+            x.left = t.left;
+        }
+        x.count = size(x.left)+size(x.right)+1;
+        return x;
+    }
+    ```
+
+    * Problem: lack of symmetric -> aways get right hand tree -> delete time $N^{1\over2}$ 
+
+--------------
+
+<h2 "5">week 5</h2>
+
+-----------
+
+### 1. Balanced Search Trees -- control logN symbol table operations
+
+----------
+
+#### (1) 2-3 Search Trees 
+
+* Properties 
+  * Idea: Allow 1 or 2 keys per node
+    * 2-node: one key, two children
+    * 3-node: two keys, three children (1 child less,1 child between , 1 child larger than the two keys)
+  * Perfect balance: Every path from root to null link has same length
+  * Symmetric order: Inorder traversal yields keys in ascending order
+* Search
+  * compare search key against keys in node
+  * find interval containing search key
+  * Follow associated link (recursively)
+* Insert
+  * Insert into a 2-node at bottom
+    * Search for key, as usual
+    * Replace 2-node with 3-node
+  * Insert into a 3-node at bottom
+    * Add new key to 3-node to create temporary 4-node
+    * Move middle key in 4-node into parent
+    * Repeate until there are no 4-node
+* Performance
+  * Worst: $lgN$ (all 2-nodes)
+  * Best: ${log}_3N $
+  * Between 12 and 20 for a million nodes
+  * Between 18 and 30 for a billlion nodes.
+  * Guaranteed logarithmic time
+
+-----------
+
+#### (2) Left-leaning Red-Black BSTs
+
+* Property 
+  * Represent 2-3 tree as a BST
+  * Use "internal" left-leaning links as "glue" for 3-nodes
+  * No node has two red links connected to it
+  * Every path from root to null link has the same number of black links
+  * Red links lean left
+
+* **Search** is the same as for elementary BST
+
+  > Because it is more balanced it will be faster
+
+  ```java
+  public Val get(Key key){
+      Node x = root;
+      while(x!=null){
+          int cmp = key.compareTo(x.key);
+          if(cmp<0) 		x = x.left;
+          else if(cmp>0) 	x = x.right;
+          else			return x.val;
+      }
+      return null;
+  }
+  ```
+
+  
+
+* Implementation
+
+  ```java
+  private static final boolean RED = true;
+  private static final boolean BLACK = false;
+  private class Node{
+      Key key;
+      Value val;
+      Node left,right;
+      boolean color;	//color represent the link from its parent to it
+  }
+  private boolean isRed(Node x){
+      if(x!=null) return false;
+      return x.color == RED;
+  }
+  ```
+
+* **Left(right) rotation**: Orient a (temporarily) right-leaning red link to lean left (when insertion we need to rotate it right and get it back)
+
+  > maintains symmetric order and perfect black balance
+
+```java
+private Node rotateLeft(Node h){
+    assert isRed(h.right);
+    //store x and it will be the parent , h will be the left child
+    Node x = h.right;
+    // send the one between h and x(x.left) to h.right
+    h.right = x.left;
+    x.left = h;
+    //keep the original color with parent
+    x.color = h.color;
+    // change color of h
+    h.color = RED;
+    return x;
+}
+private Node rotateRight(Node h){
+    assert isRed(h.left);
+    //store x and it will be the parent , h will be the left child
+    Node x = h.left;
+    // send the one between h and x(x.left) to h.right
+    h.left = x.right;
+    x.right = h;
+    //keep the original color with parent
+    x.color = h.color;
+    // change color of h
+    h.color = RED;
+    return x;
+}
+```
+
+* **Color flip** : Recolor to split a (temporary) 4-node.
+
+  ```java
+  private void flipColors(Node h){
+      assert !isRed(h);
+      assert isRed(h.left);
+      assert isRed(h.right);
+      h.color = RED;
+      h.left.color = BLACK;
+      h.right.color = BLACK;
+  }
+  ```
+
+* **Insert** 
+
+  * Warmup 1: Insert into a tree with exactly 1 node
+
+    * Left -> set the child color to be RED
+    * Right -> set the child color to be RED then rotate left
+
+  * Case 1: Insert into a 2-node at the bottom
+
+    * Do standard BST insert; color new link red
+    * if new red link is a right link, rotate left
+
+  * Warmup 2: Insert into a tree with exactly 2 nodes
+
+    * Larger than the 2 nodes -> attached new node with red link -> flipped to BLACK
+    * Smaller than the 2 nodes -> attach to left of the child of the 2 nodes -> rotated the child of the 2 nodes right -> flipped to BLACK
+    * Between -> attach to right of the child of the 2 nodes ->  rotated the new node left and then right -> flipped to BLACK
+
+  * Case 2: insert into a 3-node at the bottom
+
+    * Do standard BST insert; color new link red
+    * Rotate to balance the 4-node (if needed)
+    * Flip colors to pass red link up one level
+    * Rotate to make lean left (if needed)
+    * Repeat case 1 or case 2 up the tree ( if needed )
+
+  * **Same code handles all cases**
+
+    * Right child red, left child black: rotate left
+    * Left child , left-left child both red: rotate right
+    * Both cild red: flip colors 
+
+    ```java
+    private Node put(Node h,Key key, Value val){
+        if(h==null) return new Node(key,val,RED);
+        int cmp = key.compareTo(h.key);
+        // standard BST insert
+        if(cmp<0)		h.left = put(h.left,key,val);
+        else if(cmp>0)	h.right = put(h.right,key,val);
+        else			h.val = val;
+        // rotate and flip -> only for recursive implementation
+        if(!isRed(h.left)&&isRed(h.right))		h = rotateLeft(h);
+        if(isRed(h.left)&&isRed(h.left.left))	h = rotateRight(h);
+        if(isRed(h.right)&&isRed(h.left))		h = flipColors(h);
+        return h;
+    }
+    ```
+
+    
+
+---------
+
+#### (3) B-Trees
+
+* Background -> file system
+  * Page: Contiguous block of data
+  * Probe: First access to a page(e.g. from disk to memory)
+  * Property : Time required for a probe is much larger than time to access data within a page
+  * Cost model: number of probes (find the first page)
+  * Goal: Access data using minimum number of probes
+* Generalize 2-3 trees by allowing up to M -1 key-link pairs(a lot of keys) per node (M is choosed by user)
+  * At least 2 key-link pairs at root
+  * At least M/2 key-link pairs in pther node
+
+-----
+
