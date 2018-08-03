@@ -4,9 +4,17 @@
 
 
 
+
+
+
+
+
+
+
+
 # Machine Learning
 
----------------
+[TOC]
 
 
 
@@ -151,7 +159,7 @@
 
 #### 3. Linear Algebra
 
-* Matrix in Matlab/Octave 
+- Matrix in Matlab/Octave 
 
   ```matlab
   % The ; denotes we are going back to a new row.
@@ -251,27 +259,230 @@
   A_invA = inv(A)
   ```
 
-* for $ \vec{x}=[x_1;x_2;...;x_n] $ , we use matrix to find $\theta_0, \theta_1$
+- for $ \vec{x}=[x_1;x_2;...;x_n] $ , we use matrix to find $\theta_0, \theta_1$
   $$
   \begin{bmatrix}1&x_1\\1&x_2\\\vdots&\vdots\\1&x_m\\\end{bmatrix}\cdot\begin{bmatrix}\theta_0\\\theta_1\end{bmatrix}=\begin{bmatrix}y_1\\y_2\\\vdots\\y_m\end{bmatrix}
   $$
+  
 
-  -------
+## Week 2
 
-  ## Week 2
+--------------
 
-  --------------
+### 1. Multivariate Linear Regression
 
-  ### 1. Multivariate Linear Regression
+------------
 
-  ------------
-
-  #### (1) Multiple Features
+#### (1) Multiple Features
 
 * Features -> {$x_1,x_2,...,x_n$} -> $y$ -> Price
 
 * Notation:
 
   * $n$ = number of features
-  * $x^{(i)}$ = input (features) of $i^{th}$ training example
-  * ${x^{(i)}}_j$ = value of feature $i$ in $i^{th}$ training example
+  * $x^{(i)}$ = input (features) of $i^{th}$ training example (n dimentional vector) : 第i组sample
+  * $x{^{(i)}_j}$ = value of feature $j$ in $i^{th}$ training example： 第j个feature
+
+* Hypothesis:
+  $$
+  h_\theta(x) = \theta_0x_0+\theta_1x_1+...+\theta_nx_n = {\theta^T}X
+  $$
+  For convenience of notation, define $x_0 = 1$ ($x{^{(i)}_0} = 1$)
+
+  
+
+  
+  $$
+  h_\theta(x) = \theta_0x_0+\theta_1x_1+...+\theta_nx_n = {\theta^T}X
+  $$
+
+
+$$
+J(\theta)=J(\theta_0,\theta_1,...,\theta_n) = {{1\over{2m}}\sum_{i=1}^m(h_\theta(x^i)-y^i)^2 }
+$$
+
+$$
+\theta_j:= \theta_j -\alpha {{1\over{m}}\sum_{i=1}^m(h_\theta(x^i)-y^i)^2 }\cdot x{^{(i)}_j}=\  (for\ j\in[0,n])
+$$
+
+----------
+
+#### (2) Feature Scaling
+
+* When the two parameter have a great difference (say size(0-2000 ${feet}^2$),number of bedrooms(1-5)) The contour plots may be **tall and slim** makes it difficult to find the local minimum
+
+* Feature Scaling
+
+  * Use 
+
+  $$
+  x_1 = {size(0-2000 {feet}^2)\over2000},x_2={number\ of\ bedrooms\over5}\  (x_1,x_2\in[0,1])
+  $$
+
+  * Only needed when the scale is very different
+
+* Mean Normalization
+
+  * Replace $x_i$ with $x_i-\mu_i$ to make features have approximately zero mean (do not apply to $x_0 = 1$)
+    $$
+    x_1 = {size-1000\over2000},x_2={no. bedrooms-2\over5}
+    $$
+
+    $$
+    x_i={x_i-\mu_i\over s_i} \ (\mu\ is\ average,s\ is\ range=max-min )
+    $$
+
+    
+
+-------------
+
+#### (3) Learning Rate $\alpha$
+
+* two point
+  * ***Debugging*** : How to make sure gradient descent is working correctly
+  * How to choose $\alpha$
+* Debugging use a new function
+  * Y-axis : $min J(\theta)$ X-axis: No. of iterations
+  * $min J(\theta)$ should decrease after every iteration
+
+----------------
+
+#### (4) Features and Polynomial Regression
+
+* 2 Points
+
+  * choice of features
+  * Polynomial Regression
+
+* Defining new features
+  $$
+  h_\theta(x) = \theta_0+\theta_1*frontage+\theta_2*depth
+  $$
+
+  $$
+  frongtage*depth =Area=x
+  $$
+
+  $$
+  h_\theta(x) = \theta_0+\theta_1x
+  $$
+
+* Polynomial regression
+  $$
+  h_\theta(x) = \theta_0+\theta_1x+\theta_2x^2+\theta_3x^3
+  $$
+
+  $$
+  h_\theta(x) = \theta_0+\theta_1x+\theta_2\sqrt{x}
+  $$
+
+  
+
+  > use cubic function because house price will not go down as size increase
+
+  We can simply use
+  $$
+  h_\theta(x) = \theta_0+\theta_1x_1+\theta_2x_2+\theta_3x_3
+  $$
+
+  $$
+  x_1=size,\ x_2={size}^2,\ x_3={size}^3
+  $$
+
+  Don't forget Feature scaling
+
+------------
+
+### 2. Computing Parameters Analytically
+
+------------
+
+#### (1) Normal Equation
+
+* Solve for $min J(\theta)$ at one step analytically
+
+* Intuition: if 1D ($\theta\inR$)
+  $$
+  J(\theta)=a\theta^2+b\theta+c
+  $$
+
+  $$
+  {\delta\over\delta\theta}J(\theta)=...->0
+  $$
+
+  But it is too difficult to implement
+  $$
+  \theta={(X^TX)}^{-1}X^T\vec y
+  $$
+
+  * Explain
+
+    $X$ is the training set m*n (m sets of data,n features) $\vec y$ is the right answer
+
+  $$
+  X\vec \theta=\vec y\ is\ not\ always\ solvable
+  $$
+
+  $$
+  We\ find\ a\ similar\ answer\ \theta\ such\ that\ X\hat{\theta}=\vec p
+  $$
+
+  $$
+  \vec p\ is\ a\ projection\ of\ \vec y\ on\ the\ column\ space\ of\ X,\ to\ make\ it\ solvable
+  $$
+
+  $$
+  \hat{\theta}=X^{-1}\vec p
+  $$
+
+  $$
+  \vec p\ and\color{red}{\ column\ space\ of\ X}\ are\ orthogonal\ to\ \vec y-\vec p\Longrightarrow X^T\cdot(\vec y-\vec p)=\vec0\Longrightarrow X^T\cdot(\vec y-X\hat \theta)=0
+  $$
+
+  $$
+  \hat \theta={(X^TX)}^{-1}X^T\vec y
+  $$
+
+  $$
+  \vec p=X\vec \theta=X{(X^TX)}^{-1}X^T\vec y=P\vec y\ (P\ is\ the\ projection\ matrix)
+  $$
+
+  $$
+  P=X{(X^TX)}^{-1}X^T
+  $$
+
+  * $P^T=P$, $P^2=P$ 
+  * P * Anyone is in the column space of X
+
+* Implementation (no need feature scaling)
+
+  ```octave
+  pinv(x'*x)*x'*y
+  ```
+
+* Pros
+
+  * No need $\alpha$
+  * No need iterate
+
+* Cons : if n is large(features), it is slow [O(n^3) while gradient descent is O(kn^2) fit for(n<10000)]
+
+----------------
+
+#### (2) Normal Equation Noninvertibility
+
+* In octave
+
+  * `pinv()` : pseudo invert (has value even not investable)
+  * `inv()`: real invert
+
+* $XX^T$ is not invertable
+
+  * Redundant features	(dependent)
+
+  * To many featrues(e.g. m<=n)
+
+    > Delete some features, or use **regularization**
+
+* 
+
