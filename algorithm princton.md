@@ -1102,7 +1102,7 @@ public ckass ST<Key,Value>{
 
 ----------
 
-#### (1) 2-3 Search Trees 
+#### (1) 2-3 Search Trees
 
 * Properties 
   * Idea: Allow 1 or 2 keys per node
@@ -1134,6 +1134,7 @@ public ckass ST<Key,Value>{
 #### (2) Left-leaning Red-Black BSTs
 
 * Property 
+
   * Represent 2-3 tree as a BST
   * Use "internal" left-leaning links as "glue" for 3-nodes
   * No node has two red links connected to it
@@ -1282,9 +1283,204 @@ private Node rotateRight(Node h){
   * Property : Time required for a probe is much larger than time to access data within a page
   * Cost model: number of probes (find the first page)
   * Goal: Access data using minimum number of probes
-* Generalize 2-3 trees by allowing up to M -1 key-link pairs(a lot of keys) per node (M is choosed by user)
+* Generalize 2-3 trees by allowing up to M -1 key-link pairs(a lot of keys) per node (M is choosed by user,can be larger than 3 -> M-1,M tree)
   * At least 2 key-link pairs at root
-  * At least M/2 key-link pairs in pther node
+  * At least M/2 key-link pairs in other node
+  * if full split it
+* Proposition
+  * In a B-tree of order M with N keys requires between $\log_{M-1}N$ and $\log_{M/2}N$ probes
+  * Because all internal nodes have between M/2 and M-1 links
+  * In practice: Number of probes is at most 4
+  * Optimization: Always keep root page in memory
+* Libray
+  * Java: java.util.TreeMap, java.util.TreeSet
+  * C++ STL: map, multimap, multiet 
 
 -----
 
+### 2. Geometirc Application of BSTs
+
+-----
+
+#### (1) 1 d range search
+
+* Extension of ordered symbol table
+
+  * Range search: find all keys between $k_1\ and\ k_2$ 
+  * Range count: find number of keys between $k_1\ and\ k_2$ 
+
+* Geometrix interpretation
+
+  * Keys are point on a line
+  * Find/count points in a given 1 d interval
+
+* Two elementary operation
+
+  * Unordered array : fast insert , slow search
+  * Ordered array :     slow insert , binary search
+
+* In BST
+
+  ```JAVA
+  public int size(Key left,Key right){
+      if(contains(right)) return rank(right)-rank(left)+1;
+      else				return rank(right)-rank(left);
+  }
+  ```
+
+--------
+
+#### (2) Line segament intersection
+
+* Given N horizontal and vertical line segments, find all intersections
+* Method
+  * Quadratic algorithm : check all pairs of line segments
+  * Nondegeneracy assumption: All x- and y-coordinates are distinct
+* Sweep-line algorithm : Sweep vertical line from left to right
+  * x-coordinates define events
+  * h-segment (hit left endpoint) : insert y-coordinate into BST
+  * h-segment (hit right endpoint) : remove y-coordinate from BST
+  * v-segment(hit vertical line): range search for interval of y-endpoints (search for the point in the range) **using method above**
+* Time: NlogN + Rx
+  * Put x-coordinates on a PQ(or sort): NlogN
+  * Insert y-coordinates into BST : NlogN
+  * Remove y-coordinates from BST :NlogN
+  * Range searches in BST : NlogN + R(number of intersections)
+
+-------
+
+#### (3) Kd-trees
+
+##### a. backgroud and silly method
+
+* Extension of ordered symbol table
+  - Range search: find all keys in 2d range
+  - Range count: find number of keys in to
+* Geometrix interpretation
+  * Keys are point on a plane
+  * Find/count points in a given h-v rectangle
+* First metod
+  * Grid implementation
+    * Divide space into M-by-M grid of squares
+    * Create list of points contained in each square
+    * Use 2d array to directly index relevant square
+    * Insert: add(x,y) to list for corresponding square
+    * Range search: examine only squares that intersect 2d range query
+  * Space-time trade off
+    * Space: $M^2+N$
+    * Time: $1+N/M^2$ per square examined, on average
+  * Choose M
+    * To small: waste Time
+    * To big: waste space
+    * Rule of thumb: $M=\sqrt{N}$ 
+  * Running time(Randomly distributed points)
+    * Initialize data structure: N
+    * Insert point: 1
+    * Range search : 1 per point in range
+  * Problem: clustering
+    * Lists are too long, even though average length is short
+    * Need data structure that adapts gracefully to data
+
+##### b. Kd-trees
+
+* 2d tree : recursively divide space into two halfplanes
+  * divide the plane into two subplanes by using the vertical line through the points (left plane become left child)
+  * similar but use horizontal line in the second interation (up plane become right child)
+* Find point in rectangle
+  * Goal: find all the poins in a query axis-aligned rectangle
+    * check if point in node lies in given rectangle
+    * Recursively search left/bottom (if any could fall in rectangle)
+    * Recursively search right/top(if any could fall in rectangle)
+  * Cost
+    * Typical case: R + logN
+    * worst case : R + $\sqrt N$ 
+* Find closest point to query point
+  * Check distance from current point with query point
+  * Recursively search left/bottom (if any could be closer) 
+    * first **go down** the point that is on the **same side** of the splitting line as the **query point** as, and compare with previous point and replace if smaller (To maintain the performance, same side is more likely to be the answer)
+    * when **go out** of the recursive loop compare with the whole vertical/horizontal line, to check is it possible to have a closer point in that area
+  * Recursively search right/top(if any could be closer)
+  * Organize method so that it begins by searching for query point
+  * Cost
+    * logN
+    * Worst: N
+* Kd-tree: recursively partition k-dimensional space into 2 half spaces
+* N-body simulation
+  * Simulate the motion of N particles, mutually affected by gravity
+  * Brute force: For each pair of particles, compute force : $F = {Gm_1m_2\over r^2}$ 
+
+--------
+
+#### (4) Interval search
+
+##### a. 1 d interval search
+
+* Extension of symbol table
+
+  * Insert an interval (left,right)
+  * Search for an interval (left,right)
+  * Delete an interval (left,right)
+  * Interval intersection query: given an interval (left,right), find all intervals(or one interval) in data structure that intersects (left,right)
+
+* API
+
+  ```java
+  public class IntervalST<Key extends Comparable<key>,Value>{
+      public IntervalST();
+      public void put(Key left,Key right,Value val);
+      public Value get(Key left,Key right);
+      public void delete(Key left,Key right);
+      Iterable<Value> intersects(Key left,Key right);
+  }
+  ```
+
+* Interval search tree
+
+  * insert
+    * Use **left point** as BST key
+    * Store the **largest end point** in subtree rooted at node (largest end point of the whole subtree, **it is for the search of intersect -> if largest one is smaller than the targets' left, it won't be checked**)
+  * Search : To search for **any one** interal that intersects query interval (left,right)
+    * if interval in node intersects query interval, return it
+    * else if left subtree is null, go right
+    * else if max end point in left subtree is less than *left*, go right
+
+  ```java
+  Node x = root;
+  while(x!=null){
+      if		(x.interval.intersects(left,right))	return x.interval;
+      else if	(x.left==null||x.left.max<lo)		x = x.right;
+      else										x = x.left;
+  }
+  return null;
+  ```
+
+  * Proof:
+
+    * If search goes right, then no itersectionb in left (max<${left}_{target}$ ) 
+
+      * If search goes left, then there is either an intersection in left subtree or no intersections in either (当目标区间卡在左边子树的某两个区间之间时，无解) ->(此时$right_{target}<c$ )
+
+      * Suppose no intersection in the left
+
+      * Since went leftm we have ${left}_{target}$<= max
+
+      * Then for any interval (a,b) in right subtree of x.
+
+        $right_{target}<c<=a$ (where c is left value of interval (c,max) who provide the max end point)
+
+  * Implementation: Use a red-black BST to mentain performance
+
+-----
+
+#### (5) Rectangle Intersection
+
+* Background
+  * Goal: Find all intersections among a set of N orthogonal rectangles
+  * Quadratic algorithm: Check all pairs of rectangles for intersection
+  * Non-degeneracy assumption : all x- and y- coordinates are distinct
+* Sweep-line algorithm
+  * x-coordinates of left and right endpoints define events (when hit add or move the y-interval)
+  * Maintain set of rectangles that intersect the weep line in an interval search tree (using y-interval of rectangle)
+  * Left endpoint: interval search for y-interval of rectangle; insert y-interval
+  * right endpoint: remove y-interval
+* 
