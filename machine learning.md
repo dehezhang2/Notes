@@ -302,7 +302,7 @@ J(\theta)=J(\theta_0,\theta_1,...,\theta_n) = {{1\over{2m}}\sum_{i=1}^m(h_\theta
 $$
 
 $$
-\theta_j:= \theta_j -\alpha {{1\over{m}}\sum_{i=1}^m(h_\theta(x^i)-y^i)^2 }\cdot x{^{(i)}_j}=\  (for\ j\in[0,n])
+\theta_j:= \theta_j -\alpha {{1\over{m}}\sum_{i=1}^m(h_\theta(x^i)-y^i) }\cdot x{^{(i)}_j}=\  (for\ j\in[0,n])
 $$
 
 ----------
@@ -340,7 +340,7 @@ $$
 
 * two point
   * ***Debugging*** : How to make sure gradient descent is working correctly
-  * How to choose $\alpha$
+  * How to choose $\alpha​$
 * Debugging use a new function
   * Y-axis : $min J(\theta)$ X-axis: No. of iterations
   * $min J(\theta)$ should decrease after every iteration
@@ -401,7 +401,7 @@ $$
 
 * Solve for $min J(\theta)$ at one step analytically
 
-* Intuition: if 1D ($\theta\inR$)
+* Intuition: if 1D ($\theta \in R$)
   $$
   J(\theta)=a\theta^2+b\theta+c
   $$
@@ -484,5 +484,345 @@ $$
 
     > Delete some features, or use **regularization**
 
-* 
 
+
+-------------
+
+### 3. Ocatave/Matlab Tutorial
+
+-----------
+
+#### (1) Basic operations
+
+----------
+
+```octave
+1~=2 		%not equal sign
+xor(1,0)	%yihuo
+1&&0		%AND
+1 || 0 		%or
+PS1("somestring");	%change the string in front of command line
+x = 3;		%semicolon supressing output(not print the answer)
+a=pi
+disp(a);	%display
+disp(sprintf('2 decimals: %0.2f',a))	%display in two decimal place
+v=1:0.1:2	%quick way to get row vector from 1 to 2 every column increase 0.1
+v=1:6		%from 1 to 6 increase 1 by default
+w=ones(2,3)	%all entries is 1
+w=zero(2,3)
+w=rand(2,3)
+w=randn(1,3)%Gaussian distribution
+w = -6+sqrt(10)*(randn(1,10000));
+hist(w)		%draw histogram
+hist(w,50)	%histogram with 50 bins
+eye(4)		%4by4 identity matrix
+help eye
+help rand	%show the detail of method
+
+```
+
+#### (2) Moving Data Around
+
+```octave
+sz=size(A)	% show size of matrix sz is also a matrix
+size(A,1)	% row of A
+size(A,2)	% column of A
+length(A)	% longer dimention max(m,n)
+pwd			% current path you are in
+cd			% change the pass
+ls			% list the file
+load featureX.dat	%load the file
+load('featuresX.dat')
+who			% show all the variables
+whos		% show in detail
+clear featuresX	%delete the variable
+v = priceY(1:10)	% store first 10 columns of priceY in the v
+save hello.mat v	%save v in the new file
+save hello.txt v-ascii	%save as txt
+A(3,2)		%i=3,j=2 elements of A
+A(2,:)		%: means the whole row or column
+A([1 3],:)	%all 1 rows and 3 rows
+A(:,2)=[10;11;12]	%assign
+A=[A,[100;101;102]]	%add a column
+A(:)				%put all elements of A into a single vector
+
+```
+
+#### (3) Computing on Data
+
+```octave
+A.*B	%get matrix c that c(i,j)=a(i,j)*b(i,j)
+v = [1;2;3]
+1./v	%get matrix c that c(i,j) = 1/a(i,j)
+log(v)
+exp(v)
+abs(v)	% similar
+% add 1 to every entries
+v+1
+v+ones(length(v),1)	
+A'	% A transpose
+A = [1 15 2 0.5]
+val = max(A)	% biggest number
+max(A,[],1)
+max(A,[],2)		% row and col max respectively
+[val,ind]=max(a)% assign the position to ind
+A < 3			% return true or false as a matrix
+find(A<3)		% return all true entrys
+A = magic(3)	% all the rows and columns are diagonals sum to a same number
+[r,c]=find(A>=7)% A(ri,ci)>=7
+sum(A)			% add all colmn or row for m = 1 matrix
+sum(A,1)		% sum all the row
+sum(A,2)		% sum all the col
+sum(sum(A.*eyes(size(A),1)))	% sum the diagnal of one side
+sum(sum(A.*flipud(eyes(size(A),1)))	% sum the diagnal of other side
+prod(A)			% multiple
+floor(A)		
+ceil(A)			%for all entries
+
+
+```
+
+#### (4) Plotting Data
+
+```octave
+plot(t,y1)		% t-x axis y-y axis
+plot(t,y2,'r')	% print y2 in a different color
+xlabel('time')
+ylabel('value')
+legend('sin','cos')
+title('my plot')
+cd 'your path'; print -dpng 'myPlot.png'
+
+% plot in different pictures
+figure(1); plot(t,y1);
+figure(2); plot(t,y2);
+
+% Divides plot a 1*2 gird, access first element
+subplot(1,2,1);	
+plot(t,y1);
+subplot(1,2,2);
+plot(t,y2);
+axis([0.5 1 -1 1])	%change range of x and y
+clf;				% clear figure
+A = magic(5);
+imagesc(A);			%represent in different colors
+% present the color bar and use black white style
+imagesc(A),colorvar,colormap gray;
+
+```
+
+#### (5) Control Statement : `for` `while` `if`
+
+```octave
+% for loop
+v = zeros(1,10)
+for i = 1:10,
+	v(i) = 2*i;
+end;
+% or
+indicies = 1:10;
+for i = indicies,
+	disp(i);
+end;
+% while loop
+i = 1;
+while i<=5,
+	v(i++) = 100;
+end;
+% or
+i = 1;
+while true,
+	v(i++) = 99;
+	if i == 6,
+		break;
+	end;
+end;
+% if - else
+if v(1) == 1,
+	disp('The value is one');
+elseif v(1) == 2,
+	disp('The value is two');
+else
+	disp('The value is not one or two');
+end;
+
+
+```
+
+* Create Function
+
+  * Create a new file named as 'the name of function.m'
+
+  ```octave
+  function y = squareThisNumber(x)
+  y = x^2;
+  % use
+  addpath('path of the function')
+  squareThisNumber(5)
+  
+  function [y1,y2] = squreAndCubeThisNumber(x)
+  y1 = x^2;
+  y2 = x^3;
+  
+  ```
+
+  * $J(\theta)$ in the exmaple
+
+    ```octave
+    % use the function
+    >> x = [1 1;1 2;1 3]
+    >> y = [1;2;3]
+    >> theta = [0;1];
+    
+    ```
+
+    ```octave
+    % the function file 'costFunctionJ'
+    function J = costFunctionJ(X,y,theta)
+    m = size(X,1)
+    predictions = X*theta; 				% m*2 . 2*1
+    sqrErrors = (predictions-y).^2;		% turn every entries into its square
+    
+    J = 1/(2*m)*sum(sqrErrors);
+    
+    ```
+
+    
+
+#### (6) Vectorization
+
+$$
+h_\theta (x) = \sum{^n_{j=0}}\theta_jx_j=\theta^TX
+$$
+
+* silly version
+
+  ```octave
+  prediction = 0.0;
+  for j=1:n+1,
+  	prediction = prediction + theta(j)*X(j);
+  end;
+  ```
+
+  
+
+* Vectorized version
+
+  ```octave
+  prediction = theta'*X;
+  ```
+
+$$
+\theta_j:= \theta_j -\alpha {{1\over{m}}\sum_{i=1}^m(h_\theta(x^i)-y^i) }\cdot x{^{(i)}_j}=\  (for\ j\in[0,n])
+$$
+
+* Implementation
+
+  ```octave
+  prediction = X*theta; 	% (m,1)
+  Error = prediction - Y;	% (m,1)
+  delta = (1/m)*X'*Error;		% (n+1,m)*(m,1)=(n+1,1)
+  theta=theta-alpha*delta;
+  
+  theta = theta-alpha*X'*(X*theta-Y)
+  ```
+
+  
+
+#### (7) Method learnt in the assignment
+
+```octave
+data = load('filename');	% open the file and store it as a matrix
+linspace - 生成线性间距向量
+
+    此 MATLAB 函数 返回包含 x1 和 x2 之间的 100 个等间距点的行向量。
+
+    y = linspace(x1,x2)
+    y = linspace(x1,x2,n)
+
+
+logspace - 生成对数间距向量
+
+    此 MATLAB 函数 生成一个由在 10^a 和 10^b（10 的 N 次幂）之间的 50 个对数间距点组成的行向量 y。logspace
+    函数对于创建频率向量特别有用。该函数是 linspace 和:运算符的对数等价函数。
+
+    y = logspace(a,b)
+    y = logspace(a,b,n)
+    y = logspace(a,pi)
+```
+
+* plot
+
+  ```octave
+  % two axis of 100 grids from (-10,10) (-1,4) respectively
+  theta0_vals = linspace(-10,10,100);
+  theta1_vals = linspace(-1,4,100);
+  % draw the graph
+  J_vals = zeros(length(theta0_vals),length(theta1_vals));
+  % Fill
+  for i = 1:length(theta0_vals)
+  	for j = 1:length(theta1_vals)
+  		t = [theta0_vals(i);theta1_vals(j)];	%a pair of theta
+  		J_vals(i,j) = computeCost(x,y,t);
+  	end
+  end
+  % Surface plot
+  figure;
+  surf(theta0_vals, theta1_vals, J_vals)
+  xlabel('\theta_0'); ylabel('\theta_1');
+  
+  % Contour plot
+  figure;
+  % Plot J_vals as 15 contours spaced logarithmically between 0.01 and 100
+  contour(theta0_vals, theta1_vals, J_vals, logspace(-2, 3, 20))
+  xlabel('\theta_0'); ylabel('\theta_1');
+  hold on;
+  plot(theta(1), theta(2), 'rx', 'MarkerSize', 10, 'LineWidth', 2);
+  ```
+
+* Normalization for multiple features
+
+  ```octave
+  % normalization : after normalize you need to store the mean and standard(when predict new value we need to change its scale again)
+  mean(X);	% return average of each column
+  std(X);		% return standard deviation of each column
+  repmat(A,m,n)	% treat A as an element create a matrix m by n of A as a entry
+  % the code
+  X_norm = X;
+  mu = zeros(1, size(X, 2));
+  sigma = zeros(1, size(X, 2));
+  mu = mean(X)
+  X_norm = X_norm-repmat(mu,size(X,1),1)
+  sigma = std(X)
+  X_norm = X_norm./repmat(sigma,size(X,1),1)
+  ```
+
+* Gradient Descent for multiple features
+
+  * cost function
+
+  ```octave
+  function J = costFunctionJ(X,y,theta);
+  J = 1/(2*size(X,1))*((X*theta-y)'*(X*theta-y));
+  ```
+
+  * Gradient iteration
+
+    ```octave
+    function [theta, J_history] = gradientDescentMulti(X, y, theta, alpha, num_iters);
+    J_history = zeros(num_iters, 1);
+    theta = theta - (1/length(y))*alpha*X'*(X*theta-y);
+    J_history(iter) = computeCostMulti(X, y, theta);
+    end
+    ```
+
+  * Normal Equation
+
+    ```octave
+    function [theta] = normalEqn(X, y)
+    theta = zeros(size(X, 2), 1);
+    theta = pinv(X'*X)*X'*y;
+    end
+    ```
+
+    
