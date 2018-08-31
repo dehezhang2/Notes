@@ -8,6 +8,10 @@
 
 [week5](#5)
 
+[week6](#6)
+
+[week7](7)
+
 <h2 id = "3">Week 3 </h2>
 
 ### merge sort and quick sort
@@ -1257,7 +1261,7 @@ private Node rotateRight(Node h){
 
     ```java
     private Node put(Node h,Key key, Value val){
-        if(h==null) return new Node(key,val,RED);
+        if(h == null) return new Node(key,val,RED);
         int cmp = key.compareTo(h.key);
         // standard BST insert
         if(cmp<0)		h.left = put(h.left,key,val);
@@ -1307,7 +1311,7 @@ private Node rotateRight(Node h){
 * Extension of ordered symbol table
 
   * Range search: find all keys between $k_1\ and\ k_2$ 
-  * Range count: find number of keys between $k_1\ and\ k_2$ 
+  * Range count: find number of keys between $k_1\ and\ k_2​$ 
 
 * Geometrix interpretation
 
@@ -1372,7 +1376,7 @@ private Node rotateRight(Node h){
   * Choose M
     * To small: waste Time
     * To big: waste space
-    * Rule of thumb: $M=\sqrt{N}$ 
+    * Rule of thumb: $M=\sqrt{N}​$ 
   * Running time(Randomly distributed points)
     * Initialize data structure: N
     * Insert point: 1
@@ -1387,7 +1391,7 @@ private Node rotateRight(Node h){
   * divide the plane into two subplanes by using the vertical line through the points (left plane become left child)
   * similar but use horizontal line in the second interation (up plane become right child)
 * Find point in rectangle
-  * Goal: find all the poins in a query axis-aligned rectangle
+  * Goal: find all the points in a query axis-aligned rectangle
     * check if point in node lies in given rectangle
     * Recursively search left/bottom (if any could fall in rectangle)
     * Recursively search right/top(if any could fall in rectangle)
@@ -1483,4 +1487,495 @@ private Node rotateRight(Node h){
   * Maintain set of rectangles that intersect the weep line in an interval search tree (using y-interval of rectangle)
   * Left endpoint: interval search for y-interval of rectangle; insert y-interval
   * right endpoint: remove y-interval
+
+----------
+
+<h2 id="6">Week6</h2>
+
+----------------
+
+### 1. Hash Table
+
+--------
+
+#### (1) Hash table
+
+* To Begin with
+  * Basic idea : Save items in a key-indexed table (use an index as the key of an array) (index is a function of the key).
+  * Hash function : Method for computing array index from key.
+
+* Issue: 
+
+  * Computing the hash function
+  * Equality test: Method for checking whether two keys are equal
+  * Collision resolution: Algorithm and data structure to handle two keys that hash to the same array index
+
+* Classic space-time tradeoff
+
+  * No space limitation : trivial hash function with key as index
+  * No time limitation : trival collision resolution with sequential search
+  * Space and time limitation : hashing (the real world)
+
+* Requirement of hashfunction
+
+  * Efficiently computable
+  * Each table index **equally likely** for each key
+
+* Java's hash code conventions : all java classes inherit a method ```hashcode()``` , which returns a 32-bit ```int```.
+
+  * Requirement: If ```x.equals(y)```,then ```(x.hashCode()==y.hashcode())``` (反过来可能不行)
+
+  * Highly desirable:(for collision)  If```!x.equals(y)```,then```(x.hashCode()!=y.hashcode())```
+
+  * Default implementation : Memory address of x.
+
+  * Legal (but poor) implementation : Always return 17 
+
+    ```java
+    // method for String
+    public int hashcode(){
+    	int hash = 0;
+        for(int i=0;i<length();i++)
+            hash = s[i] + (31*hash);
+        return hash;
+    }
+    //optimization : Cache the hash value in an instance variable return the cached value (String is immutable)
+    private int hash = 0;
+    public int hashcode(){
+        int h = hash;
+        if(h!=0)return h;	// compute only one time
+        for(int i=0;i<length();i++)
+            h = s[i] + (31*h);
+        hash = h;
+        return h;
+    }
+    
+    // method for a self defined type
+    public final class Transaction implements Comparable<Transaction>{
+        private final String who;
+        private final Date when;
+        private final double amount;
+        public int hashCode(){
+    		int hash = 17 ;// some nonzero constant
+            hash = 31*hash + who.hashCode();
+            hash = 31*hash + when.hashCode();
+            hash = 31*hash + (Double) amount.hashCode();
+            return hash;
+        }
+    }
+    ```
+
+* "Standard" recipe for user-defined types
+
+  * Combine each significant field using the $31x+y$ rule
+  * If field is a primitive type, use wrapper type ```hashcode()```
+  * if field is null, return 0
+  * if field is a reference type, use ```hashCode()```. (apply rule recursibely)
+  * if field is an array, apply to each entry
+  * In theory : Keys are bitstring; "universal" hash functions exist
+
+* Modular hashing
+
+  * Hash code. An ```int``` between $-2^{31}$ and $2^{31}-1$ 
+
+  * Hash function. An ```int``` between 0 and M-1(for array)
+
+    ```java
+    private int hash(Key key){
+        return (key.hashCode()&0x7fffffff)%M;
+    }
+    ```
+
+* Uniform hashing assumption: Each key is equally likely to hash to an integer between 0 and M-1 (throw N balls into M bins)
+
+#### (2) Separate chaining
+
+* Collisions : Two distinct keys hashing to same index
+
+  * Birthday problem -> can't avoid collisions unless you have a ridiculous amount of memory
+  * Coupon collector + load balancing -> collisions will be evenly distributed (均匀分布)
+  * Challenge: Deal with collisions efficiently
+
+* Separate chaining symbol table
+
+  * Hash: map key to integer *i* between 0 and M-1
+  * Insert: put at front of $i^{th}$ chain (if not already there)
+  * Search: need to search only $i^{th}$ chain
+
+  ```java
+  public class SeparateChainingHashST<Key,Value>{
+  	private int M = 97;					//number of chains
+      private Node[] st = new Node[M];	//array of chains
+      private static class Node{
+          private Object key;
+          private Object val;
+          private Node next;
+      }
+      private int hash(Key key){    
+          return (key.hashCode()&0x7fffffff)%M;
+      }
+      public Value get(Key key){
+          int i = hash(key);
+          for(Node x = st[i];x!=null;x=x.next)
+              if(key.equals(x.key)) return x.val;
+      }
+      public void put(Key key,Value val){
+  		int i = hash(key);
+          for(Node x = st[i];x!=null;x = x.next)
+              if(key.equals(x.key)){x.val = val;return;}
+          st[i] = new Node(key,val,st[i]);
+      }
+  }
+  ```
+
+* Analysis
+
+  * The number of keys in a list is within a constant factor ofd N/M is extremely close to 1
+  * Consequence: Number of probes for search/insert is proportional to N/M
+    * M too large -> too many empty chains
+    * M too small -> too long to search
+    * Typical choice: array resizing
+
+#### (3) Linear probing (探测)
+
+* Collision resolution : open addressing
+
+  > When a new key collides, find next empty slot, and put it there
+
+* Linear probing hash table demo
+
+  * **Hash**: Map key to integer i between 0 and M-1
+
+  * **Insert**: Put at table index i if free; if not try i+1, i+2 (if reaches the end go back to head of the array) etc
+
+  * **Search**: similar as insert
+
+  * Note: Array size M *must be* greater than number of key-value pairs N 
+
+    ```java
+    public class LinearProbingHashST<Key,value>{
+        private int M = 30001;
+        private Value[] vals = (Value[]) new Object[M];
+        private Key[] keys = (Key[]) new Object[M];
+        private int hash(Key key{return(key.hashCode()&0x7fffffff)%M;}
+        public void put(Key key,Value val){
+    		int i;
+            for(i=hash(key);keys[i]!=null;i=(i+1)%M)
+                if(keys[i].equals(key))
+                    break;
+            keys[i] = key;
+            vals[i] = val;
+        }
+        public Value get(Key key){
+    		for(int i=hash(key);keys[i]!=null;i=(i+1)%M)
+                if(keys[i].equal(key))
+                    return vals[i];
+            return null;
+        }
+    }
+    ```
+
+* Clustering
+
+  * Cluster : A contiguous block of items
+  * Observation: New keys likely to hash into middle of big clusters
+
+* Lnuth's parking problem
+
+  * Model: Cars arrive at one-way street with M parking spaces (Each desire a random space i: if i is taken, try i+1,i+2,etc)
+  * Question : what is mean displacement of a car
+  * Half-full: with M/2 cars, mean displacement is ~ 3/2
+  * Full:        with M cars, mean displacement is ~ $\sqrt{\pi M\over8}$ 
+  * Method: use resizing array
+
+#### (4) Context
+
+* War story: String hashing in Java
+
+  * String ```hashCode()``` in Java 1.1
+
+  * Benefit: saves time in performing arithmetic
+
+    ```java
+    public int hashCode(){
+        int hash = 0;
+        int skip = Math.max(1,length()/8);
+        for(int i=0;i<length;i+=skip)
+            hash = s[i]+(37*hash);
+        return hash;
+    }
+    ```
+
+* Separate chaining vs. Linear probing
+
+  * Separate chaining
+    * Easier to implement delete
+    * Performance degrades gracefully
+    * Clustering less sensitive to poorly-designed hash function
+  * Linear probing
+    * less wasted space
+    * Better cache performance
+  * Improved version
+    * Two-probe hashing (separate-chaining variant)
+      * Hash to two positions（two hash function）, insert key in shorter of the two chains
+      * Reduce expected length of the longest chain to $log logN​$
+    * Double hasing (linear-probing variant)
+      * Use linear probing, but skip a variable amount, not just 1 each time
+      * Effectively eliminates clustering
+      * Can allow table to become nearly full
+      * More difficult to implement delete
+    * Cukoo hashing (linear-probing variant)
+      * Hash key to two positions (two hash function); insert key into either position; if occupied, reinsert displaced key into its alternative position (and recur)
+  * Hash tables vs balanced search tree
+    * Simpler to code
+    * No effective alternative for unordered key
+    * Faster for simple keys
+    * Better system support in java for strings
+  * Balanced search tees
+    * Stronger performance guarantee
+    * SUpport for ordered ST operations
+    * Easier to implement``` compareTO()``` correctly than ```equals()``` and ```hashCode()```.
+
+
+
+-------------
+
+### 2. Symbol table Applications
+
+------------
+
+#### (1) Sets
+
+* Mathematical set: A collection of distinct keys
+
+* Remove "Value" of any implementations
+
+  ```java
+  public class SET<Key extends Comparable<Key>>{
+  	SET();
+      void add(Key key);
+      boolean contains(Key key);
+      void remove(Key key);
+      int size();
+      Iterator<Key> iterator();
+  }
+  ```
+
+  
+
+* Exception filter
+
+  * Read in a list of words from one file
+  * Print out all word from standard input that are {in , not in } the list
+
+  ```java
+  public class WhiteList{
+  	public static void main(String[] args){
+  		SET<String> set = new SET<String>();
+          In in = new In(args[0]);
+          while(!in.isEmpty())
+              set.add(in.readString());
+          while(!StdIn.isEmpty()){
+  			String word = StdIn.readString();
+              if(set.contains(word))
+                  StdOut.println(word);
+          }
+      }
+  }
+  ```
+
+
+
+#### (2) Dictionary Clients
+
+* Dictionary lookup
+
+  * A comma-separated value (CSV) file (URL and IP address pair)
+  * Key field
+  * Value field
+
+  ```java
+  public class LookupCSV{
+      public static void main(String[] args){
+  		In in = new In(args[0]);
+          int keyField = Integer.parseInt(args[1]);
+          int valField = Integer.parseInt(args[2]);
+          ST<String,String> st = new ST<String,String>();
+          while(!in.isEmpty()){
+  			String line = in.readLine();
+              String[] tokens = line.split(",");
+              String key = tokens[keyField];
+              String val = tokens[valField];
+              st.put(key,val);
+          }
+          while(!StdIn.isEmpty()){
+              String s = StdIn.readString();
+              if(!st.contains(s)) StdOut.println("Not found");
+              else				StdOut.orintln(st.get(s));
+          }
+      }
+  }
+  ```
+
+#### (3) Indexing Clients
+
+* File indexing : Use search key to get associating information (搜索引擎)
+* Goal: Given a list of files specified, create an index so that you can efficiently find all files containing a given query string
+* Solution : Key = query string; value = set of files containing that string
+
+```java
+import java.io.File;
+public class FileIndex{
+    public static void main(String[] args){
+		ST<String,SET<File>> st = new ST<String, SET<File>>();
+        for(String filename:args){
+			File file = new File(filename);
+            In in = new In(file);
+            while(!in.isEmpty){
+                String key = in.readString();
+                if(!st.contains(key))
+                    st.put(key,new SET<File>());
+                st.get(key).add(file);
+            }
+        }
+        while(!StdIn.isEmpty()){
+			String query = StdIn.readString();
+            StdOut.println(st.get(query));
+        }
+    }
+}
+```
+
+* Book index(Index for an e-book)
+  * Preprocess a text corpus to support concordance queries: given a word, find all occurrences with their immediate contexts
+
+#### (4) Sparse Vectors
+
+* Matrix-vector multiplication (standard implementation)
+
+  ```java
+  double[][] a = new double[N][N];
+  double[] x = new double[N];
+  double[] b = new double[N];
+  for(int i=0;i<N;i++){
+  	sum = 0.0;
+      for(int j = 0; j < N; j++)
+          sum += a[i][j]*x[j];
+      b[i] = sum;
+  }
+  ```
+
+* When there is a lot of 0 entries
+
+  * x -> 1D array
+  * a -> Symbol table
+    * Key = index, value = entry
+    * Efficient iterator
+    * Space proportional to number of nonzeros
+
+  ```java
+  public class SparseVector{
+      private HashST<Integer, Double> v;
+      public SpareVector(){
+          v = new HashST<Integer, Double>();
+      }
+      public void put(int i, double x){
+          v.put(i,x);
+      }
+      public double get(int i){
+  		if(!v.contains(i)) return 0.0;
+          else return v.get(i);
+      }
+      public Iterable<Integer> indices(){
+          return v.keys();
+      }
+      public double dot(double[] that){
+          double sum = 0.0;
+          for(int i: indices())
+              sum+=that[i]*this.get(i);
+          return sum;
+      }
+  }
+  ```
+
+
+
+<h2 id="7">Week7</h2>
+
+------
+
+### 1. Undirected graph
+
+#### (1) Introduction
+
+* Graph : Set of vertices connected pairwise by edges
+* Graph-processing problems
+  * Path : Is there a path between $s$ and $t$
+  * Shortest path : What is the shortest path between $s$ and $t$ 
+  * Cycle : Is there a cycle
+  * Euler tour : Is there a cycle that uses each edge exactly once
+  * Hamilton tour : Is thete a cycle that uses each vertex exactly once
+  * Connectivily : Is there a way to connect all of the vertices
+  * MST : What is the best way to connect all of the vertices
+  * Biconnectivity : Is there a vertex whose removal disconnects the graph
+  * Planarity : Can you draw the graph in the plane with no corssing edges
+  * Graph isomorphism : Do two adjacency lists represent the same graph
+
+#### (2) Graph API
+
+* Graph representation
+
+  * Graph drawing : Provides intuition about the structure of the graph
+
+* Vertex representation
+
+  * This lecture : use integers between 0 and V-1 (Allow use vertex indexed arrays)
+  * Application : convert between names and intergers with symbol table
+
+  ```java
+  public class Graph{
+      Graph(int V);
+      Graph(In in){
+  		In in = new In(args[0]);	//create an empty graph with V vertices
+          Graph G = new Graph(in);	//create a graph from input stream
+          for(int v=0;v<G.V();v++)
+              for(int w:G.adj(v))
+                  StdOut.println(v+"-"+w);
+      }
+      void addEdge(int v,int w);		//add an edge v-w
+      Iterable<Integer> adj(int v);	//vertices adjacent to v
+      int V();						//number of vertices
+      int E();						//number of edges
+      String toString();				//string representation
+      public static int degree(Graph G,int v){
+          int degree = 0;
+          for(int w:G.adj(v)) degree++;
+          return degree;
+      }
+      public static int maxDegree(Graph G){
+  		int max = 0;
+          for(int v=0;v<G.V();v++){
+              int d = degree(G,v);
+              if(d>max)
+                  max = d;
+              return max;
+          }
+      }
+      public static double averageDegree(Graph G){
+          return 2.0*G.E()/G.V();
+      }
+      public static int numberOfSelfLoops(Graph G){
+          int count = 0;
+          for(int v=0; v < G.V(); v++)
+              for(int w : G.adj(v))
+                  if(v==w) count++;
+          return count/2;
+      }
+  }
+  ```
+
+* Set-of-edges graph representation : maintain a list of the edges
+
+* 
+
 * 

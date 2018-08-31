@@ -1,5 +1,5 @@
 # GE 1205
- 
+
 ## Green economics 
 * [Lec2](#2)
 * [Lec3](#3)
@@ -66,17 +66,17 @@
 	* Assumption: Ceteris Paribus: holding other factors constant (Qdx=-10Px+6Py+12I) 
 
 	* Conclusion: 
-	 
+	
 	> Price and Qd are negatively related
- 
+
 	> Law of Demand: Lower price -> larger demanded
 
 	* Change in demand
-	 
+	
 	> Change in Px -> move along the curve
 	
 	> Change in income(Py) -> shifting of the curve  
-	 
+	
 	> price of related goods
 	>
 	> > substitutes (replace)
@@ -90,11 +90,11 @@
 	> > Inferior (Buy more with less income) goods
 
 	> Market Demand
- 
+
 	> > Horizontal summation
- 
+
 	> > add quatities at the same level of price
- 
+
 	
 	2.Producer(Supply) 
 
@@ -103,7 +103,7 @@
 	* Function: Qsx = f(Px,Py,C,Pe) (C= cost of production)
 	
 	* Similar to the demand curve
-	 
+	
 	* Conculsion:
 	
 	 > Positive related
@@ -118,9 +118,9 @@
 	> Cost of product down -> shift of the curve 
 	
 	* Horizontal summation
-	
+
 -----------------------------
-	
+
 ### Equilibrium
 
 	* Equilibrium is a situation that both price and quantity have no tendency to change.  
@@ -140,25 +140,24 @@
 	
 * upply-and-demand diagram to see how the shift affects (Qx & Quatity)
 
-----------------------------------	
+	---------------------------------
 ### Market Equilibrium
 
 > Efficient: MB = MC
 > Underproduction: MB > MC
 > Overproduction: MB < MC
-	
+
 -------------------------------------
 ### Profit Maximization
 
 	Profit(PI the area) = Total revenue + Total Cost
 
 > a company will produce as long as MC < Price of the product
-	
+
 ------------------------------------
 ### Technical efficiency
 
 > production decisions that generate **maximum output** given some stock of resources
-
 
 -----------------------------------------
 ### Evaluating the Market Equilibrium 
@@ -192,7 +191,7 @@ Social welfare= Consumer's surplus + producer's surplus
 ### Consumer Surplus
 
 * Difference between the consumer's willingness to pay(demand price) and need to pay(actual price) for *an amount of products*(The area)
- 
+
 * Total consumer surplus= sum(consumer surplus from each unit) 
 
 ------------------
@@ -286,7 +285,7 @@ National Defense</td></tr>
 
 * No one want to pay for the public goods(due to nonexcludability characteristics)
 
-* Result is that market demand is  	undefined(property)
+	 Result is that market demand is  	undefined(property)
 
 * nonrevelation of preferences arises due to free-ridership 
 
@@ -370,11 +369,11 @@ one.
 > Limitation: 
 
 	1. assumption is hard to achieve(transacation cost & coordination cost & hard to measure)
-
+	
 	2. Fails when there are more than a few individuals are involved on each side of the market
 	
 	3. Irrational antagonism and stubbornness
-	
+
 ------------------------
 <h1 id ="4">Lecture 04</h1>
 
@@ -407,7 +406,7 @@ plant(focus on output)
 
 Two key questions: <br/>
 1. Are standards set to achieve *allocatively efficiency*(i.e. MC = MB)?
-2. Given some environmental objective, is that objective being achieved in a manner that is *technically efficient*(cost effective lower the cost by using another strategy)	
+	. Given some environmental objective, is that objective being achieved in a manner that is *technically efficient*(cost effective lower the cost by using another strategy)	
 
 -------------------------------
 ### Abatement
@@ -488,7 +487,7 @@ polluting sources **(low-abatement-cost can do more)**
 	* Pros: can achieve an efficient outcome
 	* Cons:<br/> 1. in practice it is difficult to identify<br/>
 			2.  can only achieve abatement but cannot achieve better abatement technology
-			
+	
 * Emission charge
 	* imposed directly on the discharge of pollution
 	* implemented through a tax.
@@ -527,7 +526,7 @@ polluting sources **(low-abatement-cost can do more)**
 		* Difficult to measure the MEB
 		* May bias polluters’ decisions about how best to abate
 		* Income distribution effect(tax provide money of subsidy)
-		
+	
 * Per-unit subsidy on pollution reduction
 	s*(Zst-Z0)(Z is level of pollution)
 
@@ -556,26 +555,26 @@ A deposit/refund system is a market-based instrument to reduce waste
 Establishes a **market for rights to pollute** by issuing **tradable** pollution credits(uniformed Ast/n but tradable) or allowances
 
 * two components
-	* fixed number of permits
-	* tradable
-	
+  * fixed number of permits
+  * tradable
+
 * **Bargaining** gives rise to a market for pollution rights
 
 * How it works?(remind the question MACx<MACy)
 
-	> Higher polluter buy permits from lower
-	> when MAcx = MACy stop
-	> the MAC at the end point is the trade price
-	
+  > Higher polluter buy permits from lower
+  > when MAcx = MACy stop
+  > the MAC at the end point is the trade price
+
 * Pollution permits vs Pigovian tax
-	* Pogovian set the price of pollution 
-	* Permit set the quantity of pollution
-	* Assessing Pollution Permits: Trading establishes the price of a right to pollute **without government having to “search” for a price**
-	* Trading system is flexible (goverment simply change the standard)
-	* No tax revenues are generated
+  * Pogovian set the price of pollution 
+  * Permit set the quantity of pollution
+  * Assessing Pollution Permits: Trading establishes the price of a right to pollute **without government having to “search” for a price**
+  * Trading system is flexible (goverment simply change the standard)
+  * No tax revenues are generated
 
 
 
 
- 
+
 

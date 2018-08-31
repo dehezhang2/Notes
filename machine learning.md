@@ -92,7 +92,7 @@
     * Suppose $ \theta_0 $ is 0, then draw the graph of J -> a bow shipe graph
     * for two parameters we use contour plots(figures)
       * X-axis : $ \theta_0 $ Y-axis : $ \theta_1 $
-      * Every circle represent same value of $ J(\theta_0, \theta_1)  $ (等高线, 3-D 图的投影)
+      * Every circle represent same value of $ J(\theta_0, \theta_1)  ​$ (等高线, 3-D 图的投影)
 
 ---------------------
 
@@ -291,10 +291,11 @@
 
   
 
-  
-  $$
+
+$$
   h_\theta(x) = \theta_0x_0+\theta_1x_1+...+\theta_nx_n = {\theta^T}X
-  $$
+$$
+
 
 
 $$
@@ -444,7 +445,7 @@ $$
   $$
 
   $$
-  \vec p=X\vec \theta=X{(X^TX)}^{-1}X^T\vec y=P\vec y\ (P\ is\ the\ projection\ matrix)
+  \vec p=X\hat \theta=X{(X^TX)}^{-1}X^T\vec y=P\vec y\ (P\ is\ the\ projection\ matrix)
   $$
 
   $$
@@ -462,7 +463,7 @@ $$
 
 * Pros
 
-  * No need $\alpha$
+  * No need $\alpha​$
   * No need iterate
 
 * Cons : if n is large(features), it is slow [O(n^3) while gradient descent is O(kn^2) fit for(n<10000)]
@@ -810,8 +811,11 @@ logspace - 生成对数间距向量
 
     ```octave
     function [theta, J_history] = gradientDescentMulti(X, y, theta, alpha, num_iters);
+    % Create a column vector of J
     J_history = zeros(num_iters, 1);
+    % do gradient descent
     theta = theta - (1/length(y))*alpha*X'*(X*theta-y);
+    % compute new J for debug
     J_history(iter) = computeCostMulti(X, y, theta);
     end
     ```
@@ -825,4 +829,285 @@ logspace - 生成对数间距向量
     end
     ```
 
-    
+------------
+
+## Week 3
+
+-----------
+
+### 1. Classification -> logistic regression
+
+* Email: spam/not spam
+
+* Online Transactions: Fraudulent ( Yes/ No )
+
+* Tumor: Malignant / Benign
+
+  $y\in\ \{0,1\}$ 0: "Negative Class"; 1: "Positive Class"
+
+* Why not use linear regression? : It is easily affected by noisy points
+
+--------
+
+### 2. Hypothesis Representation (function used)
+
+#### (1) Logistic Regression Model
+
+Want $0\leq h_\theta(x)\leq 1$ 
+$$
+h_\theta(x)=g({\theta}^Tx)={1\over{1+e^{-{\theta}^Tx}}}
+$$
+
+$$
+g(z) = {1\over{1+e^{-z}}}
+$$
+
+g is Sigmoid (Logistic) function
+
+#### (2) Interpretation of Hpothesis Output
+
+ $h_\theta (x)=$ estimated probability that y =1 on input x = $P(y=1\ |\ x;\theta)$
+
+$h_\theta (x)=0.7$ => Tell patient that 70% chance of tumor being malignant
+$$
+P(y=0\ |\ x;\theta)=1-P(y=1\ |\ x;\theta)
+$$
+
+#### (3) Decision Boundary
+
+* property of the g 
+
+  * Suppose predict "y=1" if $h_ \theta(x) \geq0.5$  
+  * Predict "y=0" if $h_\theta(x)<0.5$                  
+  * $g(z)\geq0.5$ when $z\geq0$  ( ${\theta}^Tx\geq0$ )
+
+* Decision Boundary
+  $$
+  h_\theta (x) = g (\theta_0+\theta_1x_1+\theta_2x_2)
+  $$
+  
+
+$$
+\theta = [-3,1,1]
+$$
+
+​	Predict "y=1" if $-3+x_1+x_2\geq0$ $x_1+x_2=3$ is a line (Decision boundary)
+
+​	Cut the $x_1x_2$ plane into two pieces 
+
+* What if the training set is more complex (cannot use a line) : Add polynomial parameter
+
+--------------
+
+### 3. Logistic Regression Model
+
+#### (1) Cost function
+
+* Problem
+
+  Training set: {$(x^{(1)},y^{(1)}),(x^{(2)},y^{(2)}),\ ...\ ,(x^{(m)},y^{(m)})$}
+
+  m examples: $x\in[x_0,x_1,\ ...\ x_n]\ x_0=1, y\in\{0,1\}$
+
+  $h_\theta(x) = {1\over1+e^{-{\theta}^Tx}}$ 
+
+  How to choose $\theta$ 
+
+* Logistic regression cost function
+  $$
+  Cost(h_\theta(x),y)=
+  \begin{cases}
+  -log(h_\theta(x))\ if\ y=1 \\
+  -log(1-h_\theta(x))\ if\ y=0\\
+  \end{cases}
+  $$
+
+  * If $y=1,\ h_\theta(x) = 1$ then Cost = 0
+  * But as $h_\theta(z)\rightarrow0$ ,$Cost\rightarrow\infin$
+  * 如果猜对了， 奖励这个算法， 猜错了则增大cost
+
+#### (2) Simplified cost function and gradient descent
+
+$$
+J(\theta)={1\over m}\sum^m_{i=1}Cost(h_\theta(x^{(i)},y^{(i)})
+$$
+
+$$
+Cost(h_\theta(x),y)=
+\begin{cases}
+-log(h_\theta(x))\ if\ y=1 \\
+-log(1-h_\theta(x))\ if\ y=0\\
+\end{cases}
+$$
+
+Note y =0 or 1 always
+$$
+Cost(h_\theta(x),y)=-ylog(h_\theta(x))-(1-y)log(1-h_\theta(x)))
+$$
+
+$$
+J(\theta)=-{1\over m}\sum^m_{i=1}[y^{(i)}log(h_\theta(x^{(i)}))+(1-y^{(i)})log(1-h_\theta(x^{(i)}))]
+$$
+
+* Gradient Descent
+
+  $\theta_j:=\theta_j-\alpha{\delta\over{\delta\theta_j}}J(\theta)$
+
+  Repeat{
+
+  $\theta_j:=\theta_j-\alpha{1\over m} \sum^m_{i=1}(h_\theta(x^{(i)})-y^{(i)})x^{(i)}_j$
+
+  }
+  $$
+  {\delta\over{\delta\theta_j}}J(\theta)={1\over m} \sum^m_{i=1}(h_\theta(x^{(i)})-y^{(i)})x^{(i)}_j
+  $$
+  
+
+Which is similar to linear regression
+
+#### (3) Advanced optimization
+
+Given $\theta$ we have code that can compute $J(\theta)$ and  ${\delta\over{\delta\theta_j}}J(\theta)$ 
+
+* Optimization algorithm
+
+  * Conjugate gradient
+  * BFGS
+  * L-BFGS
+  * Advantages
+    * No need to manually pick $\alpha$
+    * Often faster than gradient descent
+  * Disadvantages
+    * More complex 
+
+* Example (Use derivative)
+
+  $\theta = [\theta_1,\theta_2]$
+
+  $J(\theta)=(\theta_1-5)^2+(\theta_2-5)^2$
+
+  ${\delta\over\delta\theta_1}J(\theta)=2(\theta_1-5)$
+
+  ${\delta\over\delta\theta_2}J(\theta)=2(\theta_2-5)$
+
+```matlab
+function [jVal,gradient] = costFunction(theta)
+jVal = (theta(1)-5)^2+(theta(2)-5)^2;
+gradient = zero(2,1);
+gradient(1) = 2*(theta(1)-5);
+gradient(2) = 2*(theta(2)-5);
+```
+
+```matlab
+% option is a data structure which can store your options
+options = optimset('GradObj','on','MaxIter','100');
+% set gradient objective parameter to on, and set the maximum number of interation
+initialTheta = zero(2,1);
+% @represent a pointer to costFunction
+[optTheta,functionVal,exitFlag] = fminunc(@costFunction,initialTheta,options);
+```
+
+-----------
+
+### 4. Multi-class classification: one-vs-all
+
+* Multiclass classification
+
+  * Email folding/tagging: Work, friend, family, hobby
+  * Medical: Not ill, cold, flu
+  * Weather: Sunny,Cloudy,Rain,Snow
+
+* One-vs-all (one-vs-rest) : use more binary classification
+  $$
+  h_\theta^{(i)}(x)  = P(y=i|x;\theta) (i=1,2,3)for\ three\ cluster
+  $$
+
+* On a new x, to make a prediction, pick the class i that maximizes $max\ h_\theta^{(i)}(x)$ 
+
+------------
+
+### 5. Solving the problem of overfitting
+
+#### (1) The problem of overfitting
+
+* Three kinds of fitting
+  * Cannot fit very well => "Underfit" or "High bias" (偏见，偏差)
+  * Fit well => "Just right"
+  * 100% fitting (Although fitting, but the curve is meaningless) => "Overfit" "High variance"
+
+* Overfitting : If we have too many features, the learned hypothesis may fit the training set very well ($J(\theta)={1\over {2m}}\sum_{i=1}^m(h_\theta(x^{(i)}-y^{(i)})^2\approx0$), but fail to generalize to new examples (predict prices on new examples)
+
+* Addressing overfitting:
+
+  * draw the graph
+
+  * Options
+
+    (1) Reduce number of features
+
+    * Manually select which features to keep
+    * Model selection algorithm
+
+    (2) Regularization
+
+    * Keep all the features, but reduce magnitude/values of parameters $\theta_j$ 
+    * Works well when we have a lot of features, each of which contributes a bit to predicting $y$ .
+
+#### (2) Cost function
+
+* modify the cost function by add quadratic of overfitting $\theta$ , and recalculate the minimum, to make them contribute less than before
+
+![](https://d3c33hcgiwev3.cloudfront.net/imageAssetProxy.v1/j0X9h6tUEeawbAp5ByfpEg_ea3e85af4056c56fa704547770da65a6_Screenshot-2016-11-15-08.53.32.png?expiry=1535587200000&hmac=pTJpk1gxb2Iihrs1iyuawu2XC1jluYbc9E76biX1m3Q),
+
+* Regularization : small value for parameters $\theta_0,\theta_1,...,\theta_n$
+
+  * "Simpler" hypothesis
+  * Less prone to overfitting
+  * In real use, we don't know to shrink which parameter => shrink all parameters ($\lambda$ is regularization parameter)
+
+  $$
+  J(\theta)={1\over2m}[\sum_{i=1}^m(h_\theta(x^{(i)})-y^{(i)})^2+\lambda\sum_{j=1}^n{\theta_j}^2]
+  $$
+
+  * If $\lambda$ is too large => cause underfitting ( i.e. $h_\theta(x)=\theta_0$) 
+
+#### (2) regularized linear regression
+
+* Gradient descent (with regularization) => treat $\theta_0$ differently
+
+  Repeat{
+
+  $\theta_0:=\theta_0-\alpha{1\over m}\sum_{i=1}^m(h_\theta(x^{(i)})-y^{(i)})x_0^{(i)}$
+
+  $\theta_j:=\theta_j-\alpha{1\over m}[\sum_{i=1}^m(h_\theta(x^{(i)})-y^{(i)})x_j^{(i)}+\lambda\theta_j](j\neq0)$
+
+  Or $\theta_j:=\theta_j(1-\alpha{\lambda\over m})-\alpha{1\over m}\sum_{i=1}^m(h_\theta(x^{(i)})-y^{(i)})x_j^{(i)}(j\neq0)((1-\alpha{\lambda\over m})\ is\ always\ less\ than\ 1)$
+
+  }
+
+* Normal equation
+  $$
+  \theta=(X^TX+\lambda L)^{-1}X^T y
+  $$
+  Where L is a matrix
+  $$
+  \begin{bmatrix}0&0&\cdots&0\\0&1&\cdots&0\\\vdots&\vdots&\ddots&\vdots\\0&0&\cdots&1 \end{bmatrix}
+  $$
+
+  * Use when the matrix $X^TX$ is singular
+
+
+
+#### (3) regularized logistic regression
+
+* Cost function
+  $$
+  J(\theta)=-[{1\over m}\sum^m_{i=1}[y^{(i)}log(h_\theta(x^{(i)}))+(1-y^{(i)})log(1-h_\theta(x^{(i)}))]]+{\lambda\over2m}\sum^n_{j=1}{\theta_j}^2 (j=1,2,...,n)
+  $$
+
+* Advanced optimization
+
+  * 
+
+
+
