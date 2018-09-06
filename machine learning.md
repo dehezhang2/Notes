@@ -1031,6 +1031,7 @@ initialTheta = zero(2,1);
 #### (1) The problem of overfitting
 
 * Three kinds of fitting
+
   * Cannot fit very well => "Underfit" or "High bias" (偏见，偏差)
   * Fit well => "Just right"
   * 100% fitting (Although fitting, but the curve is meaningless) => "Overfit" "High variance"
@@ -1107,7 +1108,155 @@ initialTheta = zero(2,1);
 
 * Advanced optimization
 
-  * 
+
+
+-------------
+
+## Week4
+
+### 1. Motivations
+
+* There may be a lot of features => it is not efficient to use all feature
+* Neural network => build brain
+
+-----------
+
+### 2. Neural Networks
+
+#### (1) Model Representation I
+
+* Neuron model : logistic unit
+
+  
+  $$
+  \begin{bmatrix}x_0\\x_1\\\vdots\\x_m\end{bmatrix}=>[\ \ ]=>h_\theta(x)
+  $$
+
+  * Sigmoid function => activation function $g(z)$ 
+  * $\theta$ => weights or parameters
+
+* Neuron network
+
+  ![](https://d3c33hcgiwev3.cloudfront.net/imageAssetProxy.v1/0rgjYLDeEeajLxLfjQiSjg_0c07c56839f8d6e8d7b0d09acedc88fd_Screenshot-2016-11-22-10.08.51.png?expiry=1535932800000&hmac=5jlI2pmR-1O8ekWJG_xQU9DzH75VYHo1nEGwRfcALv4)
+
+  * dimension of $\Theta$ : $s_{j+1}*(s_j+1)$ where $s_n$ is the number of variables in nth layer
+
+#### (2) Model representation II
+
+* Forward propagation: Vectorized implementation
+
+$$
+z^{(j+1)}={\Theta}^{(j)}a^{(j)}
+$$
+
+$$
+h_\theta(x)=a^{(j+1)}=g(z^{(j+1)})
+$$
+
+-----------------
+
+### 3. Applications
+
+#### (1) Example and Intuitions I
 
 
 
+![](https://d3c33hcgiwev3.cloudfront.net/imageAssetProxy.v1/wMOiMrGnEeajLxLfjQiSjg_bbbdad80f5c95068bde7c9134babdd77_Screenshot-2016-11-23-10.07.24.png?expiry=1535932800000&hmac=pM3HSrJVUvTS0FU0xp8PM9V4ydfbbshgC5Ojkw282uw)
+
+![](https://d3c33hcgiwev3.cloudfront.net/imageAssetProxy.v1/f_ueJLGnEea3qApInhZCFg_a5ff8edc62c9a09900eae075e8502e34_Screenshot-2016-11-23-10.03.48.png?expiry=1535932800000&hmac=2F8_rvXgjCmIfPhfKewJ4Y42p7jyqwo6bazC8umkxcM)
+
+#### (2) Example and Intuitions II
+
+![](https://d3c33hcgiwev3.cloudfront.net/imageAssetProxy.v1/rag_zbGqEeaSmhJaoV5QvA_52c04a987dcb692da8979a2198f3d8d7_Screenshot-2016-11-23-10.28.41.png?expiry=1535932800000&hmac=NLVJU-uxcwUqyc1Zz5_Z-ZMQpTZHwBiy8zujyg-lZWU)
+
+-----------
+
+## Week 5
+
+-----
+
+### 1. Cost Function and Backpropagation
+
+#### (1) Cost function
+
+* Cost functions
+
+  * Denotes
+    * $L$ = total number of layers in the network
+    * $S_l$ = number of units (not counting bias unit) in layer $l$
+    * $K$ = number of output units/classes
+  * Logistic regression
+
+  $$
+  J(\theta)=-[{1\over m}\sum^m_{i=1}[y^{(i)}log(h_\theta(x^{(i)}))+(1-y^{(i)})log(1-h_\theta(x^{(i)}))]]+{\lambda\over2m}\sum^n_{j=1}{\theta_j}^2 (j=1,2,...,n)
+  $$
+
+  * Neural network (for multi-class problem there are K clusters) $h_\Theta(x) \in R^K\ (h_\Theta(x))_i=i^{th}\ output$
+    * The first part add the cost of all the m-by-K results
+    * The second part add all the theta used (every column, row, layer (L))
+
+$$
+J(\Theta)=-{1\over m}[\sum_{i=1}^m\sum_{k=1}^Ky^{(i)}_klog(h_\Theta(x^{(i)}))_k+(1-y^{(i)}_k)log(1-h_\Theta(x^{(i)}))_k]+{\lambda \over 2m}\sum_{l=1}^{L-1}\sum_{i=1}^{S_l}\sum_{j=1}^{S_{l+1}}(\Theta_{ji}^{l})^2
+$$
+
+#### (2) Backpropagation Algorithm
+
+* Gradient computation
+
+  * we need : $min_\Theta J(\Theta)$ and ${\delta\over\delta\Theta^{(l)}_{ij}}J(\Theta)$ 
+
+  * Given one training example $(x, y)$ 
+
+  * Intuition: $\delta^{(l)}_j$ = "errors" of node $j$ in layer $l$ 
+    $$
+    \delta_j^{(4)}=a^{(4)}_j-y_j
+    $$
+
+
+$$
+\delta^{(3)}=(\Theta^{(3)})^T\delta^{(4)}.*\ (a^{(3)}.*(1-a^{(3)}))
+$$
+
+$$
+\delta^{(2)}=(\Theta^{(2)})^T\delta^{(3)}.*\ (a^{(2)}.*(1-a^{(2)}))
+$$
+
+$$
+{\delta\over\delta\Theta_{ij}^{(l)}}J(\Theta)=a^{(l)}_j\delta^{(l+1)}_i
+$$
+
+* Backpropagation algorithm
+
+  * Training set $\{(x^{(1)},y^{(1)}),...,(x^{(m)},y^{(m)})\}$
+
+  * Set $\Delta^{(l)}_{ij}=0$ (for all l, i, j)
+
+    For i=1 to m
+
+    ​	Set $a^{(1)} = x^{(i)}$
+
+    ​	Perform forward propagation to compute $a^{(l)}$ for $l=2,3,...,L$
+
+    ​	Using $y^{(i)}$, compute $\delta^{(L)}=a^{(L)}-y^{(i)}$
+
+    ​	Compute $\delta^{(L-1)},\delta^{(L-2)}, \delta^{(2)}$  using $\delta^{(l)}=((\Theta^{(l)})^T\delta^{(l+1)}).*a^{(l)}.*(1-a^{(l)})$
+
+    ​	 $\Delta^{(l)}_{(ij)}+=a^{(l)}_j\delta^{(l+1)}_i$
+
+    ![](https://d3c33hcgiwev3.cloudfront.net/imageAssetProxy.v1/Ul6i5teoEea1UArqXEX_3g_a36fb24a11c744d7552f0fecf2fdd752_Screenshot-2017-01-10-17.13.27.png?expiry=1536019200000&hmac=15UFuOdaUFnYJHMtyA1CTMY5dwh8f5sI6W1IIwa5YNw)
+
+#### (3) Backpropagation Intuition
+
+* Forward Propagation
+  $$
+  z^{(l)}_1=\Theta^{(l-1)}_{10}*1+\Theta^{(l-1)}_{11}*a^{(l-1)}_1+\Theta^{(l-1)}_{11}*a^{(l-1)}_2
+  $$
+  Focusing on a single example $x^{(i)}$ $y^{(i)}$ ignore regularization
+  $$
+  cost = y^{(i)}logh_\Theta(x^{(i)})+(1-y^{(i)})logh_\Theta(x^{(i)})
+  $$
+  ![](https://d3c33hcgiwev3.cloudfront.net/imageAssetProxy.v1/qc309rdcEea4MxKdJPaTxA_324034f1a3c3a3be8e7c6cfca90d3445_fixx.png?expiry=1536019200000&hmac=P1IrwwNA4YtSRAQkhtuB1GL8oA2nH5rtPJhWr73OlWc)
+
+#### (4) Backpropagation in Practice
+
+* 

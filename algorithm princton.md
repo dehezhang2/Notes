@@ -18,7 +18,7 @@
 
 ---------------------------------------
 #### Interview questions 
-1. Merging with smaller auxiliary array. Suppose that the subarray \mathtt{a[0]}a[0] to \mathtt{a[n-1]}a[n−1] is sorted and the subarray \mathtt{a[n]}a[n] to \mathtt{a[2*n-1]}a[2∗n−1] is sorted. How can you merge the two subarrays so that \mathtt{a[0]}a[0] to \mathtt{a[2*n-1]}a[2∗n−1] is sorted using an auxiliary array of length nn (instead of 2n2n)?
+1. Merging with smaller auxiliary array. Suppose that the subarray $\mathtt{a[0]}a[0]$ to $\mathtt{a[n-1]}a[n−1]$ is sorted and the subarray $\mathtt{a[n]}a[n]$ to $\mathtt{a[2*n-1]}a[2∗n−1]$ is sorted. How can you merge the two subarrays so that $\mathtt{a[0]}a[0]$ to $\mathtt{a[2*n-1]}a[2∗n−1]$ is sorted using an auxiliary array of length nn (instead of 2n2n)?
 
 		copy only the left half into the auxiliary array
 2. Shuffling a linked list
@@ -1974,8 +1974,463 @@ public class FileIndex{
   }
   ```
 
-* Set-of-edges graph representation : maintain a list of the edges
+* Set-of-edges graph representation : maintain a list of the edges (linked list or array) => inefficient
 
-* 
+* Adjacency-matrix graph representation
 
-* 
+  * Maintain a two-dimentional V-by-V boolean array
+  * for each edge $v-w$ in graph ```adj[v][w]=adj[w][v]=true``` (1 represent there is a connection)
+
+* Adjacency-list graph representation : maitain vertex-indexed array of lists
+
+  ```java
+  public class Graph{
+      private final int V;
+      private Bag<Integer>[] adj;	//adjacency lists(Using bag data type)
+      public Graph(int V){
+          this.V = V;
+          adj = (Bag<Integer>[]) new Bag[V];
+          for(int v = 0;v < V; v++)
+              adj[v] = new Bag<Integer>();
+      }
+      public void addEdge(int v, int w){
+          adj[v].add(w);
+          adj[w].add(v);
+      }
+      public Iterable<Integer> adj(int v){
+          return adj[v];
+      }
+  }
+  ```
+
+* In practice : Use adjacency-lists representation
+
+  * Algorithm based on iterating over vertices adjacent to $v$ 
+  * Real-world graphs tend to be sparse (huge number of vertices, small average vertex degree)
+
+#### (3) Depth-First Search
+
+* Maze exploration
+
+  * Vertex = intersection
+  * Edge = passage
+  * Goal : explore every intersection in the maze
+
+* Tremaux maze exploration (avoid going to the same place twice)
+
+  * Unrool a ball of string behind you
+  * Mark each visited intersection and each visited passage
+  * Retrace steps when no unvisited options
+
+* Depth-first search
+
+  * Goal : Systematically search through a graph
+  * Idea : Mimic maze exploration
+  * Typical applications
+    * Find all vertices connected to a given sourse vertex
+    * Find a path between two vertices
+
+* Design pattern for graph processing => decouple(分离) graph data type from graph processing (easily to change implementation)
+
+  * Create a Graph object
+  * Pass the Graph to a graph-processing routine
+  * Query the graph-processing routine for information
+
+  ```java
+  public class Paths{
+      Paths(Graph G, int s);
+      boolean hasPathTo(int v);			//is there a path from s to v
+      Iterable<Integer> pathTo(int v);	//all paths from s to v (if no return null)
+  }
+  ```
+
+* To visit a vertex $v$ 
+
+  * Mark vertex $v$ as visited
+    * provide an array ```marked[]``` to represent vertex $v$ is marked or not
+    * provide a vertex indexed array of ints ```edgeTo[v]```  to store *where did you from*
+
+  ```java
+  public class DepthFirstPaths{
+      private boolean[] marked;
+      private int[] edgeTo;
+      private int s;
+      public DepthFirstPaths(Graph G, int s){
+          int num = G.V();
+          marked = new boolean[num];
+          edgeTo = new int[num];
+          for(int i=0;i<num;i++)
+              marked[i] = false;
+          this.s = s;
+          dfs(G,s);
+      }
+      private void dfs(Graph G, int v){
+          marked[v] = true;
+          for(int w : G.adj(v))
+              if(!marked[w]){
+                  dfs(w);
+                  edgeTo[w] = v;
+              }
+      }
+  }
+  ```
+
+* Depth-first search properties
+
+  - Proposition(主张， 命题) ： DFS marks all vertices connected to $s$ in time proportional to the sum of their degrees
+  - Pf
+    - If $w$ marked, then $w$ connected to $s$
+    - If $w$ connected to $s$ , then $w$ marked
+
+* Find the paths
+
+  ```java
+  public boolean hasPathTo(int v){
+      return marked[v];
+  }
+  public Iterable<Integer> pathTo(int v){
+      if(!hasPathTo(v)) return null;
+      Stack<Integer> path = new Stack<Integer> ();
+      for(int x = v; x != s; x = edgeTo[x])
+          path.push(x);
+      path.push(s);
+      return path;
+  }
+  ```
+
+  
+
+#### (4) Breadth-first search
+
+* Repeat until queue is empty:
+  * Remove vertex $v$ from queue
+  * Add to queue all unmarked vertices adjacent to $v$ and mark them
+* Compare
+  * Depth-first search : Put unvisited vertices on a stack (using recursion)
+  * Breadth-first search : Put unvisited vertices on a queue 
+  * Shortest path : Find path from $s$ to $t$ that uses fewest number of edges
+* Implementation
+
+ 
+
+```java
+public class BreadthFirstPaths{
+    private boolean[] marked;
+    private int[] edgeTo;
+    private int[] dist;
+    private void bfs(Graph G, int s){
+        Queue<Integer> q = new Queue<Integer>();
+        q.enqueue(s);
+        marked[s] = true;
+        dist[s]=0;
+        while(!q.isEmpty()){
+            int v = q.dequeue();
+            for(int w:G.adj(v)){
+                if(!marked[w]){
+                    q.enqueue(w);
+                    marked[w]=true;
+                    edgeTo[w]=v;
+                    dist[w] = dist[v]+1;
+                
+            }
+        }
+    }
+}
+```
+
+
+
+#### (5) Connected Components
+
+* Pre
+  * Def : 
+    * Connect : Vertices $v$ and $w$ are connected if there is a path between them
+    * Maximal set of connected vertices
+  * Goal : Preprocess graph to answer queries of the form is $v$ connected to $w$ in constant time (union find can't fulfill) 
+  * Difference with union find : union find一边画图，一边计算； 后者被提供不变的图
+
+  ```java
+  public class CC{
+      CC(Graph G);					//find connected components in G
+      boolean connected(int v, int w);//are v and w connected
+      int count();					//number of connected components
+      int id(int v);					//component identifier for v
+  }
+  ```
+
+* Properties : The relation "is connected to" is an equivalence relation
+
+  - Reflexive : v connected to v
+  - Symmetric
+  - Transitive
+
+* Implementation
+
+  * Goal : Partition vertices into connected components =>  int array id to make cluster
+
+  ```java
+  public class CC{
+      private boolean marked[];
+      private int[] id;
+      private int count;
+      
+      public CC(Graph G){
+          marked = new boolean[G.V()];
+          id = new int[G.V()];
+          for(int v=0;v<G.V();v++){
+              if(!marked[v]){
+                  dfs(G,v);
+                  count++;
+              }
+          }
+      }
+      public int count(){return count;}
+      public int id(int v){return id[v];}
+      private void dfs(Graph G,int v){
+          marked[v] = true;
+          id[v] = count;
+          for(int w:G.adj(v))
+              if(!marked[w])
+                  dfs(G,w);
+      }
+  }
+  ```
+
+
+
+#### (6) Challenges
+
+* Challenge 1 : Is a graph bipartite ?
+  * Bipartite : divide vertices into two subsets that every connect one subset's point to another's
+  * Use DFS
+* Challenge 2 : Find a cycle
+  * DFS
+* Challenge 3 : Find a cycle use each edge once
+  * Bridges of Konigsberg : Is there a cycle that uses each edge exactly once?
+  * Answer : A connected graph is Eulerian iff all vertices have even degree
+* Challenge 4 : Find a cycle that visits every vertex exactly once (Intractable)
+* Challenge 5 : Are two graphs identical except for vertex names （we don't know）
+* Challenge 6 : Lay out a graph in the plane without crossing edges (expert do this)
+
+#### (7) Interview questions
+
+* implement DFS without recursion => use stack
+* Diameter and center of a tree
+  * Diameter : pick a vertex s; run BFS from s; then run BFS again from the vertex that is furthest from s
+  * Center : consider vertices on the longest path
+* Euler circle (edge once)
+  * A connected graph has an Euler cycle if and only if every vertex has even degree
+  * Design a linear-time algorithm to determine whether a graph has an Euler cycle, and if so, find one
+  * Hint : use DFS and piece together the cycles you discover
+
+-----------
+
+### 2. Directed Network
+
+#### (1) Introduction to Digraphs
+
+* Digraph : vertices connected by directed edges
+* Problems
+  * Path : Is there a directed path from $s$ to $t$
+  * Shortest Path : What is the shortest directed path form $s$ to $t$
+  * Topological sort : Can you draw a digraph so that all edges point upwards?
+  * Strong connectivity : Is there a directed path between all pairs of vertices
+  * Transitive closure : For which vertices $v$ and $w$ is there a path from $v$ to $w$
+  * PageRank : What is the importance of a web page
+* Parallel edges : two or more edges connect two vertices
+
+#### (2) Digraph API
+
+```java
+public class Digraph{
+    private final int V;
+    private final Bag<Integer>[] adj;
+    Digraph(int V){
+        this.V = V;
+        adj = (Bag<Integer>[]) new Bag[V];
+        for(int i=0;i<V;v++)
+            adj[i] = new Bag<Integer>();
+    }
+    Digraph(In in);
+    void addEdge(int v,int w){
+        adj[v].add(w);
+    }
+    Iterable<Integer> adj(int v){
+        return adj[v];
+    }
+    int V();
+    int E();
+    Digraph reverse();				//reverse of this graph
+    String toString();
+}
+```
+
+* Maintain vertex-indexed array of lists
+
+#### (3) Digraph search
+
+* Reachability : Find all vertices reachable from $s$ along a directed path
+
+  * Same as undirected graph
+  * DFS is a digraph algorithm
+
+* Application
+
+  * program control-flow analysis
+  * Mark-sweep garbage collector (Object(vertices) reference(edges))
+
+* BFS in digraphs
+
+  * Every undirected graph is a kind of digraph
+  * BFS is a digraph algorithm
+
+* Application
+
+  * Crawl web, starting from some root web page (use implicit digraph)
+
+    * Choose root web as source s
+    * Maintain a Queue of websites to explore
+    * Maintain a SET of discovered websites
+    * Dequeue the next website and enqueue websites to which it links
+    * why not DFS : new websites create new links, make it too deep
+
+    ```java
+    Queue<String> queue = new Queue<String>();
+    SET<String> discovered = new SET<String>();
+    String root = "http://www.princeton.edu";
+    queue.enqueue(root);
+    discovered.add(root);
+    while(!queue.isEmpty()){
+        String v = queue.dequeue();
+        StdOut.println(v);
+        
+        In in = new In(v);
+        String input = in.readAll();
+        String regexp = "http://(\\w+\\.)*(\\w+)";
+        Pattern pattern = Pattern.compile(regexp);
+        Matcher matcher = pattern.matcher(input);
+        
+        while(matcher.find()){
+            String w = matcher.group();
+            if(!discovered.contains(w)){
+                discovered.add(w);
+                queue.enqueue(w);
+            }
+        }
+    }
+    ```
+
+    
+
+  #### (4) Topological Sorting
+
+  * Precedence scheduling
+
+    * Goal : Given a set of tasks to be completed with precedence constraints, in which order should we schedule the tasks
+
+    * Digraph model : vertex = task edge = precedence constraint (There is no cycle in the graph i.e. acyclic graph)
+
+    * Topological sort : Redraw the graph s.t. all edges point upwards
+
+    * Solve : DFS
+
+      * Run DFS
+      * Return vertices in reverse postorder (The order of solved)
+
+    * Implementation
+
+      ```java
+      public class DepthFirstOrder{
+          private boolean[] marked;
+          private Stack<Integer> reversePost;
+          public DepthFirstOrder(Digraph G){
+              reversePost = new Stack<Integer>();
+              marked = new boolean[G.V()];
+              for(int i=0 ; i<G.V(); i++)
+                  if(!marked[i]) dfs(G,i);
+          }
+          private void dfs(Digraph G, int i){
+              marked[i] = true;
+              for(int w:G.adj(i))
+                  if(!marked(w)) dfs(G,w);
+              reversePost.push(i);
+          }
+          public Iterable<Integer> reversePost(){
+              return reversePost;
+          }
+      }
+      ```
+
+    * Consider an execution of depth-first search on a directed acyclic graph $G$ which contains the edge $v →w$. Which one of the following is impossible at the time $dfs(v)$ is called?
+
+      * dfs(w) has already been called but not yet returned.
+      * If $dfs(v)$ is called before $dfs(w)$ returns, then the function-call stack contains a directed path from w to v (as in the previous in-video quiz). Combining this path with the edge $v→w$ yields a directed cycle, which is impossible since G is acyclic.
+
+    * Proposition : Reverse DFS postorder of a DAG(no cycle graph) is a topological order
+
+      * Pf : Consider any edge v -> w. When dfs(v) is called
+        * Case1: ```dfs(w)``` has already been called and returned, w has done before v
+        * Case2: ```dfs(w)``` has not yet been called => it will be called directly or indirectly by ```dfs(v)``` , and will finish before it
+        * Case3: impossible
+
+  * Directed cycle detection
+
+    * Proposition : A digraph has a topological order iff no directed cycle
+    * DFS
+
+#### (5) Strong components
+
+* Def : Vertices $v$ and $w$ are strongly connected if there is a directed path from $v$ to $w$ and a directed path from $w$ to $v$
+
+  * Equivalence relation
+
+* Method used in Undirected(DFS) => wrong because the source node may not be the first one in topological order
+
+* Kosaraju-Sharir algorithm
+
+  * Reverse graph : Strong components in $G$ are same as in $G^R$
+
+  * Kernel DAG : Contract each strong component into a single vertex
+
+  * Idea : 
+
+    * Compute topological order in kernel DAG
+    * Run DFS, consider vertices in reverse topological order
+    * Phase 1 : Compute reverse postorder in $G^R$
+    * Phase2 : Run DFS in $G$, in the order of reverse postorder of $G^R$
+
+  * Implementation
+
+    ```java
+    public class KosarajuSharirSCC{
+        private boolean marked[];
+        private int[] id;
+        private int count;
+        public  KosarajuSharirSCC(Digraph G){
+            marked = new boolean[G.V()];
+            id = new int[G.V()];
+            count=0;
+            DepthFirstOrder dfs = new DepthFirstOrder(G.reverse());
+            for(int v:dfs.reversePost()){
+                if(!marked[v]){
+                    dfs(G,v);
+                    count++;
+                }
+            }
+        }
+        private void dfs(G,v){
+            marked[v] = true;
+            id[v] = count;
+            for(int w:G.adj(v))
+                if(!marked[w])
+                    dfs(G,w);
+        }
+        public boolean stronglyConnected(int v,int w){
+            return id[v]==id[w];
+        }
+    }
+    ```
+
+  * Actually, you only need to use DFS in phase 1, in phase 2 any search algorithm is avaliable
+
+  * 
