@@ -2433,4 +2433,11 @@ public class Digraph{
 
   * Actually, you only need to use DFS in phase 1, in phase 2 any search algorithm is avaliable
 
-  * 
+* Convex Hull
+
+  * Quick Hull
+    * divide the plane into two every time until there is still outside points $n^2$
+  * Merge Hull
+    * generate 1 convex Hull from 2 convex Hull $n logn$
+  * Graham Scan
+    * 
