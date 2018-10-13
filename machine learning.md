@@ -24,7 +24,7 @@
 
 -------
 
-### What is Machine Learning?
+### What is Machine Learning?s
 
 * Field of study that gives computer the ability to learn without explicity programmed
 
@@ -1211,6 +1211,7 @@ $$
     $$
     \delta_j^{(4)}=a^{(4)}_j-y_j
     $$
+
 
 
 $$
