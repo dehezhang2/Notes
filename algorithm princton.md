@@ -1718,7 +1718,7 @@ private Node rotateRight(Node h){
   * Improved version
     * Two-probe hashing (separate-chaining variant)
       * Hash to two positions（two hash function）, insert key in shorter of the two chains
-      * Reduce expected length of the longest chain to $log logN​$
+      * Reduce expected length of the longest chain to $log logN$
     * Double hasing (linear-probing variant)
       * Use linear probing, but skip a variable amount, not just 1 each time
       * Effectively eliminates clustering
@@ -1811,7 +1811,7 @@ private Node rotateRight(Node h){
           while(!StdIn.isEmpty()){
               String s = StdIn.readString();
               if(!st.contains(s)) StdOut.println("Not found");
-              else				StdOut.orintln(st.get(s));
+              else				StdOut.println(st.get(s));
           }
       }
   }
@@ -2440,4 +2440,4 @@ public class Digraph{
   * Merge Hull
     * generate 1 convex Hull from 2 convex Hull $n logn$
   * Graham Scan
-    * 
+
