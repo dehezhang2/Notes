@@ -351,7 +351,7 @@ for(int i = left + 1, j = right; i < = j; ){
           // find max child
           if(j<N && less(j,j+1)) j++;	//here are N entries, start from 1 so N is the last 
           if(!less(k,j)) break;
-          swap(k.j);
+          swap(k,j);
           //check next
           k = j;
       }
@@ -1049,10 +1049,10 @@ public ckass ST<Key,Value>{
         root = deleteMin(root);	//root = root; x=x recursion pattern
     }
     private Node deleteMin(Node x){
-        //if it is null replace by its right link
+        // if it is null replace by its right link
         if(x.left == null) return x.right;
         x.left = deleteMin(x.left);
-        //recalculate the size of the BST
+        // recalculate the size of the BST
         x.count = 1+size(x.left)+size(x.right);
         return x;
     }
@@ -1068,6 +1068,7 @@ public ckass ST<Key,Value>{
       * Find successor ***x*** of ***t*** 
       * Delete the minimum in t's right subtree
       * put ***x*** in ***t***'s spot (replace x by t)
+      * i.e. swap x and the min of right subtree, delete x
 
     ```java
     public void delete(Key key){
@@ -1079,13 +1080,13 @@ public ckass ST<Key,Value>{
         if(cmp<0) delete(x.left,key);
         else if(cmp>0) delete(x.right,key);
         else{
-            //if it has only one child or zero child
+         //if it has only one child or zero child，or no child can also handle
             if(x.right==null) return x.left;
             else if(x.left==null) return x.right;
             Node t = x;	//now t is the one should be deleted
             //find the minimum of the right tree
             x = min(t.right);
-            //right of x is the right tree deleted x
+            //assign right of x as the right tree deleted x
             x.right = deleteMin(t.right);
             x.left = t.left;
         }
