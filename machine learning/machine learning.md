@@ -289,7 +289,6 @@
   $$
   For convenience of notation, define $x_0 = 1$ ($x{^{(i)}_0} = 1$)
 
-  
 
 
 $$
@@ -333,7 +332,6 @@ $$
     x_i={x_i-\mu_i\over s_i} \ (\mu\ is\ average,s\ is\ range=max-min )
     $$
 
-    
 
 -------------
 
@@ -688,7 +686,6 @@ end;
     
     ```
 
-    
 
 #### (6) Vectorization
 
@@ -704,8 +701,6 @@ $$
   	prediction = prediction + theta(j)*X(j);
   end;
   ```
-
-  
 
 * Vectorized version
 
@@ -728,7 +723,6 @@ $$
   theta = theta-alpha*X'*(X*theta-Y)
   ```
 
-  
 
 #### (7) Method learnt in the assignment
 
@@ -845,7 +839,7 @@ logspace - 生成对数间距向量
 
   $y\in\ \{0,1\}$ 0: "Negative Class"; 1: "Positive Class"
 
-* Why not use linear regression? : It is easily affected by noisy points
+* Why not use linear rexgression? : It is easily affected by noisy points
 
 --------
 
@@ -927,7 +921,6 @@ $$
   * 如果猜对了， 奖励这个算法， 猜错了则增大cost
 
 #### (2) Simplified cost function and gradient descent
-
 $$
 J(\theta)={1\over m}\sum^m_{i=1}Cost(h_\theta(x^{(i)},y^{(i)})
 $$
@@ -1211,6 +1204,8 @@ $$
     $$
     \delta_j^{(4)}=a^{(4)}_j-y_j
     $$
+
+
 
 
 
