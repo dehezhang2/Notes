@@ -65,6 +65,111 @@
 
   * I/O program includes: **label 4**(before execution, prepare output buffer); **Actual I/O command**(without interrupt, the program must wait and can only test whether the I/O instruction is end); **label 5**(after execution, may include set the flag that indicate the success or failure of the execution)
 
-    ![](/Users/zdh/Documents/GitHub/Notes/屏幕快照 2019-01-14 下午8.04.52.png)
+    ![](屏幕快照 2019-01-14 下午8.04.52.png)
 
-* 
+    ![](屏幕快照 2019-01-14 下午8.04.59.png)
+
+* Transfer of control via Interrupts
+
+  * Interrupt suspends(暂停) normal sequence of execution
+  * execution resumes when the interrupt processing is completed
+
+  ![](屏幕快照 2019-01-14 下午8.11.33.png)
+
+  ![](屏幕快照 2019-01-14 下午8.40.09.png)
+
+  ![](屏幕快照 2019-01-14 下午8.43.32.png)
+
+* Uniprogramming vs Multiprogramming
+
+  * Uniprogramming: only one program is running at a given time
+    * The processor spends a certain amount of time executing, until it reaches an I/O instruction;
+      it must then wait until that I/O instruction concludes before proceeding
+  * Multiprogramming: processor has more than one program to execute
+
+    * When **one job(A)** needs to wait for I/O, the processor can switch to the **other job(B,C)**.
+
+      ![](屏幕快照 2019-01-14 下午8.51.43.png)
+
+* Multiprogramming Example
+
+### Memory Hierarchy
+
+* Going down the hierarchy
+  * decreasing cost per bit
+  * Increasing capacity
+  * Increasing access time(lower speed)
+  * Decreasing frequency of access to the memory by the processor
+* **Cache Memory**: Processor must access memory at least once per instruction cycle -> processor execution is limited by memory cycle time, but processor speed is much faster than memory access speed
+  * Solution: copy information in use from slower to faster (but smaller) storage (cache) temporarily
+  * checked first to determine if information is there
+  * Principle of locality: Data which is required soon is often close to the current data. If data is accessed,
+    then it’s neighbors might also be accessed in the near future.
+* Secondary Memory: Also known as storage devices
+  * extension of main memory that provide large nonvolatile storage capacity
+  * Used to store program and data files
+  * Most commonly used: magnetic disks
+    * Disk surface is logically divided into *tracks*, which are subdivided into *sectors*.
+    * The disk controller determines the logical interaction between the device and the computer
+
+### I/O Communication Techniques
+
+* When the processor encounters an instruction relating to I/O , it executes that instruction by issuing a command to the appropriate I/O module
+
+* Three techniques are possile
+
+  * Programmed I/O
+
+    ![](屏幕快照 2019-01-15 上午8.54.49.png)
+
+  * Interrupt-driven I/O
+
+    ![](屏幕快照 2019-01-15 上午8.55.05.png)
+
+  * Direct memory access (DMA)
+
+    ![](屏幕快照 2019-01-15 上午8.58.11.png)
+
+  
+
+### Operating System Objectives & Functions
+
+* Definition of Operating System (OS)
+
+  ![](屏幕快照 2019-01-15 上午10.30.37.png)
+
+  * A program that control the execution of application programs
+  * An **interface between application and hardware**
+  * Main objectives of an OS
+    * Convenience : Making a computer more **convenient to use**
+    * Efficiency : Allowing computer **resources** to be used efficiently
+    * Ability to evolve : Permitting effective development, testing and introduction of new system functions
+      * hareware upgrade / new hardware
+      * new services
+      * fixes
+
+* OS Servivces
+
+  * Program developement(editors and debuggers)
+  * Program execution(OS handles steps need to be performed to execute a program, i.e. instructions)
+  * Access I/O devices(OS provides a uniform interface so that programmers can access I/O devices using simple reads and writes)
+  * Controlled access to files(In the case of system with multiple users OS provides protection mechanisms to control access to the files)
+  * System access(also for shared systems)
+  * Error detection and response(OS must provide a response that clears the error condition with the least impact on running applications. )
+  * Accounting(A good OS will collect usage statistics for various resources and monitor
+    performance parameters such as response time)
+
+* OS as resource manager
+
+  * A computer is a set of resources for the movement, storage, and processing of data
+  * OS is responsible for managing these resourses
+    * how much processor time is to be devoted to the execution of a particular user program
+    * controls the allocation of main memory
+    * decides when an I/O device can be used by a program in execution
+    * controls access to the use of files
+
+* Major topics of OS
+
+  ![](屏幕快照 2019-01-15 上午10.54.26.png)
+
+  
