@@ -212,4 +212,39 @@
 
   ![](屏幕快照 2019-01-15 上午10.54.26.png)
 
-  
+----------------
+
+## Chapter 3 Process Description and Control
+
+-----------
+
+* **Process states** which characterize the behaviour of processes
+* **Data structure** used to manage processes
+* OS use data structures to control process execution
+
+-------------------------
+
+### How are processes represented and controlled by the OS
+
+* All modern OS rely on a model in which the execution of an application corresponds to the existence of one or more processes.
+* Example: single-user systems such as Windows and mainframe system such as IBM’s mainframe OS, z/OS, are built around the ***concept of process***. 
+* Process : A program in execution
+  * An **instance of** a program running on a computer
+  * The entity that can be assigned to and executed on a processor
+  * A unit of activity characterized by the execution of a **sequence of instructions, a current state, and an associated set of system resources**
+* Process Elements
+  * Program code
+  * Associated data needed by the program
+  * Execution context of the program, containing all information the OS needs to manage the process
+* Requirement of an OS
+  * fundamental task: process management
+    * Interleave(插入) the execution of multiple processes
+    * Allocate resources to processes and protect the resources of each process from other processes
+    * enable processes to share and exchange information (interprocess communication)
+    * enable synchronization among processes
+  * Example
+    * Consider three processes being executed
+    * Plus a ***dispatcher*** - a small program which switches the processor from one process to another
+    * All are in memory
+* Trace from processes' point of view
+  * The behavior of an individual process can be characterized by listing the sequence of instructions that execute for that process: a *trace* of the process.
