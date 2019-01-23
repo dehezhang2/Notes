@@ -36,10 +36,20 @@
   * **PSW(Program Status Word)** : contains execution status information
 * Each instruction contains bits (*opcode*) specifying what action the CPU needs to take:
   * Processor-memory
+
   * Processor-I/O
+
   * data processing
+
   * control
+
   * 4 bits opcode for 16 instructions($2^4$), 12 bits left refer to a memory address
+
+    * (0001): Load AC from memory
+    * (0010): Store AC to memory
+    * (0101): Add to AC from memory
+
+    ![](屏幕快照 2019-01-18 下午3.41.03.png)
 
 ### Interrupts(New)
 
@@ -65,33 +75,43 @@
 
   * I/O program includes: **label 4**(before execution, prepare output buffer); **Actual I/O command**(without interrupt, the program must wait and can only test whether the I/O instruction is end); **label 5**(after execution, may include set the flag that indicate the success or failure of the execution)
 
+  * **If change write to read, you still have to wait, because before finish of reading, you don't have the data to be executed**
+
     ![](屏幕快照 2019-01-14 下午8.04.52.png)
 
     ![](屏幕快照 2019-01-14 下午8.04.59.png)
 
 * Transfer of control via Interrupts
 
-  * Interrupt suspends(暂停) normal sequence of execution
+  * Interrupt suspends(暂停) normal sequence of execution(control given to the Interrupt Handler)
   * execution resumes when the interrupt processing is completed
+  * **Important** : what could happen when the I/O operation takes much more time than executing the code segment 2 or 3 of the user program, i.e., the user program reaches the second WRITE call before the I/O operation called by the first one is completed: **processor** will wait for the last I/O opeartion, and generate an idle wait time
 
   ![](屏幕快照 2019-01-14 下午8.11.33.png)
 
   ![](屏幕快照 2019-01-14 下午8.40.09.png)
+
+  * Hardware part: done automatically by hardware; Software part: need to be considered by OS programmers
+  * PSW is register store the information of program execution(independent of **stack**)
 
   ![](屏幕快照 2019-01-14 下午8.43.32.png)
 
 * Uniprogramming vs Multiprogramming
 
   * Uniprogramming: only one program is running at a given time
-    * The processor spends a certain amount of time executing, until it reaches an I/O instruction;
-      it must then wait until that I/O instruction concludes before proceeding
-  * Multiprogramming: processor has more than one program to execute
+    * The processor spends a certain amount of time executing, until it reaches an I/O instruction; it must then wait until that I/O instruction concludes before proceeding
+  * Multiprogramming: processor has more than one program to execute(**Enable interrupts**)
 
     * When **one job(A)** needs to wait for I/O, the processor can switch to the **other job(B,C)**.
 
       ![](屏幕快照 2019-01-14 下午8.51.43.png)
 
-* Multiprogramming Example
+* Interrupt, multiprogramming and multiprocessing
+
+  * **Interrupt**: save the time between the initialization and finalization of I/O operation by doing next instruction, but generate idle wait time when the second write instruction called before the first write completed
+  * **Multiprogramming**: A lot of programs(not instructions) run at the same time, when one is in I/O operation(READ case which is not possible continue or idle time slot), the other do the calculation
+  * **Multiprocessing**: A lot of processors run at the same time
+    * When there is only one program to run, multiprogramming will not improve the performance by fill the I/O wait time, but using multiprocessing can divide one progress into many and run at the same time. 
 
 ### Memory Hierarchy
 
@@ -100,11 +120,31 @@
   * Increasing capacity
   * Increasing access time(lower speed)
   * Decreasing frequency of access to the memory by the processor
+
 * **Cache Memory**: Processor must access memory at least once per instruction cycle -> processor execution is limited by memory cycle time, but processor speed is much faster than memory access speed
   * Solution: copy information in use from slower to faster (but smaller) storage (cache) temporarily
+
   * checked first to determine if information is there
+
   * Principle of locality: Data which is required soon is often close to the current data. If data is accessed,
     then it’s neighbors might also be accessed in the near future.
+
+  * **Tricky case** : 
+
+  * Consider a memory system with the following parameters: 
+
+     * Cache access time: 0.1 $\mu s $ 
+
+     * Memory access time (time needed to load a 				    word into the cache): 1 $\mu s$ 
+
+     * Suppose we ignore the time required for the processor to determine whether a word is in cache or memory. What is the ***hit ratio*** in order to have an average time to access a word no more than 50% greater than the cache access time?
+
+        
+       $$
+       h*1+(1-h)*\color{red}{(1+0.1)}<=1.5
+       $$
+       
+
 * Secondary Memory: Also known as storage devices
   * extension of main memory that provide large nonvolatile storage capacity
   * Used to store program and data files
