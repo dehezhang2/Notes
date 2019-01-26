@@ -70,9 +70,101 @@
 
 -------------------
 
-## Let 02 Software Process
+## Lec 02 Software Process
 
 ------------
+
+### Part one :
+
+* Object : thing from real world which can be quantified to mean one specific item
+
+  * an **instance** of class
+  * entity that has a state and a set of operations on that state (**a set of object attribute**)
+  * Operation: provide services to other obj which request these services
+
+* Class : represent all objects of the same kind
+
+  * A set of related objects
+  * Declarations of the attributes and services associated with an object of that class
+  * represents some useful concept that existing in the **problem/solution domains**
+  * may inherit attributes and operations from other classes
+
+* OO
+
+  * OO Programming has become the **standard programming** methodology for software engineers.
+  * OO Programming is a **software programming paradigm** using “objects”, with instances of a class. 
+  * In OO programming, you would design the program with the **data parts in mind, contextual information rather than procedures.**  
+  * E.g Designing a smart phone…  : What kind of information/data to be stored/used? 
+
+* Advantage of OO
+
+  * **Easier to maintain** : Objs may be understood as stand-alone entities
+  * **reuse** 
+    * Objects are potentially **reusable** components.
+    * For some systems, there may be an obvious mapping from real world entities to system objects.
+
+* Rules to Name Classes
+
+  
+
+  ![image-20190124132542617](image-20190124132542617.png)
+
+  * notice to model *real world* objects correctly, every attribute of the class instance must be assigned with a concrete value at any time. 
+
+* UML![image-20190124133303293](/Users/zdh/Documents/GitHub/Notes/3342/image-20190124133303293.png)
+
+  * Operations : 
+
+    * **change the value** of some attribute of an obj(set)
+    * **Queries** (get)
+
+  * Reference
+
+    * Objects communicate by *message passing*: request from one object to another asking the second object to execute one of its methods.
+
+    ![image-20190124133942815](/Users/zdh/Documents/GitHub/Notes/3342/image-20190124133942815.png)
+
+* State of Object
+
+  * Objects can be in different **states**. 
+  * State will change under the influence of outside circumstances
+  * Use a interface and create difference states class to implement the interface
+
+* Object Inheritance : Tool to reuse the code
+
+  * subclass "is a (kind of)" superclass
+  * generalization and inheritance
+    * ***Generalisation*** is implemented as ***inheritance*** in OO programming languages
+    * *Classes* may be arranged in a *class
+      hierarchy* where one class (a *super-class*) is a *generalisation* of one or more other classes (*sub-classes*)
+  * Sub-class inherits (all **attributes/operations/relationships**), and add attributes and operations, relationships, **redifine(override**) inherited operations
+  * **Point from subclass to superclass**
+  *  Do not use too often which causes difficulties of management
+
+  ![image-20190124134601450](/Users/zdh/Documents/GitHub/Notes/3342/image-20190124134601450.png)
+
+* Advantage of Inheritance
+
+  * It is *an abstraction mechanism* to classify entities
+  * It *supports* ***reuse***（often exist in the exam） both at the design and programming level
+  * It provides a mechanism to extend or refine a class: by adding or overriding methods (or *operations*) and by adding attributes
+  * The inheritance diagram is a *source of organisational knowledge about domains and systems*
+
+* Information Hiding in OO
+
+  * *Information hiding* enhances **maintainability** 
+    because implementation details are **invisible** outside an object
+  * OO languages allow an attribute to be described as **private** (invisible outside the object) 
+    *  (-) minus-sign : private, (+) plus-sign : public
+
+* Benefits of information hiding
+
+  * change cannot affect other part of the system
+  * a system consists of essentially **independent** classes
+  * they **communicate by sending messages**
+  * **objects do talking to each other**
+
+### Part two:
 
 ### Software process
 
@@ -82,6 +174,7 @@
     * when and how?
     * to reach a goal
   * Process defines tasks and activities within a schedule
+  * start with understanding the business requirements
 
 ### SW Process Model (Life cycle)
 
@@ -173,3 +266,28 @@
       * Time estimation is difficult
       * Project completion date may be unknown
   * **Prototyping Model**
+    * Start with what is known about requirements.
+    * Complete a quick design.
+    * Build the prototype by focusing on what will be seen by the user.
+    * Use the prototype to show the user and help refining requirements.
+    * Better communication
+    * Advantage
+      * Prototype can serve as a way for identifying requirements.
+      * It is developed very quickly.
+    * Disadvantage
+      * Customer might think that the prototype is the final product and forget the lack of
+        quality i.e. PERFORMANCE, RELIABILITY.
+    * **When to use?**: 
+      * When the customer define general objectives for the SW but does NOT identify details about INPUT, OUTPUT, or processing requirements.
+      * The developer is unsure of the efficiency of an algorithm, human machine interaction, etc
+  * Spiral Model
+    * Iterative (like Prototype) and controlled (like waterfall)
+    * Software is developed using evolutionary releases
+    * Complexity increase with each release
+    * A spiral process rather than as a sequence of activities with backtracking
+    * *Each loop* in the spiral represents *a phase in the process*. 
+    * *No fixed phases* such as req. specification or design - loops in the spiral are chosen depending on what is required—*more flexible*
+    * Emphasize risk analysis and management (Risks are explicitly assessed and resolved throughout the process)
+
+* The Spiral Model
+

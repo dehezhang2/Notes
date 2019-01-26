@@ -70,9 +70,9 @@
 
     * (min, max) notation for relationship structural constraints 
 
-      - This notation specifies that each entity participates in at least min and at most 
+      - This notation specifies that **each entity** participates in at least min and at most 
 
-        max relationship instances in a relationship. 
+        max relationship instances(of relationship) in a relationship. 
 
       - min must be at least 0 and at most max (0 <= min and min <= max) 
 
@@ -80,20 +80,123 @@
 
 * Recursive relationship type
 
-  * A recursive relationship is one in which the same entity participates more than once in the relationship. The relationship should be marked by the role that an entity takes in the participation. 
-  * It is also called a self-referencing relationship type. 
+  * A recursive relationship is one in which **the same entity participates more than once** in the relationship. The relationship should be marked by the role that an entity takes in the participation. 
+  * It is also called a **self-referencing relationship** type. 
 
 * Weak entity type
 
-  * A **weak entity** that does not have a key attribute and is identification- dependent on another entity type. It must participate in an **identifying relationship** type with an owner or identifying entity type. In other words, weak entity type must be owned by some owner entity type. 
+  * A **weak entity** that does not have a key attribute and is identification- dependent on another entity type. It must participate in an **identifying relationship** type with an owner or identifying entity type. In other words, weak entity type **must be owned by some owner entity type**. 
   * A weak entity is identified by the combination of: (1) its partial key and (2) the identifying entity type related to the identifying relationship type. 
+    * **because partial key may be the same**
+  * e.g.: 
+    * Ada Chan is an employee. She has a dependent Cindy Chan. 
+    * Bob Chan is an employee. He has a dependent Cindy Chan. 
+    * The two dependent entities are identical. 
+    * The EMPYLOEE entity type owns the DEPENDENT entity type. 
 
 * Notations for ER Diagrams
 
   ![](屏幕快照 2019-01-16 上午11.26.04.png)
 
+* Case Study:
+
+  ![](屏幕快照 2019-01-25 上午10.36.35.png)
+
+  *   An ER diagram for the company database. 
+
+  * 3 entities: EMPLOYEE, DEPARTMENT, and PROJECT 
+
+  * 1 weak entity: DEPENDENT 
+
+  * 4 relationships: WORKS_FOR, MANAGES, WORKS_ON, and CONTROLS 
+
+  * 1 identifying relationship: DEPENDENTS_OF 
+
+  * 1 recursive relationship: SUPERVISION 
+
+  * The company is organized into DEPARTMENTs 
+
+  * Each DEPARTMENT has a unique name, unique number, many EMPLOYEEs and an EMPLOYEE who manages the DEPARTMENT. 
+
+  * A DEPARTMENT may have several locations. 
+
+  * We keep track of the start date of the department manager and the number of employees for each DEPARTMENT. 
+
+  * A DEPARTMENT controls a number of PROJECTs. 
+
+  * Each PROJECT has a unique name, unique number and is located at a single location and is controlled by a DEPARTMENT. 
+
+  * Each EMPLOYEE has social security number (Ssn), address, salary, sex, and birthdate. Ssn is a key attribute and address is composite attribute. 
+
+  * Each EMPLOYEE works for one DEPARTMENT. Many EMPLOYEEs work for the same DEPARTMENT. 
+
+  * Each EMPLOYEE may work on several PROJECTs. 
+
+  * Many EMPLOYEEs work on the same PROJECT. 
+
+  * An EMPLOYEE manages at most one DEPARTMENT. 
+
+  * It is required to keep track the number of hours per week that each EMPLOYEE currently works on each PROJECT and the direct supervisor of each EMPLOYEE. 
+
+  * A supervisor can supervise many EMPLOYEEs. 
+
+  * An EMPLOYEE may have a number of DEPENDENTs. For each dependent, it is required to keep a record of name, sex, birthdate, and relationship to the EMPLOYEE. 
+
+    ![image-20190125103614004](image-20190125103614004.png)
+
+  * An ER diagram for the company database with structural constraints specified using (min, max) notation and role name. 
+
+  * A DEPARTMENT has exactly one manager and an EMPLOYEE can manage at most one DEPARTMENT. 
+
+  * An EMPLOYEE can work for exactly one DEPARTMENT but a DEPARTMENT has at least 4 EMPLOYEEs. 
+
+  * An EMPLOYEE works on at least one project. A PROJECT has at least one worker. 
+
+  * A DEPARTMENT can control no PROJECT or any number of PROJECTs, but a PROJECT has exactly one controlling department. 
+
+  * An EMPLOYEE can have no dependent or many dependents, but a dependent belongs to exactly one EMPLOYEE. 
+
+  * An EMPLOYEE has at most one supervisor and may be a supervisor supervising any number of supervisees.
 
 ----------
+
+## Tutorial 01:ER Model
+
+![image-20190125104023459](image-20190125104023459.png)
+
+* Question 2: Construct an ER diagram for a car insurance company. Identify the key entities, relationships and their attributes in the ER diagram. 
+
+  - A customer owns at least one car. 
+
+  - A car may be owned by more than one customer. 
+
+  - An accident involves at least one car. 
+
+  - A car may have a number of recorded accidents associated with it. 
+
+    ![IMG_AAD29810382F-1](IMG_AAD29810382F-1.jpeg)
+
+* Question 3:  Construct an ER diagram for a hospital. Identify the key entities, relationships and their attributes in the ER diagram. 
+
+  - The hospital has a set of patients and a set of medical doctors. 
+
+  - A patient may be treated by more than one doctor. 
+
+  - A doctor may have a number of patients. 
+
+  - A log of the various conducted tests and results is associated with each patient. 
+
+    ![IMG_77A7AAF5726F-1](IMG_77A7AAF5726F-1.jpeg)
+
+* Steps to draw a ER diagram
+
+  * Entities: customer,car, accident
+  * Relationships: owns involve
+  * Attributes/Key Attributes
+  * Partial/Total Participation
+  * Constraints on Relationship
+
+--------------
 
 ## Lecture 02: Relational Model
 
