@@ -1,17 +1,3 @@
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # Machine Learning
 
 [TOC]
@@ -59,7 +45,7 @@
     * x's "input" variables
     * y's "output" variables
     * (x,y) -> a training example
-    * (x(i),y(i)) -> ith training example
+    * (x(i),y(i)) -> $i_{th}$ training example
 
   * Process
 
@@ -71,7 +57,7 @@
       h_{ \theta}(x) = {\theta}_0+{\theta}_1x
       $$
 
-    * $ \theta $ is parameter and the function represent a line： named as **linear regression** with one variable -> **Univariate(one var) linear regression**
+    * $ \theta ​$ is parameter and the function represent a line： named as **linear regression** with one variable -> **Univariate(one var) linear regression**
 
   -----------------
 
@@ -89,10 +75,10 @@
   $$
 
   *  J is the cost function with input $ \theta $, we need find $ J_{min} $
-    * Suppose $ \theta_0 $ is 0, then draw the graph of J -> a bow shipe graph
+    * Suppose $ \theta_0 ​$ is 0, then draw the graph of J -> a bow shipe graph
     * for two parameters we use contour plots(figures)
       * X-axis : $ \theta_0 $ Y-axis : $ \theta_1 $
-      * Every circle represent same value of $ J(\theta_0, \theta_1)  ​$ (等高线, 3-D 图的投影)
+      * Every circle represent same value of $ J(\theta_0, \theta_1) ​$ (等高线, 3-D 图的投影)
 
 ---------------------
 
@@ -109,17 +95,17 @@
 
   repeat until convergence {
 
-  
-  $$
+
+$$
   \theta_j := \theta_j - \alpha {\delta\over\delta\theta_j }J(\theta_0 , \theta_1)\  (for\ j=0\ and\ j=1)
-  $$
+$$
   }
 
   > := assignment 
   >
   > $ \alpha $ is learning rate : size of steps down the hill
   >
-  > update & \theta_0 , \theta_1 & at the same time (simultaneous update)
+  > update $\theta_0 , \theta_1$ at the same time (simultaneous update)
 
   ```
   temp0 = theta0 - something(theta0,theta1);
@@ -136,7 +122,7 @@
 * first suppose $ \theta_0 = 0 $
 
   * Use $  \alpha {\delta\over\delta\theta_j }J(\theta_0 , \theta_1)  $ if delta \<(\>) 0 then go right(left) , when =0 stop
-  * $\alpha$: small->slow large->fail to converge
+  * $\alpha$: small->slow,  large->fail to converge
 
 * Used in Linear Regression
   $$
@@ -153,7 +139,7 @@
 
   * J is Convex function 
 
-* "Batch" Gradient Descent: Batch is each step of gradient descent uses **all** the training examples
+* **"Batch" Gradient Descent**: Batch is each step of gradient descent uses **all** the training examples
 
 -------------
 
@@ -260,10 +246,12 @@
   ```
 
 - for $ \vec{x}=[x_1;x_2;...;x_n] $ , we use matrix to find $\theta_0, \theta_1$
+
+  - m represents  number of sample
+
   $$
-  \begin{bmatrix}1&x_1\\1&x_2\\\vdots&\vdots\\1&x_m\\\end{bmatrix}\cdot\begin{bmatrix}\theta_0\\\theta_1\end{bmatrix}=\begin{bmatrix}y_1\\y_2\\\vdots\\y_m\end{bmatrix}
+  \begin{bmatrix}1&w_1\\1&x_2\\\vdots&\vdots\\1&x_m\\\end{bmatrix}\cdot\begin{bmatrix}\theta_0\\\theta_1\end{bmatrix}=\begin{bmatrix}y_1\\y_2\\\vdots\\y_m\end{bmatrix}
   $$
-  
 
 ## Week 2
 
@@ -319,7 +307,7 @@ $$
   x_1 = {size(0-2000 {feet}^2)\over2000},x_2={number\ of\ bedrooms\over5}\  (x_1,x_2\in[0,1])
   $$
 
-  * Only needed when the scale is very different
+  * Only needed when the scale is slightly different
 
 * Mean Normalization
 
@@ -331,7 +319,6 @@ $$
     $$
     x_i={x_i-\mu_i\over s_i} \ (\mu\ is\ average,s\ is\ range=max-min )
     $$
-
 
 -------------
 
@@ -398,7 +385,7 @@ $$
 
 #### (1) Normal Equation
 
-* Solve for $min J(\theta)$ at one step analytically
+* Solve for $min J(\theta)​$ at one step analytically
 
 * Intuition: if 1D ($\theta \in R$)
   $$
@@ -451,7 +438,7 @@ $$
   $$
 
   * $P^T=P$, $P^2=P$ 
-  * P * Anyone is in the column space of X
+  * P * Anyone $\in$ The column space of X
 
 * Implementation (no need feature scaling)
 
@@ -472,7 +459,7 @@ $$
 
 * In octave
 
-  * `pinv()` : pseudo invert (has value even not investable)
+  * `pinv()` : pseudo invert (has value **even not invertable**)
   * `inv()`: real invert
 
 * $XX^T$ is not invertable
@@ -665,7 +652,7 @@ end;
   
   ```
 
-  * $J(\theta)$ in the exmaple
+  * $J(\theta)​$ in the exmaple
 
     ```octave
     % use the function
@@ -839,7 +826,7 @@ logspace - 生成对数间距向量
 
   $y\in\ \{0,1\}$ 0: "Negative Class"; 1: "Positive Class"
 
-* Why not use linear rexgression? : It is easily affected by noisy points
+* Why not use linear regression? : It is easily affected by noisy points
 
 --------
 
@@ -905,7 +892,7 @@ $$
 
   $h_\theta(x) = {1\over1+e^{-{\theta}^Tx}}$ 
 
-  How to choose $\theta$ 
+  How to choose $\theta​$ 
 
 * Logistic regression cost function
   $$
@@ -1049,21 +1036,21 @@ initialTheta = zero(2,1);
 
 #### (2) Cost function
 
-* modify the cost function by add quadratic of overfitting $\theta$ , and recalculate the minimum, to make them contribute less than before
+* modify the cost function by add quadratic of overfitting $\theta​$ , and recalculate the minimum, to make them contribute less than before
 
-![](https://d3c33hcgiwev3.cloudfront.net/imageAssetProxy.v1/j0X9h6tUEeawbAp5ByfpEg_ea3e85af4056c56fa704547770da65a6_Screenshot-2016-11-15-08.53.32.png?expiry=1535587200000&hmac=pTJpk1gxb2Iihrs1iyuawu2XC1jluYbc9E76biX1m3Q),
+![](屏幕快照 2019-01-28 下午3.07.25.png)
 
-* Regularization : small value for parameters $\theta_0,\theta_1,...,\theta_n$
+* Regularization : small value for parameters $\theta_0,\theta_1,...,\theta_n​$
 
   * "Simpler" hypothesis
   * Less prone to overfitting
-  * In real use, we don't know to shrink which parameter => shrink all parameters ($\lambda$ is regularization parameter)
+  * In real use, we don't know to shrink which parameter => shrink all parameters ($\lambda​$ is regularization parameter)
 
   $$
   J(\theta)={1\over2m}[\sum_{i=1}^m(h_\theta(x^{(i)})-y^{(i)})^2+\lambda\sum_{j=1}^n{\theta_j}^2]
   $$
 
-  * If $\lambda$ is too large => cause underfitting ( i.e. $h_\theta(x)=\theta_0$) 
+  * If $\lambda​$ is too large => cause underfitting ( i.e. $h_\theta(x)=\theta_0​$) 
 
 #### (2) regularized linear regression
 
@@ -1120,19 +1107,38 @@ initialTheta = zero(2,1);
 
 * Neuron model : logistic unit
 
-  
-  $$
+
+$$
   \begin{bmatrix}x_0\\x_1\\\vdots\\x_m\end{bmatrix}=>[\ \ ]=>h_\theta(x)
-  $$
+$$
 
   * Sigmoid function => activation function $g(z)$ 
+
   * $\theta$ => weights or parameters
+
+  * We can have intermediate layers of nodes between the input and output layers called the "hidden layers."
+
+    ![image-20190128151423094](image-20190128151423094.png)
 
 * Neuron network
 
-  ![](https://d3c33hcgiwev3.cloudfront.net/imageAssetProxy.v1/0rgjYLDeEeajLxLfjQiSjg_0c07c56839f8d6e8d7b0d09acedc88fd_Screenshot-2016-11-22-10.08.51.png?expiry=1535932800000&hmac=5jlI2pmR-1O8ekWJG_xQU9DzH75VYHo1nEGwRfcALv4)
+  ![image-20190128151705093](/Users/zdh/Documents/GitHub/Notes/machine learning/image-20190128151705093.png)
 
-  * dimension of $\Theta$ : $s_{j+1}*(s_j+1)$ where $s_n$ is the number of variables in nth layer
+  * dimension of $\Theta$ : $s_{j+1}*(s_j+1)$ where $s_n$ is the number of variables in nth layer, 1 is the constant column
+  * $\ A^{(j)} *Theta^{(j)T}=A^{(j+1)}$
+
+* More specific description
+
+  * Input layer: 
+    * W matrix: Each row of weight represent a neural, column represent features accept
+    * X matrix : Each row represent a feature, each column represent a sample
+    * WX+B = Z: Each row of Z represent a neural, each column of z represent a sample(Neural\*feature.feature\*sample), where B is bias
+    * A = g(Z), activate output
+  * Hidden layer:
+    * W matrix: Each row represent a neural of this layer, each column represent a neural of last layer, the first column represent the bias of last layer
+    * WA(last)+B = Z: Each row of Z represent a neural in this layer, each column of z represent a sample(Neural\*(last Neural+1).(last Neural+1)*sample)
+  * Output layer:
+    * similar to Hidden layer, instead each row represent an output for this sample
 
 #### (2) Model representation II
 
@@ -1154,13 +1160,15 @@ $$
 
 
 
-![](https://d3c33hcgiwev3.cloudfront.net/imageAssetProxy.v1/wMOiMrGnEeajLxLfjQiSjg_bbbdad80f5c95068bde7c9134babdd77_Screenshot-2016-11-23-10.07.24.png?expiry=1535932800000&hmac=pM3HSrJVUvTS0FU0xp8PM9V4ydfbbshgC5Ojkw282uw)
+![](/Users/zdh/Documents/GitHub/Notes/machine learning/image-20190128152051903.png)
 
-![](https://d3c33hcgiwev3.cloudfront.net/imageAssetProxy.v1/f_ueJLGnEea3qApInhZCFg_a5ff8edc62c9a09900eae075e8502e34_Screenshot-2016-11-23-10.03.48.png?expiry=1535932800000&hmac=2F8_rvXgjCmIfPhfKewJ4Y42p7jyqwo6bazC8umkxcM)
+
 
 #### (2) Example and Intuitions II
 
-![](https://d3c33hcgiwev3.cloudfront.net/imageAssetProxy.v1/rag_zbGqEeaSmhJaoV5QvA_52c04a987dcb692da8979a2198f3d8d7_Screenshot-2016-11-23-10.28.41.png?expiry=1535932800000&hmac=NLVJU-uxcwUqyc1Zz5_Z-ZMQpTZHwBiy8zujyg-lZWU)
+![image-20190128152225112](/Users/zdh/Documents/GitHub/Notes/machine learning/image-20190128152225112.png)
+
+
 
 -----------
 
@@ -1175,18 +1183,19 @@ $$
 * Cost functions
 
   * Denotes
-    * $L$ = total number of layers in the network
-    * $S_l$ = number of units (not counting bias unit) in layer $l$
-    * $K$ = number of output units/classes
+    * $L​$ = total number of layers in the network
+    * $S_l​$ = number of units (not counting bias unit) in layer $l​$
+    * $K​$ = number of output units/classes (channels)
   * Logistic regression
 
   $$
   J(\theta)=-[{1\over m}\sum^m_{i=1}[y^{(i)}log(h_\theta(x^{(i)}))+(1-y^{(i)})log(1-h_\theta(x^{(i)}))]]+{\lambda\over2m}\sum^n_{j=1}{\theta_j}^2 (j=1,2,...,n)
   $$
 
-  * Neural network (for multi-class problem there are K clusters) $h_\Theta(x) \in R^K\ (h_\Theta(x))_i=i^{th}\ output$
+  * Neural network (for multi-class problem there are K clusters) $h_\Theta(x) \in R^K\ (h_\Theta(x))_i=i^{th}\ output​$
     * The first part add the cost of all the m-by-K results
     * The second part add all the theta used (every column, row, layer (L))
+    * regularization doesn't include the $0^{th}$ weight
 
 $$
 J(\Theta)=-{1\over m}[\sum_{i=1}^m\sum_{k=1}^Ky^{(i)}_klog(h_\Theta(x^{(i)}))_k+(1-y^{(i)}_k)log(1-h_\Theta(x^{(i)}))_k]+{\lambda \over 2m}\sum_{l=1}^{L-1}\sum_{i=1}^{S_l}\sum_{j=1}^{S_{l+1}}(\Theta_{ji}^{l})^2
@@ -1194,13 +1203,24 @@ $$
 
 #### (2) Backpropagation Algorithm
 
+* Proof the backpropagation
+
+  * ![image-20190128182648372](image-20190128182648372.png)
+    * each number in a "()" represent the sample id
+  * ![image-20190128182817538](image-20190128182817538.png)
+  * ![image-20190128182855636](image-20190128182855636.png)
+    * m = 2 thus use $1 \over 2$
+  * ![image-20190128190817135](image-20190128190817135.png)
+  * ![image-20190128193026712](image-20190128193026712.png)
+  * ![image-20190128193122902](image-20190128193122902.png)
+
 * Gradient computation
 
   * we need : $min_\Theta J(\Theta)$ and ${\delta\over\delta\Theta^{(l)}_{ij}}J(\Theta)$ 
 
   * Given one training example $(x, y)$ 
 
-  * Intuition: $\delta^{(l)}_j$ = "errors" of node $j$ in layer $l$ 
+  * Intuition: $\delta^{(l)}_j$ = "errors" of node $j$ in layer $l$ =$\delta^{(l)}_jJ \over \delta Z^{(l)}$ 
     $$
     \delta_j^{(4)}=a^{(4)}_j-y_j
     $$
@@ -1239,7 +1259,7 @@ $$
 
     ​	 $\Delta^{(l)}_{(ij)}+=a^{(l)}_j\delta^{(l+1)}_i$
 
-    ![](https://d3c33hcgiwev3.cloudfront.net/imageAssetProxy.v1/Ul6i5teoEea1UArqXEX_3g_a36fb24a11c744d7552f0fecf2fdd752_Screenshot-2017-01-10-17.13.27.png?expiry=1536019200000&hmac=15UFuOdaUFnYJHMtyA1CTMY5dwh8f5sI6W1IIwa5YNw)
+    ![image-20190128194435806](image-20190128194435806.png)
 
 #### (3) Backpropagation Intuition
 
@@ -1247,12 +1267,13 @@ $$
   $$
   z^{(l)}_1=\Theta^{(l-1)}_{10}*1+\Theta^{(l-1)}_{11}*a^{(l-1)}_1+\Theta^{(l-1)}_{11}*a^{(l-1)}_2
   $$
-  Focusing on a single example $x^{(i)}$ $y^{(i)}$ ignore regularization
+  Focusing on a single example $x^{(i)}​$ $y^{(i)}​$ ignore regularization
   $$
-  cost = y^{(i)}logh_\Theta(x^{(i)})+(1-y^{(i)})logh_\Theta(x^{(i)})
+  cost = -[y^{(i)}logh_\Theta(x^{(i)})+(1-y^{(i)})logh_\Theta(x^{(i)})]
   $$
-  ![](https://d3c33hcgiwev3.cloudfront.net/imageAssetProxy.v1/qc309rdcEea4MxKdJPaTxA_324034f1a3c3a3be8e7c6cfca90d3445_fixx.png?expiry=1536019200000&hmac=P1IrwwNA4YtSRAQkhtuB1GL8oA2nH5rtPJhWr73OlWc)
+  ![image-20190128202724643](image-20190128202724643.png)
 
 #### (4) Backpropagation in Practice
 
 * 
+
