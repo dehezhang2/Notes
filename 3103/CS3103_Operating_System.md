@@ -17,6 +17,7 @@
   * consists of a set of locations defined by sequentially numbered addresses
   * stores data and programs
   * volatile
+* Processor: memory:I/O=1:few handreds:ten million
 * I/O Modules : moves data between the computer and the external environment(storage, communications equipment, terminals)
 * System Bus : Provides for communication among processors, main memory, and I/O modules
 
@@ -99,6 +100,7 @@
 * Uniprogramming vs Multiprogramming
 
   * Uniprogramming: only one program is running at a given time
+
     * The processor spends a certain amount of time executing, until it reaches an I/O instruction; it must then wait until that I/O instruction concludes before proceeding
   * Multiprogramming: processor has more than one program to execute(**Enable interrupts**)
 
@@ -141,7 +143,7 @@
 
      * Suppose we ignore the time required for the processor to determine whether a word is in cache or memory. What is the ***hit ratio*** in order to have an average time to access a word no more than 50% greater than the cache access time?
 
-        
+       
        $$
        h*1+(1-h)*\color{red}{(1+0.1)}<=1.5
        $$
@@ -232,7 +234,7 @@
 
 ### How are processes represented and controlled by the OS
 
-* All modern OS rely on a model in which the execution of an application corresponds to the existence of one or more processes.
+* All modern OS rely on a model in which the execution of an application corresponds to the existence of **one or more processes.**
 
 * Example: single-user systems such as Windows and mainframe system such as IBM’s mainframe OS, z/OS, are built around the ***concept of process***. 
 
@@ -240,7 +242,7 @@
 
   *  A program in execution
   * An **instance of** a program running on a computer
-  * The entity that can be assigned to and executed on a processor
+  * The entity that can be **assigned to** and **executed on a processor**
   * A unit of activity characterized by the execution of a **sequence of instructions, a current state, and an associated set of system resources**
 
 * Process Elements
@@ -292,6 +294,12 @@
 
   ![image-20190125110938704](image-20190125110938704.png)
 
+  * `fork()` just create a child process copy every thing of parent process
+    * but child process just run the codes after fork
+    * `pid()` returns the id of child process in parent process
+    * `getpid()` returns the id of current process
+    * `getppid()` returns the id of parent process
+
 -----------
 
 ### Process states which characterize the behaviour of processes
@@ -310,15 +318,13 @@
 
   ![image-20190125111613239](image-20190125111613239.png)
 
-#### Five-State Process Model
+* Five-State Process Model
 
-![image-20190125111931505](image-20190125111931505.png)
+  ![image-20190125111931505](image-20190125111931505.png)
 
-* Distinguish between blocked and ready state
-
-* While some processes in the Not Running state are ready to execute, **others may be blocked**(e.g., waiting for an I/O operation to complete) 
-
-* Using Two Queues/Multiple Blocked Queues
+  * Distinguish between blocked and ready state
+  * While some processes in the Not Running state are ready to execute, **others may be blocked**(e.g., **waiting for an I/O operation to complete**, or timer interrupt) , while ready state represent process that **run out of its instructions for this turns** (timer interrupt)
+  * Using Two Queues/Multiple Blocked Queues
 
   ![image-20190125112106945](image-20190125112106945.png)
 
@@ -328,9 +334,12 @@
 
   * Processor is faster than I/O so **all** processes could be waiting for I/O -> processor could be idle most of the time
 
-    * OS swaps one of the blocked processes out on to disk to free up more memory and use processor on other processes
+    * When there are **too many blocked processes in the main memory**, the speed of process will be too slow
+    * OS swaps one of the blocked processes out on to disk to **free up more memory** and use processor on other processes
 
   * Blocked state becomes **suspend** state **when swapped to disk**
+
+  * Distinguish between suspend state and blocked state(whether the process is in the main memory or not)
 
   * One suspend state
 
@@ -339,28 +348,30 @@
     ​	
 
     * Although each process in the suspend state was originally blocked on a particular event, when that event occurs, the process is not blocked and is potentially available for execution
-    * 阻塞 VS 挂起
+    * 阻塞 VS 挂起(blocked vs. suspended)
     * 阻塞与挂起都是进程的状态，但他们有一些相似之处，也有一些区别，下面先对他们进行概述，再进行比较
-    * 阻塞：正在执行的进程由于发生某时间（如I/O请求、申请缓冲区失败等）暂时无法继续执行。此时引起进程调度，OS把处理机分配给另一个就绪进程，而让受阻进程处于暂停状态，一般将这种状态称为阻塞状态。
-    * 挂起：由于系统和用户的需要引入了挂起的操作，进程被挂起意味着该进程处于静止状态。如果进程正在执行，它将暂停执行，若原本处于就绪状态，则该进程此时暂不接受调度。
-    * 共同点：
-      * 进程都暂停执行
-      * 进程都释放CPU，即两个过程都会涉及上下文切换
-    * 不同点：
-      * 对系统资源占用不同：虽然都释放了CPU，但阻塞的进程仍处于内存中，而挂起的进程通过“对换”技术被换出到外存（磁盘）中。
-      * 发生时机不同：阻塞一般在进程等待资源（IO资源、信号量等）时发生；而挂起是由于用户和系统的需要，例如，终端用户需要暂停程序研究其执行情况或对其进行修改、OS为了提高内存利用率需要将暂时不能运行的进程（处于就绪或阻塞队列的进程）调出到磁盘
-      * 恢复时机不同：阻塞要在等待的资源得到满足（例如获得了锁）后，才会进入就绪状态，等待被调度而执行；被挂起的进程由将其挂起的对象（如用户、系统）在时机符合时（调试结束、被调度进程选中需要重新执行）将其主动激活
-    * 挂起和阻塞区别：
-      * 挂起是一种主动行为，因此恢复也应该要主动完成。而阻塞是一种被动行为，是在等待事件或者资源任务的表现，你不知道它什么时候被阻塞，也不清楚它什么时候会恢复阻塞。
-      * 阻塞（pend）就是任务释放CPU，其他任务可以运行，一般在等待某种资源或者信号量的时候出现。挂起（suspend）不释放CPU，如果任务优先级高，就永远轮不到其他任务运行。一般挂起用于程序调试中的条件中断，当出现某个条件的情况下挂起，然后进行单步调试。
-    * sleep（）和wait（）函数的区别：
-      * 两者比较的共同之处是：两个方法都是使程序等待多少毫秒。
-      * 最主要区别是：sleep（）方法没有释放锁。而wait（）方法释放了锁，使得其他线程可以使用同步控制块或者方法。
-      * sleep（）指线程被调用时，占着CPU不工作，形象的说明为“占着CPU”睡觉。
-        * sleep(2000)表示：占用CPU，程序休眠2秒。
-        * wait(2000)表示：不占用CPU，程序等待2秒。
+      * 阻塞：正在执行的进程由于发生某时间（如I/O请求、申请缓冲区失败等）暂时无法继续执行。此时引起进程调度，OS把处理机分配给另一个就绪进程，而让受阻进程处于暂停状态，一般将这种状态称为阻塞状态。
+      * 挂起：由于系统和用户的需要引入了挂起的操作，进程被挂起意味着该进程处于静止状态。如果进程正在执行，它将暂停执行，若原本处于就绪状态，则该进程此时暂不接受调度。
+      * 共同点：
+        * 进程都暂停执行
+        * 进程都释放CPU，即两个过程都会涉及上下文切换
+      * 不同点：
+        * 对系统资源占用不同：虽然都释放了CPU，但阻塞的进程仍处于内存中，而挂起的进程通过“对换”技术被换出到外存（磁盘）中。
+        * 发生时机不同：阻塞一般在进程等待资源（IO资源、信号量等）时发生；而挂起是由于用户和系统的需要，例如，终端用户需要暂停程序研究其执行情况或对其进行修改、OS为了提高内存利用率需要将暂时不能运行的进程（处于就绪或阻塞队列的进程）调出到磁盘
+        * 恢复时机不同：阻塞要在等待的资源得到满足（例如获得了锁）后，才会进入就绪状态，等待被调度而执行；被挂起的进程由将其挂起的对象（如用户、系统）在时机符合时（调试结束、被调度进程选中需要重新执行）将其主动激活
+      * 挂起和阻塞区别：
+        * 挂起是一种主动行为，因此恢复也应该要主动完成。而阻塞是一种被动行为，是在等待事件或者资源任务的表现，你不知道它什么时候被阻塞，也不清楚它什么时候会恢复阻塞。
+        * 阻塞（pend）就是任务释放CPU，其他任务可以运行，一般在等待某种资源或者信号量的时候出现。挂起（suspend）不释放CPU，如果任务优先级高，就永远轮不到其他任务运行。一般挂起用于程序调试中的条件中断，当出现某个条件的情况下挂起，然后进行单步调试。
+      * sleep（）和wait（）函数的区别：
+        * 两者比较的共同之处是：两个方法都是使程序等待多少毫秒。
+        * 最主要区别是：sleep（）方法没有释放锁。而wait（）方法释放了锁，使得其他线程可以使用同步控制块或者方法。
+        * sleep（）指线程被调用时，占着CPU不工作，形象的说明为“占着CPU”睡觉。
+          * sleep(2000)表示：占用CPU，程序休眠2秒。
+          * wait(2000)表示：不占用CPU，程序等待2秒。
 
   * Two suspend states (blocked/suspend and ready/suspend)
+
+    * Because block and suspend are 2 independent states(block: whether has interrupt; suspend: whether in the main memory)
 
     ![image-20190125114715372](image-20190125114715372.png)
 
@@ -372,13 +383,13 @@
 
 ### Data structures used to manage process
 
-* Processes and Resources: OS manages the use of system resources by processes
+* Processes and Resources: OS manages **the use of system resources by processes**
 
   ![image-20190125115213818](image-20190125115213818.png)
 
 * Operating System Control Structures
 
-  * For the OS to manage processes and resources, it must have information about the current status of each process and resources
+  * For the OS to manage processes and resources, it must have information about the **current status of each process and resources**
 
   * Tables are constructed for each entity the OS manages
 
@@ -388,25 +399,25 @@
 
   * Memory tables are used to keep track of both main(real) and secondary(virtual memory)
   * Must include this information
-    * Allocation of main memory to processes
-    * Allocation of secondary memory to processes
-    * Protection attributes of blocks of main or virtual memory such as which processes may **access certain shared memory regions**
-    * Information needed to manage virtual memory
+    * **Allocation of main memory** to processes
+    * **Allocation of secondary memory** to processes
+    * **Protection attributes** of blocks of main or virtual memory such as which processes may **access certain shared memory regions**
+    * Information needed to **manage virtual memory**
 
 * I/O Tables
 
-  * Used by the OS to manage the I/O devices and channels of the computer.
+  * Used by the OS to **manage the I/O devices** and channels of the computer.
   * At any given time, an I/O device may be available or assigned to a particular process.
   * If an I/O operation is in progress, the OS needs to know
-    * The status of the I/O operation
-    * The location in main memory being used as the source or destination of the I/O transfer
+    * The **status of the I/O operation**
+    * The **location in main memory being used as the source or destination of the I/O transfer**
 
 * File Tables
 
   * These tables provide information about:
-    * Existence of files
-    * Location on secondary memory
-    * Current status
+    * **Existence** of files
+    * **Location** on secondary memory
+    * **Current status**
     * other attributes.
   * Sometimes this information is maintained by a file management system
 
@@ -414,7 +425,7 @@
 
   * To manage and control a process, there is one entry for each process in the process table
 
-  * Each entry points to a **process image** containing
+    * Each entry points to a **process image**(进程投影) containing
 
     ![image-20190125121746307](image-20190125121746307.png)
 
@@ -428,21 +439,21 @@
 
 * Process Attributes : we can group the information in a PCB into three general categories:(**Process identification**, **Processor state information and Process control information**)
 
-  * Process Identification: Each process is assigned a unique numeric identifier.
+  * Process Identification: Each process is assigned a unique numeric identifier. (`pid()`)
 
-    * Many of the tables controlled by the OS may use process identifiers to **cross-reference process tables**(relationship relation), e.g., memory tables may be organized to provide **a map of main memory with an indication of which process is assigned to each region**
+    * Many of the tables controlled by the OS may use process identifiers to **cross-reference process tables**(relationship relation), e.g., memory tables may be organized to provide **a map of main memory with an indication of which process is assigned to each region**(process ID -> memory block)
     * When processes **communicate with one another**, the process identifier informs the OS of the **destination of a particular communication**
     * When processes are allowed to create other processes, identifiers **indicate the parent and descendants** of each process
 
   * Process State Information: Consists of processor registers' content
 
     * User-visible registers
-    * Control and status registers
+    * **Control and status** registers
       * Program counter: address of the next instruction
       * Program status word(PSW)
         * Condition codes: –result
-          of the most recent arithmetic or logical operation (e.g., sign, zero, carry,equal, overflow)
-        * Status information: e.g. interrupt enabled/disabled flags, execution mode
+          of the **most recent arithmetic or logical operation** (e.g., sign, zero, carry,equal, overflow)
+        * Status information: e.g. **interrupt enabled/disabled flags, execution mode**
       * Stack pointers
 
   * Process Control Infromation: The additional information needs by the OS to control and coordinate the various active processes
@@ -457,7 +468,17 @@
 
     ![](屏幕快照 2019-01-25 下午12.40.59.png)
 
-* Structure of Process Images in Virtual Memory![image-20190125124220632](/Users/zdh/Documents/GitHub/Notes/3103/image-20190125124220632.png)
+* Structure of Process Images in Virtual Memory![image-20190125124220632](image-20190125124220632.png)
+
+* Role of the Process Control Block
+
+  * Most important data structure in an OS
+    * contains all of the information about a process that is needed by the OS
+    * **Read and/or modified** by virtually every module in the OS such as scheduling, resource allocation, interrupt processing and performance monitoring
+    * Defines the state of the OS
+  * Requires protection, which is difficult
+    * A faulty routine could damage PCBs, which could destroy the OS's ability to manage the affected processes
+    * Any design change to the PCB could affect many modules of the OS
 
 --------
 
@@ -481,15 +502,15 @@
 
 * Process Creation: Once the OS decides to create a new process, it:
 
-  * Assigns a unique process identifier and adds a new entry to the process table
-  * Allocates space for the process (process image)
+  * **Assigns a unique process identifier** and adds a new entry to the process table
+  * **Allocates spac**e for the process (process image)
   * Initializes process control block
   * Sets up appropriate linkages such as putting the new process in the Ready list
   * Creates or expands other data structures such as an accounting file for performance assessment
 
 * Process Switching
 
-  * When CPU switches to another process, the system must s**ave the state of the old process** and **load the saved state for the new process** (to be described).
+  * When CPU switches to another process, the system must **save the state of the old process** and **load the saved state for the new process** (to be described).
 
   * *Process-switch* time is considered as **overhead** (the system does no useful work while switching), so several issues are important
 
@@ -507,17 +528,16 @@
 
       * Save context of processor including program counter and other registers
       * Update the PCB of the process currently in the Running state
-      * Move the PCB of this process to appropriate queue- ready; blocked;ready/suspend
+      * Move the **PCB of this process to appropriate queue**- ready; blocked;ready/suspend
       * Select another process for execution
       * Update the PCB of the process for execution
       * Update memory management data structures
-      * Restore context of the processor to that which existed at the time the selected process was last switched out
+      * **Restore** context of the processor to that which existed at the time the selected process was **last switched out**
 
   * Mode Switching
 
-    * The occurrence of an interrupt does not necessarily mean a process switch
-    * It is possible that, after the processor switches from user mode to kernel mode in
-      order to **execute the interrupt handler** (which may include privileged instructions), the currently running process will resume execution.
+    * The occurrence of an **interrupt** does not necessarily mean a process switch
+    * It is possible that, after the processor switches from user mode to kernel mode in order to **execute the interrupt handler** (which may include privileged instructions), the currently running process will resume execution.
     * In such a *mode switching* case, only need to save / restore the processor state information. 
 
 ----------------
@@ -525,8 +545,12 @@
 ### Discuss process management in UNIX
 
 * System processes run in kernel mode 
-* executes operating system code to perform administrative and housekeeping functions
+  * executes operating system code to perform administrative and housekeeping functions
 * User processes
   * operate in user mode to execute user programs and utilities
+
   * operate in kernel mode to execute instructions that belong to the kernel
+
   * enter kernel mode by issuing a system call, when an exception is generated, or when an interrupt occurs
+
+    ![image-20190201145410802](image-20190201145410802.png)

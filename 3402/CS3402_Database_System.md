@@ -325,5 +325,495 @@
 
 
 
+## Tutorial 02 : Relational Model
 
+------
 
+![image-20190131123217182](image-20190131123217182.png)
+
+* (a)For each strong entity type
+  * Include simple (or atomic) attributes of the entity
+  * include components of composite attributes
+  * Identify the primary key from the key attributes
+  * Do not include : non-simple component of composite attributes, derived attributes, multivalued attributes (not yet)
+  * Employee(<u>SSN</u>, Fname, Lname)
+  * Department(<u>Number</u>, Name)
+* (b) Weak Entity(partial key, foreign key, simple attributes)
+  * **Dependent**(<u>Name</u>,<u>EmployeeSSN</u>,Relationship(simple_attr))
+* (c) Binary 1:1 relation ship type(==total side remember the information==)
+  * Options: store the Manager information into Dept or store Dept information in manager
+    * choose the total participation side to store the other side => avoid empty entry to save memory
+  * **Department**(<u>Number</u>, Name, **ManagerSSN**, **StartDate**)
+* (d) Binary 1:N Relationship type(N side remember the information)
+  * **Employee** (<u>SSN</u>, Fname, Lname, **SupervisorSSN**)
+* (e) Binary M:N Relationship type(==create new relation type==)
+  * **Work_for**(**<u>EmployeeSSN,DeptNum</u>**,simple_attrs)
+* (f) Multi-valued attribute(primary key of owner, simple_attrs values)(they are all prime keys) (Why??)
+  * each value create an entry
+  * **Dept_location**(**<u>DeptNum,single Location_value</u>**)
+
+## Lecture 03: Structured Query Languages
+
+---------
+
+* Relational Query Language :
+
+  * Data Definition Language (DDL): standard commands for defining the different structures in a database. DDL statements create, modify, and remove database objects such as tables, indexes, and users, Common DDL statements ate CREATE, ALTER, and DROP
+  * Data Manipulation Language (DML): standard commands for dealing with th**e manipulation of data present in database**. Common DDL statements SELECT, INSERT, UPDATE, and DELETE. 
+  * Each statement in SQL ends with a semicolon(;)
+
+* `CREATE SCHEMA ` Statement
+
+  * A schema is a way to **logically group objects in a single collection and provide a unique namespace for objects**. 
+
+  * The `CREATE SCHEMA` statement is used to create a schema. A schema name **cannot exceed 128 characters**. Schema names must be **unique within the database**. 
+
+  *  Syntax
+
+    ```SQL
+    CREATE SCHEMA schemaName AUTHORIZATION user-name 
+    ```
+
+    
+
+  * Example
+
+    ```SQL
+    CREATE SCHEMA COMPANY AUTHORIZATION ‘Jsmith’; 
+    ```
+
+* `CREATE TABLE` Statement
+
+  * A `CREATE TABLE` statement creates a table. Tables contain **columns and**
+    **constraints(prime-key, foreign key, data type, simple attributes)**, rules to which data must conform. Table-level constraints
+    specify a column or columns. Columns have a data type and can specify
+    column constraints (column-level constraints).
+
+    ![image-20190130114238286](image-20190130114238286.png)
+
+    ![image-20190130121202991](image-20190130121202991.png)
+
+    ![](屏幕快照 2019-01-30 下午12.16.18.png)
+
+* Table Manipulation
+
+  *  The` ALTER TABLE` statement allows you to: 
+    - Add a column to a table 
+    - Add a constraint to a table 
+    - Drop a column from a table 
+    - Drop an existing constraint from a table 
+    - Increase the width of a VARCHAR or VARCHAR FOR BIT DATA column 
+    - change the default value for a column 
+  * `DROP TABLE` statement removes the specified table.  
+  * The `TRUNCATE TABLE` statement allows you to quickly remove all content from the specified table and return it to its initial empty state. 
+
+* `SELECT` Statement
+
+  * The basic statement for retrieving(getter) information from a database
+
+    ```SQL
+    SELECT <attribute list>
+    // A list of attrbibute names whose values are to be retrieved by the query
+    FROM <table list> 
+    // a list of relation names required to process the query
+    WHERE <condition> 
+    // condition is a boolean expression
+    ```
+
+  * try one of single/double quotation for a string
+
+    ![image-20190130122300986](image-20190130122300986.png)
+
+    ![image-20190130123100100](image-20190130123100100.png)
+
+    ![image-20190130123417530](image-20190130123417530.png)
+
+    * `WHERE` will find the information according to the attributes' name
+
+* Ambiguous Attribute Names
+
+  * Same name can be used for two (or more) attributes in different relations 
+
+    - As long as the attributes are in different relations 
+
+    - Must qualify the attribute name with the relation name to prevent ambiguity (Name space)
+
+      ![image-20190130124655061](image-20190130124655061.png)
+
+* Aliasing, Renaming and Tuple Variable
+
+  * Aliases or tuple variables: Declare alternative relation names E and S to refer to the EMPLOYEE relation twice in a query
+
+  * e.g. For each employee, retrieve the employee's first and last name and the first and last name of his of her immediate supervisor
+
+    ```sql
+    SELECT E.Fname, E.Lname, S.Fname, S.Lname
+    FROM EMPLOYEE AS E, EMPLOYEE AS S	// E and S are alias
+    WHERE E.Super_ssn=S.Ssn
+    ```
+
+  * Recommended practice to **abbreviate names and to prefix same or similar attribute** from multiple tables
+
+  * Attributes can also be aliased
+
+    ```sql
+    EMPLOYEE AS E (Fn, Mi, Ln, Ssn, Bd, Addr, Sex, Sal, Sssn, Dno)
+    ```
+
+  * Note that the relation `EMPLOYEE` now has a variable name `E` which corresponds to a tuple variable 
+
+  * The “AS” may be **dropped in most SQL implementations** 
+
+    ```sql
+    EMPLOYEE E (Fn, Mi, Ln, Ssn, Bd, Addr, Sex, Sal, Sssn, Dno) 
+    ```
+
+* Unspecified `WHERE` Clause(分句)
+
+  * Missing `WHERE` clause: Indicates no condition on tuple selection(select ALL)
+
+  * The resultant effect is a CROSS PRODUCT (`JOIN` n x m)
+
+    * Result is all possible tuple combinations between the participating relations
+
+      ![image-20190130164824925](image-20190130164824925.png)
+
+  * Specify an asterisk\*: Retrive all the attributes values of the **selected tuples**
+
+* Table as Sets in SQL
+
+  * The `ALL` and `DISTINCT` keywords determine whether duplicates are eliminated from the result of the operation
+
+    * `DISTINCT` : Result have no duplicate row(**default**)
+    * `ALL` : May have duplicate row(depends on the original data set)
+
+    ```sql
+    SELECT DISTINCT Salary
+    ```
+
+  * `SELECT` statement using the set operators `UNION`, `INTERSECT` and `MINUS`, all set operators have equal precedences
+
+  * Each `SELECT` statement within the operator must have the **same number of fields** in the result sets with similar data types.
+
+  * ` UNION` operator 
+
+    * The UNION operator is used to combine the result sets of 2 or more SELECT statements. It **removes duplicate rows** between the various SELECT statements. 
+
+  * `UNION` ALL operator 
+
+    * It returns all rows from the query and it **does not remove** duplicate rows between the various SELECT statements. 
+
+    ```sql
+    SELECT column_name(s) FROM table1
+    UNION
+    SELECT column_name(s) FROM table2;
+    ```
+
+  * `INTERSECT` operator 
+
+    * The INTERSECT operator is used to return the results of 2 or more SELECT statements.It only returns the rows selected by all queries or data sets. In other words, if a record exists in one query and not in the other, it will be omitted from the INTERSECT results. 
+
+  * `MINUS` operator 
+
+    * The MINUS operator is used to return all rows in the first SELECT statement that are not returned by the second SELECT statement. Each SELECT statement will define a dataset. The MINUS operator will retrieve all records from the first dataset and then remove from the results all records from the second dataset. 
+
+* `LIKE` Conditions
+
+  * The `LIKE` condition allows wildcards(通配符) to be used in the `WHERE` clause of a `SELECT`, `INSERT`, `UPDATE`, or `DELETE ` statement. This allows you to perform pattern matching.
+
+    | Wildcard | Explanation                                                  |
+    | -------- | ------------------------------------------------------------ |
+    | %        | Allows you to match any string of any length (including zero length) |
+    | _        | Allows you to match on a single character                    |
+
+  * select first_name begins with 'P'
+
+    ```sql
+    SELECT first_name
+    FROM customers
+    WHERE customers.last_name LIKE 'P%'		
+    ```
+
+* `ORDER BY` Clause
+
+  *  The `ORDER BY` clause is used to sort the records in your result set. The `ORDER BY` clause can only be used in `SELECT` statements. 
+
+  * Syntax: `ORDER BY expression [ ASC | DESC ] `
+
+    - expressions: The columns or calculations that you wish to 
+
+      retrieve
+
+    - ASC: Optional. It sorts the result set in ascending order by expression (default, if no modifier is provider). 
+
+    - DESC: Optional. It sorts the result set in descending order by expression. 
+
+    - There may be many of the condition, when  first condition is same
+
+  * e.g.: List the entire borrow table in descending order of amount, and if
+    several loans have the same amount, order them in ascending order by loan#:
+
+    ```sql
+    SELECT *
+    FROM Borrow
+    ORDER BY amount DESC, loan# ASC;
+    ```
+
+* `INSERT` statement: insert single/ multiple records
+
+  * insert single record using the `VALUES` keyword
+
+    ```sql
+    INSERT INTO target_table (column1, column2, ... column_n) 
+    VALUES (expression1, expression2, ... expression_n);
+    ```
+
+  * insert multiple records using a `SELECT` statement
+
+    ```sql
+    INSERT INTO target_table (column1, column2, ... column_n) 
+    SELECT expression1, expression2, ... expression_n 
+    FROM source_table
+    [WHERE conditions];
+    ```
+
+  * e.g.: ![image-20190130172803112](image-20190130172803112.png)
+
+* `DELETE` Statement: delete a single/multiple records from a table
+
+  ```sql
+  DELETE FROM target_table
+  [WHERE conditions;]
+  ```
+
+  * ​	table: The table that you wish to delete records from. 
+  * `WHERE` conditions: Optional. The conditions that must be met for the records to be deleted. If no c**onditions are provided, then all records from the table will be deleted.** 
+  * Example: Delete all records from the employee table where the first_name is Bob 
+
+* `UPDATE` Statement: Used to update exsiting records in a table
+
+  ```sql
+  UPDATE table
+  SET column1 = expression1,
+  	column2 = expression2, ...
+  	column_n = expression_n
+  [WHERE conditions];
+  ```
+
+  * e.g.: Update the last_name to 'Bob' in the employee table where the employee_id is 123, and increase the balance by 5%
+
+    ```sql
+    UPDATE employee
+    SET last_name = ‘Bob’, balance = balance*1.05 
+    WHERE employee_id = 123;
+    ```
+
+* Nested queries and set comparisons
+
+  * Nested queries
+
+    * `SELECT-FROM-WHERE` blocks within `WHERE` clause of another query 
+    * For example, some queries require that existing values in the database be fetched and then used in a comparison condition 
+
+  * Comparison operator IN
+
+    * Compares value v with a set (or multiset) of values v
+
+    * Evaluate to `TRUE` if v is one of the elements in V
+
+      ![image-20190130181352775](image-20190130181352775.png)
+
+  * `=ANY` (or `=SOME`) operator returns `TRUE` if the value b is equal to **some value** in the set V and is hence equivalent to `IN`
+
+  * `=ALL` returns `TRUE` if the value b is equal to all the values in the set V
+
+  * Other operators that can be combined: >, >=, < , <= and <>(!=)
+
+  * e.g.: 
+
+    * Find the last name and first name of the employees with salary higher than all the employees in the department with Dno=5 
+
+    ```sql
+    SELECT Lname, Fname
+    FROM Employee
+    WHERE Salary>ALL(SELECT salary
+                     From	Employee
+                     WHERE	Dno = 5);
+    ```
+
+    * Find the name of braches that not the least assets
+
+    ```sql
+    SELECT DISTINCT T.cname 
+    FROM Deposit T
+    WHERE assets > SOME (SELECT assets
+    					 FROM Branch
+    					 WHERE b-city = “Central”);
+    //or
+    SELECT X.bname
+    FROM Branch X, Branch Y
+    WHERE X. assets > Y.assets AND Y.b-city= “Central”;
+    
+    ```
+
+    * Find all customers who have an account at some branch in which Jones has an account
+
+      ```sql
+      SELECT DISTINCT T.cname 
+      FROM Deposit T
+      WHERE T.cname != “Jones”
+      	  AND T.bname IN(SELECT S.bname
+                           FROM Deposit S
+                           WHERE S.cname = "Jones");
+      //A set of branch name with “Jones” as cname.
+      SELECT DISTINCT T.cname
+      FROM Deposit S, Deposit T
+      WHERE S.cname = “Jones” AND S.bname = T.bname
+      		AND T.cname != S.cname;
+      ```
+
+* `EXISTS` Condition: 
+
+  * `EXISTS` : The EXISTS operator is used to test for the existence of any record in a subquery. The EXISTS operator returns true if the subquery returns one or more records.
+
+  * `NOT EXISTS` condition: return true when there is no answer
+
+  * Thus, **the sub selection always have the information from super selection in order to return the information**
+
+  * e.g.: 
+
+    * Find all customers of Central branch who have an account there but no loan there
+
+      ```sql
+      SELECT C.cname 
+      FROM Customer C 
+      WHERE EXISTS
+      			(SELECT *
+      			 FROM Deposit D
+      			 WHERE D.cname = C.cname
+      			 AND D.bname = “Central”)
+      	  AND NOT EXISTS
+      			(SELECT *
+      			 FROM Borrow B
+      			 WHERE B.cname = C.cname
+      			 AND B.bname = “Central”);
+      ```
+
+    * Find braches having greater assets than all branches in N.T
+
+      ```sql
+      SELECT X.bname
+      FROM Branch X
+      WHERE NOT EXISTS(SELECT *
+                       FROM Brach Y
+                       WHERE Y.b-city="N.T."
+                       	AND Y.assets>=X.assets);
+      //or
+      SELECT bname
+      FROM Branch
+      WHERE assets>ALL(SELECT assets
+                       FROM Brach
+                       WHERE b-city="N.T.")
+      ```
+
+    * Find all customers who have a deposit account at ALL braches located in Kowloon(no branch do not contain its deposit)
+
+      ```sql
+      SELECT DISTINCT S.cname
+      FROM Deposit S
+      WHERE NOT EXIST(
+          (
+              SELECT bname
+           	FROM Branch
+           	WHERE b-city = "Kowloon"
+          )
+          MINUS(
+          	SELECT T.bname
+              FROM Deposit T
+              WHERE S.cname = T.cname
+          )
+      );
+      所有的S使得 不存在(在九龙但不包含S的branch)
+      ```
+
+* Aggregate(总数) Functions
+
+  * Built-in aggregate functions: `COUNT`, `SUM`, `MAX`, `MIN`, `AVG`
+
+  * summarize information from multiple tuyples into a single tuple
+
+    ```sql
+    SELECT SUM(Salary), MAX(Salary), MIN(Salary), AVG(Salary)
+    FROM EMPLOYEE;
+    ```
+
+  * e.g.: Find the sum of the salaries of all employees of the 'Reasearch' department, as well as the maximum salary, the minimum salary, and the average salary in this department
+
+    ```sql
+    SELECT SUM(Salary), MAX(Salary), MIN(Salary), AVG(Salary)
+    FROM EMPLOYEE, DEPARTMENT
+    WHERE Dno = Dnumber AND Dname = 'Research';
+    ```
+
+  * Retrieve the total number of employees in the company
+
+    ```sql
+    SELECT COUNT(*)
+    FROM EMPLOYEE;
+    ```
+
+  * Retrieve the number of employees in the 'Reasearch' department
+
+    ```sql
+    SELECT COUNT(*)
+    FROM EMPLOYEE, DEPARTMENT
+    WHERE Dno = Dnumber AND Dname = "Reasearch"
+    ```
+
+  * Count how many different salary values in the data base
+
+    ```sql
+    SELECT COUNT(DISTINCT Salary)
+    FROM EMPLOYEE
+    ```
+
+  * Retrieve the names of all employees who have two or more dependents
+
+    ```sql
+    SELECT Lname, Fname
+    FROM EMPLOYEE
+    WHERE (
+        SELECT COUNT(*)
+        FROM DEPENDENT
+        WHERE SSN=ESSN
+    ) >= 2 ;
+    ```
+
+* GROUP BY Clause
+
+  * group tuples by some of its attributes
+
+    * The same value of attributes for group members called **grouping attribute(s)**, and the aggregate function is applied to each subgroup independently
+
+    * SQL has the GROUP BY clause for this purpose
+
+    * The **GROUP BY clause** specifies the grouping attributes, which should also appear in the SELECT clause => **value resulting from applying each function to a group of tuples** appears along with the value of the grouping attributes
+
+    * e.g.: For each department, retrieve the department number, the number of employees in the department, and their average salary
+
+      ```sql
+      SELECT Dno, COUNT(*), AVG(Salary)
+      FROM EMPLOYEE
+      GROUP BY Dno
+      ```
+
+    * For each project, retrieve the project number, the project name, and the number of employees who work on that project
+
+      ```sql
+      SELECT Pnumber, Pname, COUNT(*)
+      FROM PROJECT, WORKS_ON
+      WHERE Pnumber=Pno
+      GROUP BY Pnumber, Pname
+      ```
+
+      
