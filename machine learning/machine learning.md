@@ -1124,7 +1124,7 @@ $$
 
   ![image-20190128151705093](/Users/zdh/Documents/GitHub/Notes/machine learning/image-20190128151705093.png)
 
-  * dimension of $\Theta$ : $s_{j+1}*(s_j+1)$ where $s_n$ is the number of variables in nth layer, 1 is the constant column
+  * dimension of $\Theta$ : $s_{j+1}*(s_j+1)$ where $s_n​$ is the number of variables in nth layer, 1 is the constant column
   * $\ A^{(j)} *Theta^{(j)T}=A^{(j+1)}$
 
 * More specific description
@@ -1274,6 +1274,34 @@ $$
   ![image-20190128202724643](image-20190128202724643.png)
 
 #### (4) Backpropagation in Practice
+
+* Add all matrices of each layer into one big vector
+
+  ```matlab
+  thetaVec = [Theta1(:); Theta2(:); Theta2(:)];
+  % reshape row 1 to 110 to a 10*11 matrix
+  Theta1 = reshape(thetaVec(1:110),10,11)
+  ```
+
+  ![image-20190211214319614](image-20190211214319614.png)
+
+* Gradient checking
+
+  * use an approximate value ${J(\theta +\epsilon)-J(\theta -\epsilon)}\over 2\epsilon$
+
+    ![image-20190211215552817](image-20190211215552817.png)
+
+  ```matlab
+  for i=1:n,
+  	thetaplus = theta;
+  	thetaplus(i) = thetaplus(i) + EPSILON;
+  	thetaMinus = theta;
+  	thetaMinus(i) = thetaMinus(i) - EPSILON;
+  	gradApprox(i) = (J(thetaPlus)-J(thetaMinus))/(2*EPSILON);
+  end;
+  ```
+
+  * Check that `gradApprox` $\approx$ `DVec` (but it is slow)
 
 * 
 

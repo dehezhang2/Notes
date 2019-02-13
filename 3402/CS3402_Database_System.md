@@ -6,22 +6,22 @@
 
 ---------
 
-* Definition of **ER model**: describes interrelated things of interest in a specific domain of knowledge. Becomes an abstract data model, that defines a data or information structure which can be implemented in a database. Composed of:
+* Definition of **ER model**: describes *interrelated things of interest* in a specific domain of knowledge. Becomes an abstract data model, that defines a data or information structure which can be implemented in a database. Composed of:
 
   * Entity types(classify the things of interest)
   * Specifies relationships: instances of those entity types
 
 * Entity, Entity type and Entity Set
 
-  * **Entity**: a thing capable of an independent existence that **can be uniquely identified** and exists either **physically or logically**. (represented as rectangle)
-  * **Entity type**: collection of entities that have the **same attributes**
-  * **Entity set**: set of entities of the same type
+  * **Entity**: a thing capable of an independent existence that **can be uniquely identified** and exists either **physically or logically**. (represented as rectangle)(object)
+  * **Entity type**: collection of entities that have the **same attributes**(class)
+  * **Entity set**: set of entities of the same type(a set of objects)
 
 * Relationship, Relationship types and  Relationship Set
 
-  * **Relationship** (ties): captures how entities are related to one another. Relationships can be thought of as verbs, linking two or more nouns. For example, a work_for relationship between an employee and a department.(represented as a diamond )
+  * **Relationship** (ties): captures how entities are related to one another. Relationships can be thought of as *verbs, linking two or more nouns(entities)*. For example, a work_for relationship between an employee and a department.(represented as a diamond )
   * **Relationship type**(same kinds of ties) : Defines a relationship among entities of certain entity types
-    * Degree of a relationship type: **number of participating entity types**
+    * **Degree** of a relationship type: **number of participating ==entity types==**
       * binary(ternary) relation type: involving two(three) entity types
   * **Relationship set** (a bunch of ties) : collection of relationships all belonging to one relationship type represented in the database
 
@@ -31,15 +31,15 @@
 
     ![](屏幕快照 2019-01-16 下午12.33.06.png)
 
-  * **Key attribute** : A set of attributes (one or more attributes) that uniquely identify an entity 
+  * **Key attribute** : A set of attributes (one or more attributes) that ==uniquely identify an entity== 
 
   * Types of attribute
 
-    * **Simple attribute** : Has a single atomic value that does not contain any smaller meaningful components
-    * **Composite attributes** : composed of several components.
+    * **Simple attribute** : Has a single atomic value that ==does not contain any smaller meaningful components==
+    * **Composite attributes** : composed of several components(simple attributes).
     * **Multi-valued attribute** : Has multiple values. For example, color of a product (i.e., red and white) and major of a student (i.e., computer science and mathematics).(stored as a collection)
-      * In general, composite and multi-valued attributes may be nested to any number of levels although this is rare.  
-    * **Derived attribute** : An attribute who value is calculated from other attributes(need not be physically stored within the database) 
+      * In general, composite and multi-valued attributes may be nested to any number of levels although this is rare.  (Muti-valued consists of multi-valued)
+    * **Derived attribute** : An attribute who value is calculated from other attributes(==need not be physically stored== within the database) 
 
 * Value sets(domains) of attributes
 
@@ -52,11 +52,10 @@
   * **Participation constraint**: Indicate the minimum number of relationship instances that an entity can participate in
 
     * **Total participation** requires that each entity is involved in the relationship.
-      In other words, an entity must exist related to another entity(represented by **double lines** in ER model)
-    *  **Partial participation** means that not all entities are involved in the
-      relationship. (represented by single lines in ER model)
+      In other words, an entity must exist related to another entity(represented by **double lines** in ER model) => **Key word: at least one**
+    * **Partial participation** means that not all entities are involved in the relationship. (represented by single lines in ER model)
 
-  * **Cardinality constraint** : Indicates the maximum num per of relationship instances that an entity can participate in 
+  * **Cardinality constraint** : Indicates the ==maximum number== of relationship instances that an entity can participate in 
 
     * A **1:1 or one-to-one relationship** from entity type S to entity type T is one in which an entity from S is related to at most one entity from T and vice versa. 
 
@@ -68,11 +67,9 @@
 
     * An **N:M or many-to-many relationship** from entity type S to entity type T is one in which an entity from S can be related to two or more entities from T, and an entity from T can be related to two or more entities from S. 
 
-    * (min, max) notation for relationship structural constraints 
+    * *(min, max)* notation for relationship structural constraints 
 
-      - This notation specifies that **each entity** participates in at least min and at most 
-
-        max relationship instances(of relationship) in a relationship. 
+      - This notation specifies that **each entity** participates in at least min and at most max relationship instances(of relationship) in a relationship. 
 
       - min must be at least 0 and at most max (0 <= min and min <= max) 
 
@@ -80,7 +77,7 @@
 
 * Recursive relationship type
 
-  * A recursive relationship is one in which **the same entity participates more than once** in the relationship. The relationship should be marked by the role that an entity takes in the participation. 
+  * A recursive relationship is one in which **the same entity participates more than once** in the relationship. The relationship should be ==marked by the role that an entity takes in the participation==(supervisor). 
   * It is also called a **self-referencing relationship** type. 
 
 * Weak entity type
@@ -89,7 +86,7 @@
   * A weak entity is identified by the combination of: (1) its partial key and (2) the identifying entity type related to the identifying relationship type. 
     * **because partial key may be the same**
   * e.g.: 
-    * Ada Chan is an employee. She has a dependent Cindy Chan. 
+    * Ada Chan is an employee. She has a dependent(受抚养者) Cindy Chan. 
     * Bob Chan is an employee. He has a dependent Cindy Chan. 
     * The two dependent entities are identical. 
     * The EMPYLOEE entity type owns the DEPENDENT entity type. 
@@ -166,11 +163,11 @@
 
 * Question 2: Construct an ER diagram for a car insurance company. Identify the key entities, relationships and their attributes in the ER diagram. 
 
-  - A customer owns at least one car. 
+  - A customer owns **at least one(total participation)** car. 
 
   - A car may be owned by more than one customer. 
 
-  - An accident involves at least one car. 
+  - An accident involves **at least one** car. 
 
   - A car may have a number of recorded accidents associated with it. 
 
@@ -191,10 +188,10 @@
 * Steps to draw a ER diagram
 
   * Entities: customer,car, accident
-  * Relationships: owns involve
+  * Relationships: owns involve 
+    * Partial/Total Participation
+    * Constraints on Relationship
   * Attributes/Key Attributes
-  * Partial/Total Participation
-  * Constraints on Relationship
 
 --------------
 
@@ -208,7 +205,7 @@
 
 * Relation : Looks like a table of values
 
-  * A relation contains a set of **rows (tuples)** and each **column (attribute)** has a column header that gives an indication of the meaning of the data items in that column 
+  * A relation contains a set of **rows (tuples(元组))** and each **column (attribute)** has a column header that gives an indication of the meaning of the data items in that column 
     - Associated with each attribute of a relation is a set of values (domain) 
     - Students(SSN:string, Name:string, GPA:double) 
   * The data elements in **each row** (tuple) represent certain facts that **correspond to a real-world entity or relationship(also multivalued attribute)**  
@@ -217,14 +214,14 @@
 
 * Primary Key vs Foreign Key
 
-  * **Primary Key**: Unquely indentify a record in the table. (We can have **only one** primary key in a table)
-  * **Foreign Key**: Foreign key is a field in the table that is primary key in another table(reference to other table, can be treated as a object field or pointer). (We can have **more than one** foreign key in a table )
+  * **Primary Key**: Uniquely indentify a record in the table. (We can have **only one** primary key in a table)
+  * **Foreign Key**: Foreign key is a field in the table that is ==primary key in another table==(reference to other table, can be treated as a object field or pointer). (We can have **more than one** foreign key in a table )
 
 * Relational Data Model: Basic Structure
 
   * Each row/turple in a relation is a record/turple (an entity)
 
-  * Each attribute in a relation corresponds to a particular field of a record 
+  * Each attribute in a relation corresponds to a ==particular field of a record== 
 
     ![](屏幕快照 2019-01-23 下午2.49.28.png)
 
@@ -235,7 +232,7 @@
 * Relation State
 
   * Each populated relation has many records or tuples in its relation state
-  * Whenever the database is changed a new state arises
+  * Whenever the database is changed a new state arises (==change the data => change the state==)
   * Basic operations for changing the database:
     * Insert – add a new tuple in a relation 
     * Delete – remove an existing tuple from a relation 
@@ -243,21 +240,21 @@
 
 * Characteristics of Relations
 
-  * The tuple  **are not considered to be ordered**, even though they appear to be in a tabular form (may have dfferent presentation orders)
-    - **same relation state can be with different order of turples**
+  * The tuple  **are not considered to be ordered**, even though they appear to be in a tabular(列成表的) form (may have dfferent presentation orders)
+    - **same relation state can be with different order of tuples**
   * Values in a tuple
     * All values are considered atomic(indivisible)
     * Basic unit for manipulation(add or change)
   * Each value in a turple must be from the domain(set of values) of the attribute for that column
-  * A special null value is used to represent values that are unknown or not available or inapplicable in certain tuples
+  * A special null value is used to represent values that are ==unknown or not available or inapplicable in certain tuples==
 
 * From ER Diagram to Relations:
 
   * Step 1: Mapping of strong Entity types
 
-    * Create a relation R that includes all the simple attributes of E(The strong enity)
+    * Create a relation R that includes all the ==simple attributes== of E(The strong enity)
 
-    * Choose one of the key attributes E as the primary key for R 
+    * Choose ==one of the key attributes== E as the primary key for R 
 
     * R is called an entity relation
 
@@ -274,15 +271,15 @@
     * Identify relations that correspond to the entity types participating R (Says S and T)
     * Approaches:
       * **Foreign key approah**(let one of the entity remember the relationship) used in the example
-        * Choose one of relations(says S) and include the primary key of T as the foreign key in S
+        * Choose one of relations(says S, normally the total participation side) and include the primary key of T as the foreign key in S
         * Include all the simple attributes of the relationship as the attributes of S
       * Merged relationship approach: merge the 2 entity types and the relationship(simple attributes) into a single relation (**not efficient**)
       * Cross reference or **relationship relation approach**
         * Set up a third relation **R** for the purpose of cross-referencing(including) the **primary keys of the two relations S and T** representing the entity types
-        * Also including the primary key attributes of S and T as foreign keys to S and Tm respectively
+        * Also including the primary key attributes of S and T as foreign keys to S and T respectively
         * primary key of R will be **one of the two foreign keys** (because it is 1: 1 relation, 1 key is enough to identify a relation) 
 
-  * Step 4: Mapping of 1:N Relationship Types(let N-side remember the relation)
+  * Step 4: Mapping of 1:N Relationship Types(let N-side remember the relation=>more efficient)
 
     * Identify relation S that represents participating entity type at **N-side** of relationship type
     * Include **the primary key of relation T as the foreign key in S** 
@@ -789,7 +786,7 @@
     ) >= 2 ;
     ```
 
-* GROUP BY Clause
+* GROUP BY Clause(used to construct a new table, each row is identified by the attribute used to group)
 
   * group tuples by some of its attributes
 
@@ -816,4 +813,89 @@
       GROUP BY Pnumber, Pname
       ```
 
-      
+* HAVING Clause(conjunction with the GROUP BY clause)
+
+  * Retrieve the values of the aggregate functions only for **groups that satisfying certain conditions**(select some rows in the GROUP BY table)
+
+  * Example 1: For each project on which ==more than two employees work==,
+    retrieve the project number, the project name, and the number of
+    employees who work on the project.
+
+    ```sql
+    SELECT Pnumber, Pname, COUNT(*)
+    FROM PROJECT, WORKS_ON
+    WHERE Pnumber=Pno
+    GROUP BY Pnumber, Pname
+    HAVING COUNT(*)>2
+    ```
+
+    * `WHERE` limit the tuples to which functions applies)(correspond to WORKS_ON), `HAVING` serves to choose groups
+
+  * Example 2: For each department that has more than five employees,
+    retrieve the department number and the number of its employees who are marking more than $40,000.
+
+    ```sql
+    SELECT Dname, COUNT(*)
+    FROM DEPARTMENT, EMPLOYEE
+    WHERE Dnumber = Dno AND Salary>40000
+    GROUP BY Dname
+    HAVING COUNT(*)>5
+    ```
+
+    * This is **incorrect** because it will select only departments that have more than five employees who earn more than $40,000. This is because the WHERE clause is executed first to select individual tuples, and then the HAVING clause is applied later to select individual groups of tuples.
+
+    ```sql
+    SELECT Dname, COUNT(*)
+    FROM DEPARTMENT, EMPLOYEE
+    WHERE Dnumber = Dno AND Salary>40000 AND Dno in
+    		(
+            	SELECT Dno
+                FROM EMPLOYEE
+                GROUP BY Dno
+                HAVING COUNT(*)>5
+            )
+    GROUP BY Dnumber;
+    ```
+
+* Views(Virtual Tables)
+
+  * A VIEW is a virtual table that does not physically exist. 
+
+  * A view contains rows and columns, just like a real table. The fields in a 
+
+    view are fields from one or more real tables in the database. 
+
+  * You can add SQL functions, WHERE, and JOIN statements to a view and present the data as if the data were coming from one single table. 
+
+  * A view always shows up-to-date data! The database engine recreates the data, using the view's SQL statement, every time a user queries a view. 
+
+  * When you update record(s) in a VIEW, it updates the records in the underlying tables that make up the View. However, most SQL-based DBMSs restrict that a modification is permitted through a view ONLY IF the view is defined in terms of ONE underlying table. 
+
+    ![image-20190210175356966](image-20190210175356966.png)
+
+* NULL Values
+
+  * Information can be very often incomplete in the real world
+
+  * Unknown attributes are assigned a null value
+
+  * One proposal to deal with NULL values is by using 3-valued logic
+
+    ![image-20190210175502133](image-20190210175502133.png)
+
+  * Syntax: expression IS NULL
+
+    * Expression: The value to test whether it is a null value 
+    * If *expression* is a NULL value, the condition evaluates to TRUE. 
+    * If *expression* is not a NULL value, the condition evaluates to FALSE. 
+
+* Summary:
+
+  ![image-20190210175704945](image-20190210175704945.png)
+
+  ![image-20190210175728566](image-20190210175728566.png)
+
+----------------
+
+
+
