@@ -615,5 +615,138 @@
 
 -------------
 
+## Lecture 04 Software Requirement Modeling with Use-cases
 
+-------
 
+### Introduction
+
+* Use Cases: Typically, a use case is a **contract** of an interaction between the system and an actor. 
+
+  * The Actor can be a human or an external system / machine.
+  * A full use-case model comprise of:
+    * A Use Case Diagram, describing relations between use-cases (system tasks, roles) and actors (external parties).
+    * Use Case Specifications (usually one per each use case) Documents describe the use case in details ![image-20190217194936347](image-20190217194936347.png)
+
+* Use cases as means of communication: simulate about what the system should do
+
+  * mainly with people who are outside of the development team.
+
+    The objective of *use case analysis* is to **model** the system and describe
+
+    *  how users interact with this system
+    * when trying to achieve their objectives. 
+    * “It is one of the key activities in requirements analysis”
+
+* Use Case Diagram Objective:
+
+  * Create a semi-formal model of the functional requirements (what the system does..)
+  * Analyze and define:
+    * Scope  (What are the main functions?)
+    * External parties  (who will interact with the system?)
+    * External interfaces  (how they are related?)
+    * Scenarios and reactions  (One Big Picture)
+
+### Use Case Diagram
+
+* Steps to build an Use-Case Model
+  * Choose the ***system boundary*** – what are you modeling? System? Business organization?
+  * Identify the ***primary*** ***actors*** – they have user goals fulfilled by using the services of the system
+  * For each primary actor, ***identify their user goals*** – define what they want to do with the system. Describe their goals at the correct level
+  * ***Define use cases*** that satisfy user goals. Name each according to its goal. [You may find out other actors, which we call secondary actors of ***that particular*** use case.]
+
+![image-20190217213409813](image-20190217213409813.png)
+
+* Actors(provides input and takes output): External objects that produce/consume data:
+
+  * must serve as sources and destinations for data
+  * must be **external to the system**
+  * **Primary actor** : interacts directly with the system
+  * **Secondary actor**: interacts indirectly with the system or support the use case to complete a use case for the primary actor
+  * Use case is User-centric
+
+* Basic Types of Relationship in Use Case Model
+
+  * Include(Allow one to express **commonality** between several different use cases)
+
+    * Can be included in other use cases: very different use cases can share sequence of actions and enable you to avoid repeating details in multiple use cases
+    * Shows the performing of a lower-level task with a lower-level goal
+    * e.g. "place order" includes "validate user"
+
+  * Extend - Graphical representation
+
+    * Conditional flow (IF...THEN...)
+
+    * show **optional** behaviour or handle **exception** 
+
+      ![image-20190217214928800](image-20190217214928800.png)
+
+  * Association: Instances of the actor and instances of the use case communicate with each other(**Only** relationship between actors and use cases) 
+
+  * Generalization: A generalization from use case A to use case B indicates that A inherits B
+
+    ![image-20190217215247633](image-20190217215247633.png)
+
+  * Actors can also be generalized: Child actor inherit all use-cases associations
+
+### Writing Use Cases
+
+* Contents in a single use case:
+
+  ![image-20190217215635105](image-20190217215635105.png)
+
+  * **Name**: Give a short, descriptive name to the use case.
+  * **Purpose**: State clearly the purpose of the use case. Give a short informal description.
+  * **Actors**: List the actors who can perform this use case. 
+  * **Pre-conditions**: Describe the state of the system before the use case.(need to be true before running)
+  * **Flow of Events** 
+    * interactions between actors and the system
+    * business logic
+  * **Not allowed paths** (if any)
+  * **Alternative paths** (if any)
+  * **Exceptions** (if any)
+  * **Post-conditions**: State of the system in following completion.(outcome condition of the use case)
+  * **Extension Points**
+  * **Triggers** : What starts the use-case
+  * **success senario**: main story-line of the use-case
+    * written under the assumption that everything is okay, no errors or problems
+    * Composed of a sequence of action steps
+
+### Guidelines for Effective Use Cases
+
+* Guide lines
+
+  * simple grammar
+  * one side is doing something in a single step
+  * write from an "objective" point of view
+  * any step should lead to some progress
+
+  ![image-20190217221555241](image-20190217221555241.png)
+
+* Common Mistakes:
+
+  * complex diagram
+  * No system box
+  * no actor
+  * too many details(implementation, UI ...)
+
+* Alternative Flows: used to describe exceptional functionality
+
+  * Errors:
+    * “Case did not eject properly”
+    * “Any network error occurred during steps 4-7”
+    * “Any type of error occurred”
+  * Unusual or rare cases
+    * “Credit card is defined as stolen”
+    * “User selects to add a new word to the dictionary”
+  * Endpoints: “The system detects no more open issues”
+  * Shortcuts : “The user can leave the use-case by clicking on the “ESC” key
+
+* Writing include: add a reference as a step
+
+  * system shows homepage
+  * User executes \<include: login to the system\>
+
+* Wriring extend![image-20190217222037037](image-20190217222037037.png)
+
+* 

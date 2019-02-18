@@ -598,57 +598,79 @@
     * A process is allocated ownership of resources including a virtual address space to hold **process image**(user data, user program, stack, PCB)
     * OS performs a protection function to prevent unwanted interference between processes with respect to resource
   * Dispatching/scheduling/execution
-    * The execution of a process follows an execution path that may be interleaved with other processes
-    * A process has an execution state(Running, Ready,etc) and a dispatching priority, and is the entity that is scheduled and dispatched by the OS
+    * The execution of a process follows an **execution path** that may be **interleaved with other processes**
+    * A process has an **execution state(Running, Ready,etc) and a dispatching priority**, and is the entity that is **scheduled and dispatched by the OS**
 
 * Multithreading
   * These two characteristics can be treated independently by the OS
     * The ==unit of dispatching== is referred to as a ***thread*** or lightweight process
-    * The unit of resource ownership is referred to as a ***process*** or task
+    * The unit of ==resource ownership== is referred to as a ***process*** or task
   * ***Multithreading*** is the ability of an OS to support multiple, ==concurrent paths of execution== within **a single process**.
 
 ![image-20190210183331621](image-20190210183331621.png)
 
 * Single-threaded Approaches: A single thread of execution per process(concept of thread is not recognized)
 
-  * MS-DOS supports a single-user process and a single thread
+  * MS-DOS supports a ==single-user process and a single thread==
   * Some variants of UNIX support multiple user processes but only support one thread per process
 
 * Multithreaded Approaches
 
-  * A Java run-time environment is a system of one process with multiple threads.
+  * A **Java run-time environment** is a system of one process with multiple threads.
   * The use of multiple processes, each of which supports multiple threads are found in Windows, Solaris, and many modern versions of UNIX.
 
 * Process vs. Thread
 
   * Process (in OS): 
 
-    * A unit of resource allocation: a virtual address space that holds the ***process image*** (code + data + stack + PCB)
-    * A unit of protection: protected access to processors, other processes (for inter-process communication), files, I/O resources
+    * A **unit of resource allocation**: a virtual address space that holds the ***process image*** (code + data + stack + PCB)
+    * A **unit of protection**: protected access to processors, other processes (for inter-process communication), files, I/O resources
 
   * Thread(in Process):
 
-    * An execution state (running, ready, etc.)
-    * A saved thread context when not running
-    * An execution stack
+    * An execution **state** (running, ready, etc.)
+    * A saved thread **context** when not running
+    * An execution **stack**
     * Some per-thread **static storage** for local variables
     * Access to the memory and resources of its process, **shared by all threads** in that process
 
     ![image-20190210184018024](image-20190210184018024.png)
 
-  * One way to view a thread is as an **independent program counter operating within a process** 
+  * One way to view a thread is as an **independent program counter operating within a process to execute different part of instructions in the main memory** 
+
+    ```c++
+    #include <pthread.h>
+    int g = 0;
+    void *myThreadFun(void *vargp){
+        long myid = *(long*)vargp;
+        int s = 0;
+        ++s; ++g;
+        printf("Thread ID: %ld, local: %d, global: %d\n"
+              , myid, ++s, ++g);
+    }
+    
+    int main(){
+        pthread_t tid;
+        for(int i=0;i<3;i++)
+        	pthread_create(&tid,NULL,myThreadFun,(void*)i);
+        pthread_exit(NULL);
+        return 0;
+    }
+    ```
+
+    
 
 * **Activities Similar to Processes**: Similar to processes, threads have *execution states* and need to *synchronize* with one another.
 
   * Execution states
     * Reminder: In an OS that supports threads, scheduling and dispatching is done on a thread basis.
-    * Most of the state information dealing with execution is maintained in thread-level data structures.
+    * Most of the **state information dealing with execution** is maintained in **thread-level** data structures.
     * The key states for a thread are: Running, Ready, Blocked.
-    * Some states are at process-level.
+    * Some states are at process-level
       * Suspending a process involves ==suspending all threads== of the process because they share the address space.
       * ==Termination of a process terminates all threads within the process==.
   * Threads need to **synchronize** with one another so that they **don't interfere with each other or corrupt data structures**
-    * All threads of a process share the same address space and other resources.
+    * All threads of a process share the **same address space and other resources**.
     * ==Any alteration of a resource by one thread affects the other threads in the same process.==
 
 * Multithreading on a Uniprocessor(单处理器): Mutiprogramming enables the interleaving(插入) of multiple threads within multiple processes
@@ -663,16 +685,15 @@
 
   * Asynchronous processing: 
 
-    In a Web server, multiple threads can work independently and simultaneously, such as issuing SQL queries and invoking Web services, to gather
-    information that are required to build a Web response page
+    In a Web server, multiple threads can work independently and simultaneously, such as issuing SQL queries and invoking Web services, to gather information that are required to build a Web response page
 
   * Speed of execution
 
     In computer graphics, matrix data can be divided and distributed into multiple threads to be calculated in parallel (on multiple cores)
 
-* *Benefits of Threads*: If an application is implemented as a set of related units of execution, it is far more efficient to do so as a collection of threads rather than a collection of separate processes. Reasons include: 
+* *Benefits of Threads*: If an application is implemented as **a set of related units of execution**, it is far more efficient to do so as a collection of threads rather than a collection of separate processes. Reasons include: 
 
-  * less time to create&terminate&switch new thread than a process
+  * less time to **create & terminate & switch** new thread than a process
   * Ehance efficiency in communication because threads within the same process ==share memory and files==, they can ==communicate== with each other ==without invoking the kernel==
 
 -------
@@ -692,41 +713,35 @@
     * Scheduling can be application specific
     * Can run on ==any OS== because the threads library is a set of application-level functions(already based on the OS)
   * Cons: 
-    * Only a single thread within a process can execute at a time -> a multithreaded application cannot take advantage of multiprocessing
-    * When a ULT executes a blocking system call, all of the threads within the process are blocked.
+    * Only a single thread within a process can execute at a time -> a multithreaded application cannot take advantage of multiprocessing(processor just for one process's threads)
+    * When a ULT executes a blocking system call, all of the threads within the process are blocked
 
 * Kernel level Thread(KLT), also called(kernel-supported threads or lightweight processes): Thread management is done by the kernel
 
   ![image-20190210221107012](image-20190210221107012.png)
 
-  * No thread management done by application, just an API to the kernel thread facility(服务)
+  * No thread management done by application, just an **API to the kernel thread facility**(服务)
   * Each user-level thread is mapped to a kernel-level thread
   * Kernel maintains context information for the whole process ==and individual threads within the process==.
   * Scheduling is done ==on a thread basis==.
   * e.g. : Windows, Linux
+  * time comparation for three different kinds of the execution modes(for uni-processor)
 
   ![image-20190210222123084](image-20190210222123084.png)
 
   * Pros:
-
     * The kernel can simultaneously schedule multiple threads from the same process onto multiple processors.
-
     * If one thread in a process is blocked, the kernel can schedule another thread of the same process.
-
-    * Kernel routines themselves can be 
-
-      multithreaded.
-
+    * Kernel routines themselves can be  multithreaded.
   * Cons:
-
-    * The transfer of control from one thread to another within the same process requires a mode switch to the kernel.
+    * The transfer of control from one thread to another within the same process requires a mode switch to the kernel.(conversion overhead)
     * Managing KLTs is slower than ULTs.
     * KLT implementation needs ==OS support==.
 
-* Combined Approach: m-to-n hybrid implementation
+* Combined Approach: **m-to-n hybrid** implementation
 
   * ![image-20190210222324632](image-20190210222324632.png)Application creates *m* ULTs.
-  * OS provides pool of *n* KLTs.
+  * OS provides pool of *n* KLTs(n processors to manage).
   * Multiple ULTs are mapped onto a ==smaller or equal number of KLTs==.
   * Multiple threads within the same application can run in parallel on multiple processors.
   * A blocking system call need not block the entire process.
@@ -767,17 +782,11 @@
     * Create, detach(分开), join 
     * Set/query thread attributes
 
-  * ***Mutexes*** 
+  * ***Mutexes*** : Deal with synchronization via a “***mutex***” (mutual（相互） exclusion)
 
-    * Deal with synchronization via a “***mutex***” (mutual（相互） exclusion)
+  * ***Condition variables*** : Address communications between threads that share a mutex
 
-  * ***Condition variables*** 
-
-    * Address communications between threads that share a mutex
-
-  * ***Synchronization***
-
-    * Manage read/write locks and barriers
+  * ***Synchronization*** : Manage read/write locks and barriers
 
   * Some of the thread-management function calls
 
@@ -792,6 +801,87 @@
   * Reading and writing to the same memory locations is possible
   * No guarantee as to the order that threads will run
   * Therefore requires ==explicit *synchronization* by the programmer==
+
+-------------
+
+## Chapter 05 Concurrency: Mutual Exclusion and Synchronization
+
+--------
+
+### Principles of Concurrency
+
+* OS design is concerned with the management of processes and threads in different systems
+
+  * Multiprogramming: Multiple processes, one core
+  * Multiprocessing: Multiple processes, multiple cores (shared memory)
+  * Distributed Processing: Multiple process, multiple nodes (distributed memory)
+
+* Processes not only interleave(插入) but also overlapped on multi-processors
+
+  ![image-20190217190445211](image-20190217190445211.png)
+
+* Principles of Concurrency(an assumption): ***Interleaving*** and ***overlapping*** can be viewed as examples of **concurrent(同时发生) processing** and present the same problems
+
+  * The relative speed of execution of processes cannot be predicted.
+    * depends on activities of other processes
+    * the way the OS handles interrupts
+    * scheduling policies of the OS
+
+* Difficulties of Concurrency
+
+  * Sharing of global resources: global variables(may be changed)
+  * Difficult for OS to manage the allocation of resources optimally: Multiple
+    processes may request use of the same resource.
+  * Difficult to locate programming errors: Results are not deterministic and reproducible
+
+* **Race Condition**: Occurs when multiple processes or threads read and write shared data items
+
+  * Final result depends on how the execution of instructions in the multiple processes interleaves
+
+  * "Loser" of the race is the process that updates last and will determine 
+
+  * e.g.: P1 P2 are 2 threads can access X
+
+    ![image-20190217192559555](image-20190217192559555.png)
+
+    ![image-20190217192623378](image-20190217192623378.png)
+
+* OS Concerns: What design and management issues are raised by the existence of concurrency?
+
+  * keep track of various processes
+  * allocate and de-allocate resources for each active process; multiple processes want access to the same resource
+  * protect the data and physical resources of each process against interference by other processes
+  * **ensure that a process and its output must be independent of the speed at which its execution is carried out relative to the speed of other concurrent processes**
+
+* Resouce Competition
+
+  * Concurrent processes come into conflict when they are competing for use of the same resource such as I/O devices, memory, and processor time.
+  * Three control problems must be faced:
+    * **Need for mutual exclusion**
+    * Deadlock
+    * Starvation
+
+### Mutual Exculsion
+
+* Mutual Exculsion
+
+  - The problem concerns a group of processes which need access to some resource that **cannot be used simultaneously by more than one single process.**
+  - Control of competition involves the OS because it is the OS that allocates resources. 
+
+  - The processes themselves also need to be able to express the requirement for mutual exclusion.
+
+  - **Critical Section**: The piece of code within a process that accesses a shared resource (data structure or device) that must **not** be concurrently accessed by other processes.
+  - It is important that only one program at a time be allowed in its critical section. 
+
+* 
+
+* 
+
+### Semaphores
+
+### IPC - Message Passing
+
+### Readers/Writers Problem
 
 --------
 
