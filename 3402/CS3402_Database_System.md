@@ -897,5 +897,194 @@
 
 ----------------
 
+## Lecture 04: Relational Algebra
 
+---------------
+
+* Relational Algebra: a formal language for the relational model 
+  * The operations in relational algebra enable  a user to **specify basic retrieval requests(or queries)**
+  * Relational algebra consists of **a set of operations on relations to generate relations**
+  * The result of an operation is a new relation that can  be further manipulated using operations
+  * A sequence of relational algebra operations forms a relational algebra expression
+  * provides a formal foundation for relational model
+
+* Overview
+
+  * Unary(一元) Relational Operations 
+    * SELECT (symbol: $\sigma$ (sigma)) 
+    * PROJECT (symbol: $\pi​$ (pi)) 
+    * RENAME (symbol: $\rho​$ (rho)) 
+  * Relational algebra operations from set theory 
+    * UNION ($\cup$), INTERSECTION ( $\cap$ ), DIFFERENCE (or MINUS, $-$ ) 
+    * CARTESIAN PRODUCT ( **x**) 
+  * Binary Relational Operations
+    * JOIN (several variations of JOIN exist) 
+    * DIVISION 
+  * Additional Relational Operations 
+    - OUTER JOINS, OUTER UNION 
+    - AGGREGATE FUNCTIONS (These compute summary of information: for example, SUM, COUNT, AVG, MIN, and MAX) 
+
+* SELECT: Used to select **a subset of the tuples** from a relation based on a selection conditioin(different with the SQL select, similar to WHERE in SQL)
+
+  * only keep tulples satisfying the condition
+
+  ![image-20190216215059331](image-20190216215059331.png)
+
+  * Properties: 
+
+    * (1) selected relation has the same attrbutes with the parent relation; 
+    * (2) commutative(order of selected attributes doesn't matter) => A cascade (sequence) of SELECT operation may be applied in any order;
+    * (3) A cascade of SELECT operations may be replaced by a single selection with a conjunction (and) of all the conditions
+
+    ![image-20190217120545148](image-20190217120545148.png)
+
+    * The **number of tuples** in the result of a SELECT operation is **less  than (or equal to)** the number of tuples in the input relation R 
+    * The fraction of tuples selected by a selection condition is called the **selectivity of the condition** 
+
+* Unary Relational Operations: PROJECT($\pi$) (similar to SELECT in SQL)
+
+  * Keeps certain attributes from a relation and discards the other attributes: create **vertical partitioning** => spercified attributes are kept in each tuple and the other attributes in each tuple are discarded
+
+    ![image-20190217121018846](image-20190217121018846.png)
+
+  * General form of the project operation is ${\pi}_{<attribute\ list>}(R)​$ 
+
+  * **Removes duplicate tuples**: Result of the project operation must be a mathmetical set(do not allow duplicate) of tuples => equivalent to SELECT DISTINCT in SQL
+
+  * Number of tuples in the result of projection is always **less or equal** to the number of tuples(duplicate removed)
+
+  * If the list of attributes **includes a key of R**, then the number of tuples in the result of PROJECT is equal to the number of tuples in R
+
+    * ${\pi}_{Lname,Fname,Salary}(R)$ (with key)and ${\pi}_{Sex, Salary}(R)$ (without key)
+
+      ![image-20190217123017133](image-20190217123017133.png)
+
+  * Not commutative: 
+
+    ![image-20190217122801028](image-20190217122801028.png)
+
+* Relational Algebra Expressions
+
+  * Apply several relational algebra operations one after the other: Either we can write the operations as a single relational algebra expression by nesting the operation(**must select before  projection** because we need to use the DNO as the condition)
+
+    ![image-20190217123617305](image-20190217123617305.png)
+
+  * Or we can apply one operation at a time and create intermediate result relations
+
+    ![image-20190217123636892](image-20190217123636892.png)
+
+  * In the latter case, we must give names to the relations that hold the intermediate results
+
+* Unary relational Operations: RENAME($\rho$) 
+
+  * Forms of expression ![image-20190217123837256](image-20190217123837256.png)
+
+    ![image-20190217123925602](image-20190217123925602.png)
+
+    Create R and attributes(similar to class init in cpp)
+
+* Set Theory : UNION Operation (R$\cup$S)
+
+  * Either in R or S; remove duplicate
+
+  * R and S must be "type compatible" (double and int are different types but compatible) (same for R$\cap$S and R-S)
+
+    * R and S have same number of attributes
+    * Domains of each corresponding pair of attr must be type compatible
+    * Resulting relation has the same attr names as the first operand relation
+
+  * e.g. Retrieve all employees that are either in Dept 5 or supervise an employee in Dept 5
+
+    ![image-20190217124951386](image-20190217124951386.png)
+
+    * SSN and SUPERSSN are compatible
+
+* INTERSECTION and DIFFERENCE ($\cap$ and -)
+
+  * $R\cap S=(R \cup S)-(R-S)-(S-R)$
+
+* Some properties of set operation (3 operations above)
+
+  * commutative(except minus)
+  * associative
+
+* CARTESIAN (or CROSS) PRODUCT 
+
+  * $R(A_1,A_2,...,A_n) X S(B_1,B_2,...,B_m)$)
+
+  * In order take all the possible combination
+
+  * result is a relation Q with degree n+m attributes and $n_R*n_s​$ tuples
+
+  * R and S **do not have to be compatible**
+
+  * meaningless because some tuple do not exist in real world, but meaningful followed by other operations
+
+    * e.g. all combination of part of female employee information and dependent
+
+    ![image-20190217130157854](image-20190217130157854.png)
+
+    * meaningful after checking the reference of SSN(the name of female employees and their dependents)
+
+      ![image-20190217130344883](image-20190217130344883.png)
+
+* Binary Relational Operations: JOIN (denote by ![image-20190217130524597](image-20190217130524597.png))
+
+  * represents a sequence of CROSS PRODUCT followed by SELECT ![image-20190217133458837](image-20190217133458837.png)
+  * similar property with CROSS PRODUCT but has number of tuples is less than or equal to $n_R*n_s$ 
+  * The general case of JOIN operation is called a Theta-join: R S 
+  * The join condition is called theta 
+  * Theta can be any general boolean expression on the attributes of R and S
+  *  Most join conditions involve one or more equality conditions
+    “AND”ed together
+
+* EQUIJOIN: join conditions with equality comparisons only(the only operator used is =)
+
+  * In the result of an EQUIJOIN, we always have **one or more pairs of attributes that have identical values** in every tuple
+
+* NATURAL JOIN Operation(denoted by \*)
+
+  * created to get rid of the second(superfluous(多余的)) attribute in an EQUIJOIN condition
+
+  * The standard definition of natural join requires that the two join attributes, or each pair of corresponding join attributes, have the **same name in both relations** 
+
+  * If this is not the case, a **renaming operation is applied first** 
+
+  * e.g.: For 2 relations(DEPARTMENT and DEPT_LOCATIONS) has only 1 same name attributes, sufficient to write:
+
+    DEPT_LOCS <- DEPARTMENT*DEPT_LOCATIONS
+
+  * Only attribute with the same name is DNUMBER -> An implicit join condition is created based on this attribute: 
+
+    DEPARTMENT.DNUMBER=DEPT_LOCATIONS.DNUMBER 
+
+  *   Another example: Q <- R(A,B,C,D) * S(C,D,E) 
+
+    - The implicit join condition includes each pair of attributes with the same name, 
+
+      “AND”ed together: R.C=S.C AND R.D=S.D 
+
+    - Result keeps only one attribute of each such pair: Q(A,B,C,D,E) 
+
+* **Complete Set** of Relational Operations: SELECT, PROJECT, UNION, DIFFERENCE, RENAME, and CARTESIAN PRODUCT X (any other relational algebra expression can be expressed by a combination of these five)
+
+* DIVISION:  The division operation is applied to two relations 
+
+  * R(Z) $\div$ S(X), where X is a subset of Z (both of them are set of attributes)
+
+  * Let Y = Z - X (and hence Z = X $\cup$ Y); that is, let Y be the set of attributes of R that are not attributes of S 
+
+  * The result of DIVISION is a relation T(Y) that includes a tuple t if tuples $t_R$ appear in R with $t_R$ [Y] = t, and with  $t_R$ [X]=$t_s$ for every tuple $t_s$ in S(consectutive X same in S and Y same in R) 
+
+  * For a tuple t to appear in the result T of the DIVISION, the values in t must appear in R in combination with every tuple in S 
+
+    ![image-20190217140151633](image-20190217140151633.png)
+
+* summary
+
+  ![image-20190217140224815](image-20190217140224815.png)
+
+  ![image-20190217140307907](image-20190217140307907.png)
+
+-----------
 
