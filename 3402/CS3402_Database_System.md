@@ -498,7 +498,7 @@
 
   * `UNION` ALL operator 
 
-    * It returns all rows from the query and it **does not remove** duplicate rows between the various SELECT statements. 
+    * It returns all rows from IANs SELECT statements. 
 
     ```sql
     SELECT column_name(s) FROM table1

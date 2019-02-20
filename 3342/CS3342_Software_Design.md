@@ -507,7 +507,7 @@
 
     
 
-  * Temporary: A variable holding some value for a very short time only. 
+  * **Temporary**: A variable holding some value for a very short time only. 
 
     * Keep values that are only needed for very short period(e.g. separated by a few lines of code)
 
@@ -534,7 +534,7 @@
 
       
 
-  * Organizer: An array which is only used for rearranging its elements after
+  * **Organizer:** An array which is only used for rearranging its elements after
     initialization. (container)
 
     * An array[] for containing and rearranging elements
@@ -559,7 +559,7 @@
 
     
 
-  * Transformation: A variable that always gets its new value from the same calculation from value(s)of other variable(s). 
+  * **Transformation**: A variable that always gets its new value from the same calculation from value(s)of other variable(s). 
 
     * Purpose: Compute value in new unit
     * e.g.: `speed = distance/time`
