@@ -1028,7 +1028,7 @@
 
       ![image-20190217130344883](image-20190217130344883.png)
 
-* Binary Relational Operations: JOIN (denote by ![image-20190217130524597](image-20190217130524597.png))
+* Binary Relational Operations: **JOIN** (denote by ![image-20190217130524597](image-20190217130524597.png))
 
   * represents a sequence of CROSS PRODUCT followed by SELECT ![image-20190217133458837](image-20190217133458837.png)
   * similar property with CROSS PRODUCT but has number of tuples is less than or equal to $n_R*n_s$ 
@@ -1038,15 +1038,17 @@
   *  Most join conditions involve one or more equality conditions
     “AND”ed together
 
-* EQUIJOIN: join conditions with equality comparisons only(the only operator used is =)
+* **EQUIJOIN**: join conditions with equality comparisons only(the only operator used is =)
 
   * In the result of an EQUIJOIN, we always have **one or more pairs of attributes that have identical values** in every tuple
 
-* NATURAL JOIN Operation(denoted by \*)
+* **NATURAL JOIN** Operation(denoted by \*)
 
-  * created to get rid of the second(superfluous(多余的)) attribute in an EQUIJOIN condition
+  * created to get rid of the second(superfluous(多余的)) attribute in an EQUIJOIN condition(**attributes in table 2 are not included in the result table**)
 
   * The standard definition of natural join requires that the two join attributes, or each pair of corresponding join attributes, have the **same name in both relations** 
+
+  * The same name attributes are all included
 
   * If this is not the case, a **renaming operation is applied first** 
 
@@ -1058,7 +1060,7 @@
 
     DEPARTMENT.DNUMBER=DEPT_LOCATIONS.DNUMBER 
 
-  *   Another example: Q <- R(A,B,C,D) * S(C,D,E) 
+  * Another example: Q <- R(A,B,C,D) * S(C,D,E) 
 
     - The implicit join condition includes each pair of attributes with the same name, 
 
@@ -1074,7 +1076,7 @@
 
   * Let Y = Z - X (and hence Z = X $\cup$ Y); that is, let Y be the set of attributes of R that are not attributes of S 
 
-  * The result of DIVISION is a relation T(Y) that includes a tuple t if tuples $t_R$ appear in R with $t_R$ [Y] = t, and with  $t_R$ [X]=$t_s$ for every tuple $t_s$ in S(consectutive X same in S and Y same in R) 
+  * The result of DIVISION is a relation T(Y) that includes a tuple t if tuples $t_R​$ appear in R with $t_R​$ [Y] = t, and with  $t_R​$ [X]=$t_s​$ for every tuple $t_s​$ in S(S X T$\in​$R) 
 
   * For a tuple t to appear in the result T of the DIVISION, the values in t must appear in R in combination with every tuple in S 
 
@@ -1088,3 +1090,142 @@
 
 -----------
 
+## Lecture 05 Integrity Constraints
+
+* Integrity Constraints
+
+  * Constraints determine which values are permissible and which are not in the database (table)
+    * Constraints are conditions that must hold on all valid relation states
+  * A relational database schema S is a set of relation schemes S = {R 1 , R 2 , ..., R n } and a set of integrity constraints IC
+  * Valid state vs. invalid state 
+    * Valid state: a state that satisfies all the constraints in the defined set of integrity constraints
+    * Invalid state: A database state that does not obey all the integrity constraints
+
+* Three Main Types of Relational Integrity
+  Constraints
+
+  * Inherent or Implicit Constraints: characteristics of relations, e.g., no duplicate tuples
+  * Schema-based or Explicit Constraints: Expressed in schemas by DDL (i.e., SQL)
+  * Application-based or Semantic constraints: These are beyond the expressive power of the model (i.e., cannot be expressed in the schemas of the data model) and must be specified and enforced by the application programs(business rules, laws, which cannot be checked in the data base)
+
+* Schema-based Constraints
+
+  *  There are three main types of schema-based constraints that can be expressed in the relational mode
+    * Key constraints
+    * Entity integrity constraints
+    * Referential integrity constraints
+  * Another schema-based constraint is the domain constraint
+    * Every value in a tuple must be from the domain of its attribute (or it could be null, if allowed for that attribute) (domain is determined in SQL)
+
+* Keys of Relations: Example
+
+  * A set of one or more attributes {A 1 , A 2 , ..., A n } is a key for a relation if:
+    * The attributes functionally determine **all other** **attributes** of the relation
+    * Relations are sets. It is impossible for two distinct tuples of R to agree on all A 1 , A 2 , ..., A n
+    * No proper subset of {A 1 , A 2 , ..., A n } functionally determines all other attributes
+      of R, i.e., a **key must be minimal**
+  * A functional dependency (FD) on a relation R is a statement of the form: if two tuples of R agree on attributes {A 1 , A 2 , ..., A n } (i.e., the tuples have the
+    same values in their respective components for each of these attributes), then they must also agree on another attribute, “B”, {A 1 , A 2 , ..., A n } → B
+  * e.g. Movies(title, year, length, type, studioName, starName): title, year, starName → length, type, studioName
+    * Attributes {title, year, starName} form a key for the relation Movie
+    * Suppose two tuples agree on these three attributes: title, year, starName
+    * They must agree on the other attributes, length, type and studioName
+  * No proper subset of {title, year, starName} functionally determines all other attributes
+    * {title, year} does not determine starName since many movies have more than one star
+    * {year, starName} is not a key because we could have a star in 2 movies in the same year
+
+* Key Constraints
+
+  * A set of attributes that contains a key is called a superkey
+  * It is a set of attributes super key SK, e.g., {A 1 , A2 } of R with the following conditions:
+    * No two tuples in any valid relation state r(R) will have the same value for SK
+    *  For any distinct tuples t1 and t2 in r(R), t1[SK] $\neq$ t2[SK] (i.e., different SK)
+  * Key is also superkey(minimal superkey): remove any attributes, it will not be a superkey
+  * If a relation has several candidate keys, one is chosen arbitrarily to be the primary key(uniquely identify each tuple in a relation)
+  * **General rule**: choose the key with smallest size as the primary key
+
+* Entity Integrity(完整性)
+
+  * The primary key attributes PK of each relation schema R cannot have null values in any tuple of R
+    * t[PK] $\neq$ null for any tuple t in R because it need to be used to identify
+    * if PK has several attributes, null is not allowed in any of these attributes
+  * Note: Other attributes of R **may be** constrained to disallow null values, even though they are not members of the primary key
+
+* Referential Integrity
+
+  * Key and entity integrity constraints are specified on **individual relations**
+  * Referential integrity is a constraint **involving two relations**
+    * To specify a relationship among tuples in two relations
+    * The referencing relation and the referenced relation (R 1 → R 2 )
+  * Tuples in the referencing relation R 1 have attributes FK (called foreign key attributes) that reference the primary key attributes PK of the referenced relation R 2 if it satisfies:
+    * The attributes in FK have the same domain(s) as the primary key attributes PK of R2
+    * a one-to-one mapping
+
+* Displaying a Relational Database Schema and its Constraints
+
+  * Each relation schema can be displayed as **a row of attribute names**
+  * The name of the relation is **written above the attribute names**
+  * The primary key attribute (or attributes) will be **underlined**
+  * A foreign key (referential integrity) constraints is **displayed as a directed** arc (arrow) from the foreign key attributes to the referenced table
+  * Next slide shows the COMPANY relational schema diagram with referential integrity constraints
+
+  ![1550639363932](1550639363932.png)
+
+* Referential Integrity
+
+  * Referential integrity constraints typically arise from the **relationships among the entities represented by the relation**
+  * For example, in the EMPLOYEE relation, the attribute Dno refers to DEPARTMENT for which an employee works. We designate Dno to be a foreign key of EMPLOYEE referencing the DEPARTMENT.
+  * **The constraint**: A value of Dno in any tuple t1 of the EMPLOYEE relation **must match** a value of the primary key of DEPARTMENT, Dnumber, in the same tuple t2 of the DEPARTMENT relation or the value of Dno can be NULL if the employee **does not belong to a department** or will be assigned to a department later.
+
+* Update Operations on Relations
+
+  * Update operations: INSERT / DELETE / MODIFY a tuple
+  * Integrity constraints **should not be violated by the update operations**
+  * Update the department number of “Research” from “001” to “R001”: several update operations **may have to be grouped together**
+  * Updates may propagate to cause other updates automatically. This may be necessary to maintain integrity constraints
+
+* Possible Violations for Update Operations
+
+  * DELETE may violate only referential integrity
+    If the primary key value of the tuple being deleted is referenced from other tuples in the database
+  * INSERT may violate any of the constraints(INSERT any entry break the law)
+    * **Domain constraint**: if one of the attribute values provided for the new tuple is not of the specified attribute domain
+    * **Key constraint**: if the value of a key attribute in the new tuple already exists in another tuple in the relation (cannot maintain unique)
+    * **Referential integrity**: if a foreign key value in the new tuple references a primary key value that does not exist in the referenced relation
+    * **Entity integrity**: if the primary key value is null in the new tuple
+
+* Integrity Violation: In case of integrity violation, several actions can be taken:
+
+  * Cancel the operation that causes the violation
+  * Perform the operation but inform the user of the violation
+  * Trigger additional updates so the violation is corrected
+  * Execute a user-specified error-correction routine
+
+* Adding constraints in SQL
+
+  ```sql
+  CREATE TABLE TOY
+  ( 	toy_id NUMBER(10),
+  	description VARCHAR(15) NOT NULL,
+  	purchase_date DATE, remaining_qnt NUMBER(6)
+  );
+  CREATE TABLE TAB1(
+  	col1 NUMBER(10) PRIMARY_KEY,
+      col2 NUMBER(4) NOT NULL,
+      col3 VARCHAR(5) REFERENCES zipcode(zip) ON DELETE CASCADE,
+      --CASCADE: parent delete => child delete
+      col4 DATE,
+      col5 VARCHAR(20) UNIQUE,	
+      --A unique constraint is a single field or combination of fields that uniquely defines a record.
+      col6 NUMBER(5) CHECK(col6<100)
+  );
+  ```
+
+* Reference Constraints in SQL
+
+  ![1550672400633](1550672400633.png)
+
+  * Add constraints to tables COUNTRY and EXCHANGE
+    * ALTER TABLE COUNTRY ADD CONSTRAINT PK_country PRIMARY KEY(cntry_cd);
+    * ALTER TABLE EXCHANGE ADD CONSTRAINT PK_exchange PRIMARY KEY(exchg_cd);
+    * ALTER TABLE EXCHANGE ADD CONSTRAINT FK_exchg_cntry FOREIGN KEY(cntry_cd) REFERENCES COUNTRY(cntry_cd);.
