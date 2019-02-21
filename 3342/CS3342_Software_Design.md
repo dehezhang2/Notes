@@ -749,4 +749,156 @@
 
 * Wriring extend![image-20190217222037037](image-20190217222037037.png)
 
-* 
+
+
+
+---------------------------
+
+## Lecture 05 Sequence Diagram
+
+----------
+
+* Sequence diagram: Things between implementation and request
+
+  * execution sequence between objects: class methods calling each others
+
+  * when to use centralized or delegation of responsibility and express them in sequence
+
+  * shows objects or actors(**not** classes or the system itself) as vertical dotted lines
+
+  * events as horizontal arrows from the sender object to the receiver object
+
+    ![1550726874986](1550726874986.png)
+
+* Basic components
+
+  ![1550727018881](1550727018881.png)
+
+  * **Frame**: define the scope of a sequence diagram
+  * **Object, message, life-line, condition,execution occurrence** are basic elements to compose a sequence diagram
+
+* Message:
+
+  ![1550727098638](1550727098638.png)
+
+  * Messages, written with horizontal [arrows](https://en.wikipedia.org/wiki/Arrow_(symbol)) with the message name written above them, display interaction. Solid  arrow heads represent synchronous calls, open arrow heads represent [asynchronous messages](http://www.uml-diagrams.org/sequence-diagrams.html), and dashed lines represent reply messages.[[1\]](https://en.wikipedia.org/wiki/Sequence_diagram#cite_note-1)
+
+  * If a caller sends a synchronous message, it must **wait until the message  is done**, such as invoking a subroutine. If a caller sends an  asynchronous message, it **can continue**(bg demo run 1 1) processing and doesn’t have to  wait for a response. 
+
+    * synchronous  
+
+      ![1550727495687](1550727495687.png)
+
+    * Asynchronous(do not pair with return)
+
+    ![1550727559836](1550727559836.png)
+
+    * Asynchronous calls are present in multithreaded  applications, event-driven applications and in [message-oriented middleware](https://en.wikipedia.org/wiki/Message-oriented_middleware).  
+    * Activation boxes, or [method](https://en.wikipedia.org/wiki/Method_(computer_science))-call boxes, are opaque rectangles drawn on top of lifelines to represent  that processes are being performed in response to the message  (ExecutionSpecifications in [UML](https://en.wikipedia.org/wiki/Unified_Modeling_Language)).
+
+  * okay without return values(optional) => reduce line in the diagram(when return val is obvious)
+
+  * Object Creation message(make the lifeline correct)
+
+    ![1550727675531](1550727675531.png)
+
+  * Object Destruction
+
+    * c++ : call destructor
+
+    * java: garbage collection
+
+      ![1550727762469](1550727762469.png)
+
+  * summary
+
+    ![1550727843877](1550727843877.png)
+
+    ![1550727857268](1550727857268.png)
+
+### SD with Complexity
+
+* Condition(event occurs when satisfies condition)
+
+  ![1550728371685](1550728371685.png)
+
+  * [condition] methodName() when  initiate an event
+
+* Lost and found
+
+  ```java
+  public void register(String name, int age){ // found
+      Account acc = new Account();
+      acc.setId(1);
+      acc.setName(name);
+      acc.setAge(age);
+      _accound.add(account);	//loss
+  }
+  ```
+
+  ![1550728469081](1550728469081.png)
+
+  * Lost message:  are those that are either sent but not arrived, or which go to a recipient not shown on the current diagram. (connecting to other functions in another diagram)
+
+  * Found message: are those that arrived from an unknown source, or from a sender not shown on the current diagram.  (They are denoted going to or coming from an endpoint element.)
+
+  * Enhanced Version
+
+    ![1550728710945](1550728710945.png)
+
+    * No one destructs Traffic Violation obj, memory leaks
+
+* Condition/control logics: if then else, for breaks, fragmentations
+
+  * Reference of interactionUSe(ref): Fragment refers/points to another sequence diagram
+
+    ![1550730079944](1550730079944.png)
+
+    ![1550730108126](1550730108126.png)
+
+    * Interaction scenario of objects
+    * short hand for copying the contents(inline in cpp)
+      * To be accurate the copying must take into account substituting parameters with arguments and connect the formal gates with the actual ones.
+
+  * CombinedFragments: Control information of sequence diagram(modeling simple combinations)
+
+    * alt(alternatives): similar to switch: at most one operands
+
+      ![1550730361284](1550730361284.png)
+
+      * use "else " for unnamed case
+
+    * opt(option): if satisefy run, else skip(no else)
+
+      ![1550730391175](1550730391175.png)
+
+    * Break(break): similar to cpp(if satisifies break, run the code, other wise, do not run the code)
+
+      ![1550730435279](1550730435279.png)
+
+    * Iteration(loop)
+
+      ![1550745409825](1550745409825.png)
+
+      * loop(min,max) // where min max define the range of iterations
+      * loop(3) minimum of 3 iterations , equivalent to loop(3,*)
+
+* Case study
+
+  * how to determine the well structured sequence : 2 implementations: 
+
+    * Fork diagram(centralized control): Appropriate when the operations can <u>change order</u> or new operations <u>could be inserted</u> 
+    * Stair Diagram(decentralized control): Appropriate when the operations have a **strong connection** and will **always** be performed in the **same order**
+
+    ![1550746183842](1550746183842.png)
+
+  * A **strong connection** exists among the operations if the objects:
+
+    * form a "consists-of" hierarchy(country-state-city)
+    * Information hierarchy(document-chapter-section)
+    * represent a fixed procedural sequence such as advertisement-order-invoice-delivery-payment
+    * form a (conceptual) inheritance hierarchy(animal-mammal-cat)
+
+  * Reverse Engineering SD
+
+    * 
