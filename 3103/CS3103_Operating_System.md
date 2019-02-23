@@ -950,16 +950,16 @@
 * Semaphore: (**An OS service which is possible to be interruptted, different with the swap-compare instruction**)
 
   * Fundamental principle: multiple processes can cooperate by means of simple signals such that a **process can be forced to stop at a specified place** until it has received a specific signal.
-  * Semaphore: an integer value used for signalling among processes.
-  * Three operations on a semaphore are all *atomic*:
+  * Semaphore: an integer value used for signalling among processes.(**shared as a global variable**)
+  * **Three operations**(but not the semaphore is atomic) on a semaphore are all *atomic*:
     * Initialize to a non-negative integer value
     * **semWait** decrements the semaphore value: to receive a signal
     * **semSignal** increments the semaphore value: to transmit a signal
   * The semaphore is i**nitialized to zero or a positive value.** 
-  * When the value is positive, that value equals the number of processes that can issue a **wait** and immediately continue to execute. (maximum processes that can be executed simultaneously)
+  * When the value is positive, that value equals the number of processes that can issue a **wait** and **immediately continue** to execute. (maximum processes that can be executed simultaneously)
   * When the value is zero, the next process to issue a **wait** is blocked, and the semaphore value goes negative. 
     * Each subsequent **wait** further decrements the value. 
-    * The negative value equals the number of processes waiting to be unblocked.
+    * The negative value equals the number of processes waiting to be unblocked. (equals to the number of process in the waiting queue)
   * Each **signal** *unblocks* **one of** the waiting processes, if any.
 
 * Implementation
@@ -987,9 +987,111 @@
   }
   ```
 
-  * 
+  * Binary Semaphore Primitive(allows only one process executing => mutual exclusive)
 
-* sdf
+    ```cpp
+    struct semaphore{
+      	enum {zero,one} value;
+        queueType queue;
+    };
+    void semWait(semaphore s){
+      	if(s.value == one) 
+            s.value = zero;
+        else{
+            /* s.queue.push(P) */
+            /* block P */
+        }
+    }
+    void semSingnal(semaphore s){
+        if(s.queue.empty())
+        // no waiting => reset value
+            s.value = one;
+        else{
+        // waiting => pop one
+            /* P=queue.front();
+               queue.pop();
+               place P one readylist
+            */
+        }
+    }
+    ```
+
+    
+
+* Mutex
+
+  * A concept related to the binary semaphore is the **mutex**
+  * Two operations: `lock()` and `unlock()`
+  * When a process tries to lock a mutex
+    * mutex not locked => acquire a lock
+    * mutex locked => fail and enter in waiting mode if the mutes is being locked
+  * When a process tries to unlock a mutex : It releases the lock and makes the mutex available for another process to lock
+  * A key difference between binary semaphore and mutex is that the **process that locks the mutex must be the one to unlock it**, i.e., a process cannot unlock a mutex that is not locked by itself.(cannot change priority??)
+
+* Strong/Weak Semaphore
+
+  * Waiting queue for processes waiting on the semaphore
+  * strong/weak determined by the order are processes are removed from the queue
+  * **strong semaphores** use FIFO
+  * **weak semaphores** do not specify the order of removal from the queue
+
+* Mutual Excusion Using Semaphores
+
+  ![1550901280234](1550901280234.png)
+
+  ```cpp
+  const int n = /*number of processes*/;
+  semaphore s = 1; // set the max val
+  void P(int i){
+      while(1){
+          semWait(s);
+          // critical section
+          semSignal(s);
+          // remainder
+      }
+  }
+  int main(){
+     parbegin(P(1),P(2),...,P(n));
+     return 0;
+  }
+  ```
+
+* Producer/Consumer Problem
+
+  * General Statement:
+    * One or more producers are generating data and placing these in a buffer.
+    * A single consumer is taking items out of the buffer one at time.
+    * Only one producer or consumer may access the buffer at any one time.
+  * The Problem : Ensure that the Producer can’t add data into full buffer and Consumer can’t remove data from empty buffer.
+
+* Infinite buffer: assume an infinite buffer b with a linear array of elements
+
+  ![1550901479859](1550901479859.png)
+
+  * A consumer is :
+
+    * blocked when removing from empty buffer
+    * unblocked when an item is inserted by the producer(i.e. >0 number of items in the buffer)
+
+  * A semaphore, n=number of items in the buffer, can be used to implement the idea
+
+    ```cpp
+    const int sizeofbuffer = // buffer size;
+    // operator= overrided
+    semaphore s=1,n=0,e=sizeofbuffer;
+    void producer(){
+        while(1){
+            produce();
+            semWait(e);
+            semWait(s);
+            append();
+            semSignal(s);
+            semSignal(n);
+        }
+    }
+    ```
+
+    
 
 ### IPC - Message Passing
 
