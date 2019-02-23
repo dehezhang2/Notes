@@ -584,7 +584,6 @@
     * Transfer control to the child process: The child process **begins executing at the same point in the code as the parent**, namely at the return from the fork call
     * Transfer control to another process: Both parent and child are left in the ***Ready to Run*** state
 
-
 --------
 
 ## Chapter 04 Threads
@@ -830,17 +829,16 @@
 * Difficulties of Concurrency
 
   * Sharing of global resources: global variables(may be changed)
-  * Difficult for OS to manage the allocation of resources optimally: Multiple
-    processes may request use of the same resource.
+  * Difficult for OS to manage the allocation of resources optimally: Multiple processes may request use of the same resource.(the example of the multithreaded hello program => same resource: screen)
   * Difficult to locate programming errors: Results are not deterministic and reproducible
 
 * **Race Condition**: Occurs when multiple processes or threads read and write shared data items
 
   * Final result depends on how the execution of instructions in the multiple processes interleaves
 
-  * "Loser" of the race is the process that updates last and will determine 
+  * "Loser" of the race is the process that updates last and will determine => finish last process(loser) determine the final value of shared variable
 
-  * e.g.: P1 P2 are 2 threads can access X
+  * e.g.: P1 P2 are 2 threads can access X, each instruction are inorder from a process point of view, **and 2 process use different registers**
 
     ![image-20190217192559555](image-20190217192559555.png)
 
@@ -858,26 +856,140 @@
   * Concurrent processes come into conflict when they are competing for use of the same resource such as I/O devices, memory, and processor time.
   * Three control problems must be faced:
     * **Need for mutual exclusion**
-    * Deadlock
-    * Starvation
+    * Deadlock： wait for each other(one process wait for memory while using process and another using processor while using memory)
+    * Starvation: wait for resources forever
 
 ### Mutual Exculsion
 
-* Mutual Exculsion
+* **Mutual Exculsion**: Only one process access the shared resource at one time
 
   - The problem concerns a group of processes which need access to some resource that **cannot be used simultaneously by more than one single process.**
+
   - Control of competition involves the OS because it is the OS that allocates resources. 
 
   - The processes themselves also need to be able to express the requirement for mutual exclusion.
 
   - **Critical Section**: The piece of code within a process that accesses a shared resource (data structure or device) that must **not** be concurrently accessed by other processes.
-  - It is important that only one program at a time be allowed in its critical section. 
 
-* 
+  - e.g. : Each process includes a critical section operate on some resource **Ra**.
 
-* 
+    ![image-20190222152241932](image-20190222152241932.png)
+
+    - The two functions: **entercritical** and **exitcritical** (进出关键) are used to enforce mutual exclusion: any process that attempts to enter its critical section while another process is in its critical section is made to wait.
+    - if one is in its critical section, other processes cannot access the shared resouce
+    - BUT, how to provide the functions entercritical and exitcritical?
+
+* Requirements of Mutual Exclusion
+
+  * Mutual exclusion must be **enforced**: only one process at a time is allowed into its critical section, among all processes that have critical sections for the same resource
+  * A process that halts in its noncritical section must do so **without interfering(插足) with other processes**
+  * No **deadlock or starvation**
+    * Starvation: Process keep waiting resources forever
+  * When no process is in a critical section, any process that request entry to its critical section must be permitted to enter without delay
+    * process with higher priority can be switch to the front by this requirement 
+  * No assumptions are made about **relative process speeds or number of processes**
+  * A process remains inside its critical section **for a finite time only**
+
+* Hardware Support: (software solution is difficult to deal with the situation)
+
+  * Disabling Interrupt (**Do not work for multiprocess systems !!!**)
+
+    * Uniprocessors only allow interleaving, no overlapping:
+
+      * Recall: operation system switch the processes
+      * IO is disabled to access control
+
+    * to guarantee mutual exclusion: sufficient to prevent a process from being interrupted while it is in the critical section
+
+      ```pseudocode
+      while(1){
+          /* disable interrupts */
+          /* critical section */
+          /* enable interrupts */
+          /* remainder */;
+      }
+      ```
+
+  * Another hardware solutino: Special Machine Instructions![image-20190222155851819](image-20190222155851819.png)
+
+    
+
+    ```cpp
+    int compare_and_swap(int* word, int testval, int newval);
+    // word: point to old value
+    // testval: test value
+    // newval: new value
+    // if testval==oldval swap
+    // always return oldval (in memory)
+    // bolt is a global variable, (means existCritical)
+    // when in the critical section, set bolt to 1 to disable the ability to access, after finish, reset the bolt to 0
+    // if one is occupying the critical area others will busy-waiting for the bolt reset to 1
+    ```
+
+    
+
+    * Compare-and-Swap (CAS) Instruction: ***atomic*** CPU instruction that cannot be interrupted (interrupt occurs: must finish the current instruction, thus atomic(only one) instructions cannot be interrupted)
+    * A **compare** is made between a memory value and a test value.
+    * If the values are the same, a **swap** occurs.
+    * Advantage: 
+      * Applicable to **any number** of processes on either a **single processor or multiple processors** sharing main memory
+      * Simple and easy to verify
+      * It can be used to support **multiple critical sections**; each critical section can be defined by its own variable
+    * Disadvantage
+      * *Busy-waiting* consumes processor time
+      * Starvation is possible
+        * When a process leaves a critical section and more than one process is waiting, the selection of a waiting process is arbitrary; some process could indefinitely be denied access.
+      * Deadlock is possible
+        * P1 enters its critical section and is then preempted(制止) by a higher-priority P2.
+        * P2 attempts to use the same resource as P1 but is denied access because of the mutual exclusion mechanism. 
+        * P2 goes into a busy waiting loop.
+        * The lower-priority P1 will never be dispatched
 
 ### Semaphores
+
+* Semaphore: (**An OS service which is possible to be interruptted, different with the swap-compare instruction**)
+
+  * Fundamental principle: multiple processes can cooperate by means of simple signals such that a **process can be forced to stop at a specified place** until it has received a specific signal.
+  * Semaphore: an integer value used for signalling among processes.
+  * Three operations on a semaphore are all *atomic*:
+    * Initialize to a non-negative integer value
+    * **semWait** decrements the semaphore value: to receive a signal
+    * **semSignal** increments the semaphore value: to transmit a signal
+  * The semaphore is i**nitialized to zero or a positive value.** 
+  * When the value is positive, that value equals the number of processes that can issue a **wait** and immediately continue to execute. (maximum processes that can be executed simultaneously)
+  * When the value is zero, the next process to issue a **wait** is blocked, and the semaphore value goes negative. 
+    * Each subsequent **wait** further decrements the value. 
+    * The negative value equals the number of processes waiting to be unblocked.
+  * Each **signal** *unblocks* **one of** the waiting processes, if any.
+
+* Implementation
+
+  * General Semaphore with Primeitives
+
+  ```cpp
+  struct semaphore{
+  	int count;	//max execute processes
+      queueType queue;
+  };
+  void semWait(semaphore s){
+      s.count--;
+      if(s.count < 0){
+          /* place this process in s.queue */
+          /* block this process */
+      }
+  }
+  void semSignal(semaphore s){
+      s.count++;
+      if(s.count<0){
+          /* rmove a process P from s.queue */;
+          /* place process P on ready list */;
+      }
+  }
+  ```
+
+  * 
+
+* sdf
 
 ### IPC - Message Passing
 
