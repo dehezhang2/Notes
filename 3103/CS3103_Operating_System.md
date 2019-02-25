@@ -651,7 +651,7 @@
     int main(){
         pthread_t tid;
         for(int i=0;i<3;i++)
-        	pthread_create(&tid,NULL,myThreadFun,(void*)i);
+        	pthread_create(&tid,NULL,myThreadFun,&i);
         pthread_exit(NULL);
         return 0;
     }
@@ -1099,3 +1099,136 @@
 
 --------
 
+## Workshop 2: Threads
+
+-------
+
+* Common functions:
+
+  ```cpp
+  #include <pthread.h>
+  pthread_create(thread,attr,start_routine,arg);
+  // thread: An opaque, unique identifier for the new thread returned by the subroutine
+  // attr: An opaque(不透明) attribute object that may be used to set thread attributes. You can specify a thread attrbutes object, or NULL for the default values
+  // start_routine: The C++ routine that the thread will execute once it is created(function pointer)
+  // arg: A single argument that may be passed to start_routine. It must be passed by referce as a pointer cast of type void. NULL may be used if no argument is to be passed
+  // void pointer has different address int the function and the main
+  pthread_exit(status);
+  // retval: specifies the return value for the thread, the value can be obtained in another thread by calling pthread_join()
+  // main() finished before the threads it has created => other threads will continue
+  // main()... after..., just terminate all
+  pthread_join(pthread_t thread, void **retval);
+  // accomplish synchronization
+  
+  // Pthreads functions return 0 on success of a positive value on failure
+  ```
+
+  ![1551067003348](1551067003348.png)
+
+  ![1551066965036](1551066965036.png)
+
+  * Passing arguments
+
+    ```cpp
+    // use a structure to pass the arguments
+    typedef struct thread_data{
+      	int thread_id;
+        char* message
+    } args;
+    void *PrintHello(void *threadarg){
+    	args *my_data;
+        my_data = (args *)threadarg;
+    }
+    pthread_t threads[NUM_THREADS];
+    args td[NUM_THREADS];
+    rc = pthread_create(&threads[i],NULL,PrintHello,(void *)&td[i]);
+    ```
+
+  * **Mutex** variables are used for enforcing mutual exclusion: **binary semaphores** that can only be unlocked by the process or thread that locked them
+
+    ```cpp
+    pthread_mutex_t mymutex = PTHREAD_MUTEX_INITIALIZER;
+    pthread_mutex_lock(&mymutex);
+    
+    pthread_mutex_unlock(&mymutex);
+    ```
+
+  * e.g. three different way to sell icecream
+
+    ```cpp
+    void* seller(void *arg)
+    {
+        int id = *(int *)arg;
+        int done = 0;  /* 0 - not done; 1 - done */
+        long mysell = 0;
+    
+        while (!done) {
+            /* pthread_mutex_lock(&mutex); */
+            if ( icecream > 0 ) {
+                for (int i=0; i<100; i++) {}; // simulate selling duration
+                icecream--;
+                mysell++;
+            }
+            else
+                done = 1;
+            /*  pthread_mutex_unlock(&mutex); */
+        }
+        pthread_exit((void *) mysell);
+    }
+    // main
+     for (i = 0; i < NUM_SELLER; i++) {
+            threadid[i] = i;
+            rc = pthread_create(&threads[i], NULL, seller, (void *)&threadid[i]);
+            if (rc) {
+                cout << "Error when creating thread!" << endl;
+                exit(-1);
+            }
+            jrc = pthread_join(threads[i],&retval);
+            if(jrc){
+                cout << "Error when joining thread!\n";
+                exit(-1);
+            }
+             cout << "Seller #" << threadid[i] << " sold " << (long) retval << " ice-creams" << endl;
+             total_sold+=(long) retval;
+        }
+    
+        /*  for (i = 0; i < NUM_SELLER; i++) { */
+        // rc = pthread_join(threads[i], &retval);
+        // if (rc) {
+        //     cout << "Error when joining thread!" << endl;
+        //     exit(-1);
+        // }
+        //     cout << "Seller #" << threadid[i] << " sold " << (long) retval << " ice-creams" << endl;
+        // total_sold+=(long) retval;
+        /* } */
+    ```
+
+    * First: create all then  join all without mutex
+
+      ```cpp
+      //Seller #0 sold 1389 ice-creams
+      //Seller #1 sold 1340 ice-creams
+      //Seller #2 sold 1276 ice-creams
+      //A total of 4005 ice-creams sold
+      ```
+
+    * second: create all then join all with mutex on each sell
+
+      ```cpp
+      //Seller #0 sold 1153 ice-creams
+      //Seller #1 sold 903 ice-creams
+      //Seller #2 sold 944 ice-creams
+      //A total of 3000 ice-creams sold
+      ```
+
+    * third: create one and join one => same as uni-thread program
+
+      ```cpp
+      //Seller #0 sold 3000 ice-creams
+      //Seller #1 sold 0 ice-creams
+      //Seller #2 sold 0 ice-creams
+      //A total of 3000 ice-creams sold
+      
+      ```
+
+* 
