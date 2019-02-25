@@ -122,7 +122,7 @@
 
     * Objects communicate by *message passing*: request from one object to another asking the second object to execute one of its methods.
 
-    ![image-20190124133942815](/Users/zdh/Documents/GitHub/Notes/3342/image-20190124133942815.png)
+    ![image-20190124133942815](image-20190124133942815.png)
 
 * State of Object
 
@@ -141,7 +141,7 @@
   * **Point from subclass to superclass**
   *  Do not use too often which causes difficulties of management
 
-  ![image-20190124134601450](/Users/zdh/Documents/GitHub/Notes/3342/image-20190124134601450.png)
+  ![image-20190124134601450](image-20190124134601450.png)
 
 * Advantage of Inheritance
 
@@ -748,7 +748,6 @@
   * User executes \<include: login to the system\>
 
 * Wriring extend![image-20190217222037037](image-20190217222037037.png)
-
 
 
 
