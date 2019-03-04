@@ -1258,7 +1258,7 @@
   * DELETE may violate only referential integrity: If the primary key value of the tuple being deleted is referenced from other tuples in the database
   * INSERT may violate any of the constraints(INSERT any entry break the law)
     * **Domain constraint**: if one of the attribute values provided for the new tuple is not of the specified attribute domain
-    * **Key constraint**: if the value of a key attribute in the new tuple already exists in another tuple in the relation (can be duplicate)
+    * **Key constraint**: if the value of a key attribute in the new tuple **already exists** in another tuple in the relation (can be duplicate)
     * **Referential integrity**: if a foreign key value in the new tuple references a primary key value that does not exist in the referenced relation
     * **Entity integrity**: if the primary key value is null in the new tuple
 
@@ -1266,7 +1266,7 @@
 
   * **Cancel the operation** that causes the violation
   * Perform the operation but **inform the user** of the violation
-  * **Trigger additional updates** so the violation is corrected
+  * **Trigger additional updates**(automatically) so the violation is corrected
   * Execute a **user-specified error-correction routine**
 
 * Adding constraints in SQL
@@ -1281,11 +1281,12 @@
   	col1 NUMBER(10) PRIMARY_KEY,
       col2 NUMBER(4) NOT NULL,
       col3 VARCHAR(5) REFERENCES zipcode(zip) ON DELETE CASCADE,
-      --CASCADE: parent delete => child delete
+      --CASCADE: parent delete => child delete (called cascade delete in Oracle)
       col4 DATE,
       col5 VARCHAR(20) UNIQUE,	
-      --A unique constraint is a single field or combination of fields that uniquely defines a record.
+      --A unique constraint is a single field or combination of fields that uniquely defines a record. => cannot be duplicate
       col6 NUMBER(5) CHECK(col6<100)
+      -- specify a condition(domain) on each row in the table
   );
   ```
 
