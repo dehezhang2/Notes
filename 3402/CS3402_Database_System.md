@@ -1464,5 +1464,25 @@
 
   * e.g.![image-20190227212145477](image-20190227212145477.png)
 
+* Algorithm to find all Candidate keys
+
+  ```
+  1. Find the attributes that are neither on the left and right side
+  
+  2. Find attributes that are only on the right side
+  
+  3. Find attributes that are only on the left side
+  
+  4. Combine the attributes on step 1 and 3
+  
+  // by now, step 4 contains all attributes that must be included into the candidate key
+  
+  5. Test if the closures of attributes on step 4 constitutes all the attributes. If yes it is a candidate key.
+  
+  6. If not, find the relation exteriors, that is the attributes not included in step 4 and step 2.
+  
+  7. Now test the closures of attributes on step 4 + one attribute in step 6 one at a time. All those combinations are candidate keys if their closures constitute all the attributes.
+  ```
+
 ----------
 
