@@ -937,9 +937,9 @@
       * It can be used to support **multiple critical sections**; each critical section can be defined by its own variable
     * Disadvantage
       * *Busy-waiting* consumes processor time
-      * Starvation is possible
-        * When a process leaves a critical section and more than one process is waiting, the selection of a waiting process is arbitrary; some process could indefinitely be denied access.
-      * Deadlock is possible
+      * **Starvation is possible**
+        * When a process leaves a critical section and more than one process is waiting, the selection of a waiting process is arbitrary; some process could i**ndefinitely be denied access.**
+      * **Deadlock is possible**
         * P1 enters its critical section and is then preempted(制止) by a higher-priority P2.
         * P2 attempts to use the same resource as P1 but is denied access because of the mutual exclusion mechanism. 
         * P2 goes into a busy waiting loop.
@@ -1068,6 +1068,13 @@
 
   ![1550901479859](1550901479859.png)
 
+  ![IMG_7FA60C91C07B-1](IMG_7FA60C91C07B-1.jpeg)
+
+  * Correct solution : each time let producer goes first if there is no inserted
+
+    * e: size of buffer
+    * n: inserted number
+
   * A consumer is :
 
     * blocked when removing from empty buffer
@@ -1075,31 +1082,90 @@
 
   * A semaphore, n=number of items in the buffer, can be used to implement the idea
 
-    ```cpp
-    const int sizeofbuffer = // buffer size;
-    // operator= overrided
-    semaphore s=1,n=0,e=sizeofbuffer;
-    void producer(){
-        while(1){
-            produce();
-            semWait(e);
-            semWait(s);
-            append();
-            semSignal(s);
-            semSignal(n);
-        }
-    }
-    ```
+    * Producer => not full => produce
+    * For infinite buffer
 
-    
+    ![image-20190301161138092](image-20190301161138092.png)
+
+    * for finite buffer
+
+      ![image-20190301161220246](image-20190301161220246.png)
+
+  
 
 ### IPC - Message Passing
 
+* Message passing
+
+  - When processes interact with one another, they may need to satisfy two fundamental requirements: 
+    - synchronization: to enforce mutual exclusion
+    - communication: to exchange information
+  - Message Passing is one approach to providing both of these functions.
+
+* direct
+
+* Indirect(send to mail box)
+
+* Synchronization
+
+  * Message passing may be either blocking or non-blocking
+  * Blocking is considered synchronous
+  * **Blocking send**: the sender is blocked until the message is received
+  * **Blocking receive**: the receiver is blocked until a message arrives
+  * Non-blocking is considered asynchronous
+  * **Non-blocking** send: the sender sends the message and continues
+  * **Non-blocking** receive: the receiver receives the message or abandons the attempt to receive and continues
+
+* Mutual exculsion by using message
+
+  * Receive will be blocked
+
+  * send will unlock
+
+  * critical section will wait until receive the message
+
+    ![image-20190301162135315](image-20190301162135315.png)
+
+* Producer/consumer problem
+
+  * mayconsume mailbox is also a buffer
+  * Empty buffer <=> empty mailbox <=> no message
+  * Need send in main because need to activate producer
+  * mayproduce means available space
+
+  ![image-20190301162201086](image-20190301162201086.png)
+
 ### Readers/Writers Problem
+
+* The problem: A data area is shared among many processes
+
+  * Some processes only read the data area (readers), some only write to the data area (writers)
+  * Conditions to satisfy:
+    * **Any number of readers** may simultaneously read the file.
+    * **Only one** writer at a time may write to the file.
+    * **If a writer is writing to the file, no reader may read it.**
+
+* Solution without achieve multiple reader
+
+  ![image-20190301163309703](image-20190301163309703.png)
+
+* Add readcount to record number of readers, Add one more semaphore to deal with the add or minus of readcount 
+
+  * Reader priority solution(it is difficult for writer to access because there may be many readers); writer may suffer from **starvation**
+
+  ![image-20190301163631512](image-20190301163631512.png)
+
+* An alternative solution: no new readers are allowed to access to the data area once at least one writer wants to write
+
+  * semWait(rsem) block readers except the first one
+
+  ![image-20190301163951772](image-20190301163951772.png)
+
+  * 
 
 --------
 
-## Workshop 2: Threads
+Workshop 2: Threads
 
 -------
 
@@ -1231,4 +1297,6 @@
       
       ```
 
-* 
+
+-------
+

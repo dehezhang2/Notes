@@ -119,7 +119,8 @@ for(int i = left + 1, j = right; i < = j; ){
 	* Lower bound : N Why?
 
 * Quick selection 
-	> Partition array until j == the k order you want (again shuffle before the partition)
+
+  > Partition array until j == the k order you want (again shuffle before the partition)
 
 * proposition: Linear time on average
 

@@ -9,17 +9,18 @@
 * Definition of **ER model**: describes *interrelated things of interest* in a specific domain of knowledge. Becomes an abstract data model, that defines a data or information structure which can be implemented in a database. Composed of:
 
   * Entity types(classify the things of interest)
-  * Specifies relationships: instances of those entity types
+  * Specifies relationships: exist between entities, instances of those entity types
 
 * Entity, Entity type and Entity Set
 
   * **Entity**: a thing capable of an independent existence that **can be uniquely identified** and exists either **physically or logically**. (represented as rectangle)(object)
-  * **Entity type**: collection of entities that have the **same attributes**(class)
+  * **Entity type**: collection of entities that have the **same kinds of attributes**(class)
   * **Entity set**: set of entities of the same type(a set of objects)
 
 * Relationship, Relationship types and  Relationship Set
 
-  * **Relationship** (ties): captures how entities are related to one another. Relationships can be thought of as *verbs, linking two or more nouns(entities)*. For example, a work_for relationship between an employee and a department.(represented as a diamond )
+  * **Relationship** (ties): captures how entities are related to one another(can be thought of as *verbs, linking two or more nouns(entities)*). 
+    * For example, a *work_for* relationship between an *employee* and a *department*.(represented as a diamond )
   * **Relationship type**(same kinds of ties) : Defines a relationship among entities of certain entity types
     * **Degree** of a relationship type: **number of participating ==entity types==**
       * binary(ternary) relation type: involving two(three) entity types
@@ -31,33 +32,35 @@
 
     ![](屏幕快照 2019-01-16 下午12.33.06.png)
 
-  * **Key attribute** : A set of attributes (one or more attributes) that ==uniquely identify an entity== 
+  * **Key attribute** : A set of attributes (one or more attributes) that ==uniquely identify an entity==(super keys) 
 
   * Types of attribute
 
     * **Simple attribute** : Has a single atomic value that ==does not contain any smaller meaningful components==
     * **Composite attributes** : composed of several components(simple attributes).
-    * **Multi-valued attribute** : Has multiple values. For example, color of a product (i.e., red and white) and major of a student (i.e., computer science and mathematics).(stored as a collection)
+    * **Multi-valued attribute** : Has multiple values. 
+      * For example, color of a product (i.e., red and white) and major of a student (i.e., computer science and mathematics).(stored as a collection)
       * In general, composite and multi-valued attributes may be nested to any number of levels although this is rare.  (Muti-valued consists of multi-valued)
-    * **Derived attribute** : An attribute who value is calculated from other attributes(==need not be physically stored== within the database) 
+    * **Derived attribute** : An attribute whose value is calculated from other attributes(==need not be physically stored== within the database) 
 
 * Value sets(domains) of attributes
 
-  * Each simple attribute is associated with a value set (or domain)
+  * Each **simple attribute** is associated with a **value se**t (or domain)
   * The value set specifies the set of values associated with an attribute
   * Value sets are similar to data types in most programming languages(**normally do not use float in database**, unsteadily, use double)
+  * Char(20), int ….
 
 * Constrains on relationships
 
-  * **Participation constraint**: Indicate the minimum number of relationship instances that an entity can participate in
+  * **Participation constraint**(focus on pariticipation of each entity): Indicate the ==minimum number of relationship== instances that an entity can participate in(must be larger than what)
 
     * **Total participation** requires that each entity is involved in the relationship.
-      In other words, an entity must exist related to another entity(represented by **double lines** in ER model) => **Key word: at least one**
+      * In other words, an entity must exist related to another entity(represented by **double lines** in ER model) => **Key word: A must have at least one B**
     * **Partial participation** means that not all entities are involved in the relationship. (represented by single lines in ER model)
 
-  * **Cardinality constraint** : Indicates the ==maximum number== of relationship instances that an entity can participate in 
+  * **Cardinality constraint**(focus on the map between A and B) : Indicates the ==maximum number== of relationship instances that an entity can participate in(cannot be larger than what) 
 
-    * A **1:1 or one-to-one relationship** from entity type S to entity type T is one in which an entity from S is related to at most one entity from T and vice versa. 
+    * A **1:1 or one-to-one relationship** from entity type S to entity type T is one in which an entity from S is related to **at most one** entity from T and vice versa. 
 
     * An **N:1 or many-to-one relationship** from entity type S to entity type T is one in which an entity from T can be related to two or more entities from S. 
 
@@ -67,28 +70,30 @@
 
     * An **N:M or many-to-many relationship** from entity type S to entity type T is one in which an entity from S can be related to two or more entities from T, and an entity from T can be related to two or more entities from S. 
 
-    * *(min, max)* notation for relationship structural constraints 
+    * *(min, max)* notation for relationship structural constraints (focus on each of the entity in one entity type)
 
       - This notation specifies that **each entity** participates in at least min and at most max relationship instances(of relationship) in a relationship. 
-
+        - total participation: min > 0
+        - 1:1, max = 1
+        - 1:1 total: (1,1)
+        - 1:1 partial: (0,1)
       - min must be at least 0 and at most max (0 <= min and min <= max) 
-
       - max must be at least 1 (max >= 1) 
 
-* Recursive relationship type
+* Recursive relationship type![image-20190303151001028](image-20190303151001028.png)
 
   * A recursive relationship is one in which **the same entity participates more than once** in the relationship. The relationship should be ==marked by the role that an entity takes in the participation==(supervisor). 
   * It is also called a **self-referencing relationship** type. 
 
-* Weak entity type
+* Weak entity type: defined as entity types that **doesn't have super key**, therefore determined by other entity by reference(foreign key)
 
-  * A **weak entity** that does not have a key attribute and is identification- dependent on another entity type. It must participate in an **identifying relationship** type with an owner or identifying entity type. In other words, weak entity type **must be owned by some owner entity type**. 
-  * A weak entity is identified by the combination of: (1) its partial key and (2) the identifying entity type related to the identifying relationship type. 
+  * A **weak entity** that does not have a key attribute and is identification- dependent on another entity type. It **must** participate in an **identifying relationship** type with an owner or identifying entity type. In other words, weak entity type **must be owned by some owner entity type**. 
+  * A weak entity is identified by the combination of: (1) its **partial key** and (2) the **identifying entity type** related to the identifying relationship type. 
     * **because partial key may be the same**
   * e.g.: 
     * Ada Chan is an employee. She has a dependent(受抚养者) Cindy Chan. 
     * Bob Chan is an employee. He has a dependent Cindy Chan. 
-    * The two dependent entities are identical. 
+    * The two dependent entities are identical and determined by employee name(foreign key) and dependent name(partial key)
     * The EMPYLOEE entity type owns the DEPENDENT entity type. 
 
 * Notations for ER Diagrams
@@ -143,7 +148,7 @@
 
   * An ER diagram for the company database with structural constraints specified using (min, max) notation and role name. 
 
-  * A DEPARTMENT has exactly one manager and an EMPLOYEE can manage at most one DEPARTMENT. 
+  * A DEPARTMENT has **exactly one** manager and an EMPLOYEE can manage at most one DEPARTMENT. 
 
   * An EMPLOYEE can work for exactly one DEPARTMENT but a DEPARTMENT has at least 4 EMPLOYEEs. 
 
@@ -237,18 +242,21 @@
     * Insert – add a new tuple in a relation 
     * Delete – remove an existing tuple from a relation 
     * Update – modify an attribute of an existing tuple 
+  * Query is not a part of changing state operations
 
 * Characteristics of Relations
 
   * The tuple  **are not considered to be ordered**, even though they appear to be in a tabular(列成表的) form (may have dfferent presentation orders)
-    - **same relation state can be with different order of tuples**
+    - **same relation state can be with different order of tuples** => unordered set
   * Values in a tuple
-    * All values are considered atomic(indivisible)
+    * **All values are considered atomic(indivisible) => the reason of construct a new relation for multivalued attributes**
     * Basic unit for manipulation(add or change)
-  * Each value in a turple must be from the domain(set of values) of the attribute for that column
+  * Each value in a turple must be from the domain(set of values) of the attribute for that column => data type and size should fulfill the requirements initialized in table schema
   * A special null value is used to represent values that are ==unknown or not available or inapplicable in certain tuples==
 
 * From ER Diagram to Relations:
+
+  * **notice: all composite attribute should be divided into multiple simple attributes in the relation model**
 
   * Step 1: Mapping of strong Entity types
 
@@ -256,7 +264,7 @@
 
     * Choose ==one of the key attributes== E as the primary key for R 
 
-    * R is called an entity relation
+    * R is called an entity relation(each tuple represent an entity instance)
 
       ![](屏幕快照 2019-01-23 下午3.10.00.png)
 
@@ -271,7 +279,7 @@
     * Identify relations that correspond to the entity types participating R (Says S and T)
     * Approaches:
       * **Foreign key approah**(let one of the entity remember the relationship) used in the example
-        * Choose one of relations(says S, normally the total participation side) and include the primary key of T as the foreign key in S
+        * Choose one of relations(says S, **normally the total participation side**) and include the primary key of T as the foreign key in S
         * Include all the simple attributes of the relationship as the attributes of S
       * Merged relationship approach: merge the 2 entity types and the relationship(simple attributes) into a single relation (**not efficient**)
       * Cross reference or **relationship relation approach**
@@ -287,7 +295,7 @@
     * Alternative approach(create a new relationship)
       * Use the relationship relation option as in the third approach for binary 1:1 relationships, but the **primary key of R will be two foreign keys of both involvoing entities**
 
-  * Step 5: Mapping of Binary M:N Relationship Types
+  * Step 5: Mapping of Binary M:N Relationship Types(cross reference)
 
     * Create a new relation R
     * Include all primary key of the participating entity types as the foreign key attributes in R
@@ -355,13 +363,13 @@
 
 * Relational Query Language :
 
-  * Data Definition Language (DDL): standard commands for defining the different structures in a database. DDL statements create, modify, and remove database objects such as tables, indexes, and users, Common DDL statements ate CREATE, ALTER, and DROP
+  * Data Definition Language (DDL): standard commands for defining the different structures in a database. DDL statements create, modify, and remove database objects such as tables, indexes, and users, Common DDL statements ate CREATE, ALTER, and DROP x
   * Data Manipulation Language (DML): standard commands for dealing with th**e manipulation of data present in database**. Common DDL statements SELECT, INSERT, UPDATE, and DELETE. 
   * Each statement in SQL ends with a semicolon(;)
 
 * `CREATE SCHEMA ` Statement
 
-  * A schema is a way to **logically group objects in a single collection and provide a unique namespace for objects**. 
+  * A schema is a way to **logically group objects in a single collection and provide a unique namespace for objects**. => like a package
 
   * The `CREATE SCHEMA` statement is used to create a schema. A schema name **cannot exceed 128 characters**. Schema names must be **unique within the database**. 
 
@@ -382,9 +390,7 @@
 * `CREATE TABLE` Statement
 
   * A `CREATE TABLE` statement creates a table. Tables contain **columns and**
-    **constraints(prime-key, foreign key, data type, simple attributes)**, rules to which data must conform. Table-level constraints
-    specify a column or columns. Columns have a data type and can specify
-    column constraints (column-level constraints).
+    **constraints(prime-key, foreign key, data type, simple attributes)**, rules to which data must conform. Table-level constraints specify a column or columns. Columns have a data type and can specify column constraints (column-level constraints => **determined the domain of attributes**).
 
     ![image-20190130114238286](image-20190130114238286.png)
 
@@ -394,14 +400,14 @@
 
 * Table Manipulation
 
-  *  The` ALTER TABLE` statement allows you to: 
+  *  The ` ALTER TABLE` statement allows you to => **manipulate columns of table instead of insert an instance into the table**: 
     - Add a column to a table 
     - Add a constraint to a table 
     - Drop a column from a table 
     - Drop an existing constraint from a table 
     - Increase the width of a VARCHAR or VARCHAR FOR BIT DATA column 
     - change the default value for a column 
-  * `DROP TABLE` statement removes the specified table.  
+  * `DROP TABLE` statement **removes the specified table**.  
   * The `TRUNCATE TABLE` statement allows you to quickly remove all content from the specified table and return it to its initial empty state. 
 
 * `SELECT` Statement
@@ -413,7 +419,7 @@
     // A list of attrbibute names whose values are to be retrieved by the query
     FROM <table list> 
     // a list of relation names required to process the query
-    WHERE <condition> 
+    WHERE <condition> ;
     // condition is a boolean expression
     ```
 
@@ -425,6 +431,7 @@
 
     ![image-20190130123417530](image-20190130123417530.png)
 
+    * Each connection between 2 tables will be as one constraint in WHERE closure
     * `WHERE` will find the information according to the attributes' name
 
 * Ambiguous Attribute Names
@@ -439,7 +446,7 @@
 
 * Aliasing, Renaming and Tuple Variable
 
-  * Aliases or tuple variables: Declare alternative relation names E and S to refer to the EMPLOYEE relation twice in a query
+  * Aliases or tuple variables: Declare alternative relation names E and S to refer to the EMPLOYEE relation twice in a query (**important when there is a recursive relation and some query based on comparation between entries within the same relation**)
 
   * e.g. For each employee, retrieve the employee's first and last name and the first and last name of his of her immediate supervisor
 
@@ -469,26 +476,28 @@
 
   * Missing `WHERE` clause: Indicates no condition on tuple selection(select ALL)
 
-  * The resultant effect is a CROSS PRODUCT (`JOIN` n x m)
+  * **notice that**: to select all tuples => do not write where; to select all columns => use `SELECT *`
 
-    * Result is all possible tuple combinations between the participating relations
+  * The resultant effect is a CROSS PRODUCT (`JOIN` n x m) => multiple relations without `WHERE`
+
+    * Result is **all possible tuple combinations** between the participating relations
 
       ![image-20190130164824925](image-20190130164824925.png)
 
-  * Specify an asterisk\*: Retrive all the attributes values of the **selected tuples**
+  * Specify an asterisk\*: Retrive all the **attributes** values of the **selected tuples**
 
 * Table as Sets in SQL
 
-  * The `ALL` and `DISTINCT` keywords determine whether duplicates are eliminated from the result of the operation
+  * The `ALL` and `DISTINCT` keywords determine **whether duplicates are eliminated from the result of the operation**
 
-    * `DISTINCT` : Result have no duplicate row(**default**)
+    * `DISTINCT` : Result have no duplicate row(**default**) => **Thus, the returned row of selecting different attribute might be different**
     * `ALL` : May have duplicate row(depends on the original data set)
 
     ```sql
     SELECT DISTINCT Salary
     ```
 
-  * `SELECT` statement using the set operators `UNION`, `INTERSECT` and `MINUS`, all set operators have equal precedences
+  * `SELECT` statement using the set operators `UNION`, `INTERSECT` and `MINUS`, all set operators have equal precedences(**set operations work on two returned queries got by 2 distinct select**)
 
   * Each `SELECT` statement within the operator must have the **same number of fields** in the result sets with similar data types.
 
@@ -496,9 +505,29 @@
 
     * The UNION operator is used to combine the result sets of 2 or more SELECT statements. It **removes duplicate rows** between the various SELECT statements. 
 
+    * e.g.: Select a list of all project numbers for projects that involve an employee whose last name is 'Smith', **either as a worker or as a manager of the department that controls the project**(2 tables are involved)
+
+      ```SQL
+      (
+      	SELECT PNUMBER
+          FROM PROJECT, DEPARTMENT, EMPLOYEE
+          WHERE DNUM = DNUMBER	(project <=> department) 
+          AND MGR_SSN = SSN		(department <=> employee)
+          AND LNAME = 'Smith'		(the condition)
+      ) UNION (
+      	SELECT DISTINCT PNUMBER
+          FROM PROJECT, WORKS_ON, EMPLOYEE
+          WHERE PNUMBER = PNO		(project <=> works_on relationship)
+          AND ESSN = SSN			(employee <=> works_on relationship)
+          AND LNAME = 'Smith'		()
+      );
+      ```
+
+      
+
   * `UNION` ALL operator 
 
-    * It returns all rows from IANs SELECT statements. 
+    * It returns all rows from query and it **does not remove duplicate rows** between the various SELECT statements. 
 
     ```sql
     SELECT column_name(s) FROM table1
@@ -506,13 +535,13 @@
     SELECT column_name(s) FROM table2;
     ```
 
-  * `INTERSECT` operator 
+  * INTERSECT` operator 
 
     * The INTERSECT operator is used to return the results of 2 or more SELECT statements.It only returns the rows selected by all queries or data sets. In other words, if a record exists in one query and not in the other, it will be omitted from the INTERSECT results. 
 
   * `MINUS` operator 
 
-    * The MINUS operator is used to return all rows in the first SELECT statement that are not returned by the second SELECT statement. Each SELECT statement will define a dataset. The MINUS operator will retrieve all records from the first dataset and then remove from the results all records from the second dataset. 
+    * The MINUS operator is used to return all rows in the first SELECT statement that are not returned by the second SELECT statement. Each SELECT statement will define a dataset. The MINUS operator will retrieve all records from the first dataset and then **remove from the results all records from the second dataset.** 
 
 * `LIKE` Conditions
 
@@ -533,15 +562,13 @@
 
 * `ORDER BY` Clause
 
-  *  The `ORDER BY` clause is used to sort the records in your result set. The `ORDER BY` clause can only be used in `SELECT` statements. 
+  * The `ORDER BY` clause is used to sort the records in your result set. The `ORDER BY` clause can only be used in `SELECT` statements. 
 
   * Syntax: `ORDER BY expression [ ASC | DESC ] `
 
-    - expressions: The columns or calculations that you wish to 
+    - expressions: The columns or calculations that you wish to  retrieve
 
-      retrieve
-
-    - ASC: Optional. It sorts the result set in ascending order by expression (default, if no modifier is provider). 
+    - ASC: Optional. It sorts the result set in ascending order by expression (**default**, if no modifier is provider). 
 
     - DESC: Optional. It sorts the result set in descending order by expression. 
 
@@ -565,7 +592,7 @@
     VALUES (expression1, expression2, ... expression_n);
     ```
 
-  * insert multiple records using a `SELECT` statement
+  * insert multiple records using a `SELECT` statement(list attrs after target_table because may insert only part of the value, others attrs use default)
 
     ```sql
     INSERT INTO target_table (column1, column2, ... column_n) 
@@ -576,16 +603,25 @@
 
   * e.g.: ![image-20190130172803112](image-20190130172803112.png)
 
-* `DELETE` Statement: delete a single/multiple records from a table
+* `DELETE` Statement: delete a single/multiple records from a table(different with drop)
 
   ```sql
   DELETE FROM target_table
   [WHERE conditions;]
   ```
 
-  * ​	table: The table that you wish to delete records from. 
+  * target_table: The table that you wish to delete records from. 
+
   * `WHERE` conditions: Optional. The conditions that must be met for the records to be deleted. If no c**onditions are provided, then all records from the table will be deleted.** 
+
   * Example: Delete all records from the employee table where the first_name is Bob 
+
+    ```sql
+    DELETE FROM EMPLOYEE
+    WHERE FIRST_NAME = 'Bob';
+    ```
+
+    
 
 * `UPDATE` Statement: Used to update exsiting records in a table
 
@@ -612,7 +648,7 @@
     * `SELECT-FROM-WHERE` blocks within `WHERE` clause of another query 
     * For example, some queries require that existing values in the database be fetched and then used in a comparison condition 
 
-  * Comparison operator IN
+  * Comparison operator IN (focus on an **entry** in the **selected set** or not)
 
     * Compares value v with a set (or multiset) of values v
 
@@ -620,25 +656,29 @@
 
       ![image-20190130181352775](image-20190130181352775.png)
 
+    * multiple attributes can be collected by a parenthesis for comparison
+
+      ![image-20190303173810782](image-20190303173810782.png)
+
   * `=ANY` (or `=SOME`) operator returns `TRUE` if the value b is equal to **some value** in the set V and is hence equivalent to `IN`
 
-  * `=ALL` returns `TRUE` if the value b is equal to all the values in the set V
+  * `=ALL` returns `TRUE` if the value b is equal to all the values in the set V ( meaningless but make sence when used with '>' or '<' )
 
   * Other operators that can be combined: >, >=, < , <= and <>(!=)
 
   * e.g.: 
 
-    * Find the last name and first name of the employees with salary higher than all the employees in the department with Dno=5 
+    * Find the last name and first name of the employees with salary **higher than all the employees** in the department with Dno=5 
 
     ```sql
     SELECT Lname, Fname
     FROM Employee
-    WHERE Salary>ALL(SELECT salary
-                     From	Employee
-                     WHERE	Dno = 5);
+    WHERE Salary > ALL(	SELECT salary
+                     	From	Employee
+                     	WHERE	Dno = 5);
     ```
 
-    * Find the name of braches that not the least assets
+    * Find the name of braches that not the least assets in "central city"
 
     ```sql
     SELECT DISTINCT T.cname 
@@ -646,8 +686,8 @@
     WHERE assets > SOME (SELECT assets
     					 FROM Branch
     					 WHERE b-city = “Central”);
-    //or
-    SELECT X.bname
+    //or use alias
+    SELECT (DISTINCT) X.bname
     FROM Branch X, Branch Y
     WHERE X. assets > Y.assets AND Y.b-city= “Central”;
     
@@ -656,6 +696,9 @@
     * Find all customers who have an account at some branch in which Jones has an account
 
       ```sql
+      // bname is branch name, cname is customer name
+      // first select all bname of customer "Jones"
+      // second select all customer except Jones whose branch name is in the selected branches
       SELECT DISTINCT T.cname 
       FROM Deposit T
       WHERE T.cname != “Jones”
@@ -671,11 +714,11 @@
 
 * `EXISTS` Condition: 
 
-  * `EXISTS` : The EXISTS operator is used to test for the existence of any record in a subquery. The EXISTS operator returns true if the subquery returns one or more records.
+  * `EXISTS` : The EXISTS operator is **used to test for the existence of any record in a subquery.** The EXISTS operator returns true if the subquery returns one or more records.(**not existence of entry but existence of selected type**)
 
   * `NOT EXISTS` condition: return true when there is no answer
 
-  * Thus, **the sub selection always have the information from super selection in order to return the information**
+  * Thus, **the sub selection always use the attributes as a `WHERE` constraint from super selection in order to return the existence information**
 
   * e.g.: 
 
@@ -687,16 +730,16 @@
       WHERE EXISTS
       			(SELECT *
       			 FROM Deposit D
-      			 WHERE D.cname = C.cname
+      			 WHERE D.cname = C.cname	(account <=> customer)
       			 AND D.bname = “Central”)
       	  AND NOT EXISTS
       			(SELECT *
       			 FROM Borrow B
-      			 WHERE B.cname = C.cname
+      			 WHERE B.cname = C.cname	(loan <=> customer)
       			 AND B.bname = “Central”);
       ```
 
-    * Find braches having greater assets than all branches in N.T
+    * Find branches having greater assets than all branches in N.T
 
       ```sql
       SELECT X.bname
@@ -704,7 +747,7 @@
       WHERE NOT EXISTS(SELECT *
                        FROM Brach Y
                        WHERE Y.b-city="N.T."
-                       	AND Y.assets>=X.assets);
+                       AND Y.assets>=X.assets);
       //or
       SELECT bname
       FROM Branch
@@ -731,13 +774,26 @@
           )
       );
       所有的S使得 不存在(在九龙但不包含S的branch)
+      在九龙-包括他 个数为零
+      //not sure correct
+      SELECT DISTINCT S.cname
+      FROM Deposit S
+      WHERE (
+      	SELECT COUNT(*)
+          FROM BRANCH B, DEPOSIT T
+          WHERE B.cname = T.cname
+          AND B.b-city = "Kowloon"
+          AND S.cname != T.cname
+      )=0;
       ```
 
 * Aggregate(总数) Functions
 
   * Built-in aggregate functions: `COUNT`, `SUM`, `MAX`, `MIN`, `AVG`
 
-  * summarize information from multiple tuyples into a single tuple
+  * summarize information from multiple tuples into a single tuple
+
+  * use `where` to limit the rows that under the consideration
 
     ```sql
     SELECT SUM(Salary), MAX(Salary), MIN(Salary), AVG(Salary)
@@ -753,6 +809,8 @@
     ```
 
   * Retrieve the total number of employees in the company
+
+    * `COUNT(*)` is different with `SELECT *`, it is used to calculate total number of rows instead of working on the columns
 
     ```sql
     SELECT COUNT(*)
@@ -774,7 +832,7 @@
     FROM EMPLOYEE
     ```
 
-  * Retrieve the names of all employees who have two or more dependents
+  * Retrieve the names of all employees who have two or more dependents(more specific query than `EXIST`)
 
     ```sql
     SELECT Lname, Fname
@@ -786,7 +844,7 @@
     ) >= 2 ;
     ```
 
-* GROUP BY Clause(used to construct a new table, each row is identified by the attribute used to group)
+* `GROUP BY ` clause(used to construct a new table, each row is identified by the attribute used to form a group) => **when you what to calculate some things according to one entity type but the type is in another relation (referenced in the current relation)**
 
   * group tuples by some of its attributes
 
@@ -796,30 +854,36 @@
 
     * The **GROUP BY clause** specifies the grouping attributes, which should also appear in the SELECT clause => **value resulting from applying each function to a group of tuples** appears along with the value of the grouping attributes
 
-    * e.g.: For each department, retrieve the department number, the number of employees in the department, and their average salary
+    * e.g.: For each department, retrieve the department number, the number of employees in the department, and their average salary (salary is not stored in department table)
+
+      ![image-20190303200844777](image-20190303200844777.png)
 
       ```sql
       SELECT Dno, COUNT(*), AVG(Salary)
       FROM EMPLOYEE
-      GROUP BY Dno
+      GROUP BY Dno;
       ```
 
+      ![image-20190303200952304](image-20190303200952304.png)
+
     * For each project, retrieve the project number, the project name, and the number of employees who work on that project
+
+      * `GROUP BY` restricts the type of tuples that the `COUNT(*)` function works on
+        * `COUNT(*)` : from all tuples to a group that shares the same Pnumber an Pname
+      * If we want to select all distinct Pnumber and Pname only, we can omit `GROUP BY` 
 
       ```sql
       SELECT Pnumber, Pname, COUNT(*)
       FROM PROJECT, WORKS_ON
       WHERE Pnumber=Pno
-      GROUP BY Pnumber, Pname
+      GROUP BY Pnumber, Pname;
       ```
 
 * HAVING Clause(conjunction with the GROUP BY clause)
 
-  * Retrieve the values of the aggregate functions only for **groups that satisfying certain conditions**(select some rows in the GROUP BY table)
+  * Retrieve the values of the aggregate functions only for **groups that satisfying certain conditions**(select some rows in the GROUP BY table) => **constraint on the groups**, used when you need to make some constraints to the value that calculated by functions that only works correctly under `GROUP BY`（是where的后置条件，即先选择entry组成group， 再判断）. (`where` only works when you are dealing with each of the row)
 
-  * Example 1: For each project on which ==more than two employees work==,
-    retrieve the project number, the project name, and the number of
-    employees who work on the project.
+  * Example 1: For each project on which ==more than two employees work==, retrieve the project number, the project name, and the number of employees who work on the project.
 
     ```sql
     SELECT Pnumber, Pname, COUNT(*)
@@ -829,10 +893,9 @@
     HAVING COUNT(*)>2
     ```
 
-    * `WHERE` limit the tuples to which functions applies)(correspond to WORKS_ON), `HAVING` serves to choose groups
+    * `WHERE` limit the tuples to which functions applies (correspond to WORKS_ON), `HAVING` serves to choose groups
 
-  * Example 2: For each department that has more than five employees,
-    retrieve the department number and the number of its employees who are marking more than $40,000.
+  * Example 2: For **each department that has more than five employees**(前置条件), retrieve the department number and the number of its employees who are marking more than $40,000.
 
     ```sql
     SELECT Dname, COUNT(*)
@@ -861,13 +924,11 @@
 
   * A VIEW is a virtual table that does not physically exist. 
 
-  * A view contains rows and columns, just like a real table. The fields in a 
+  * A view contains rows and columns, just like a real table. The fields in a view are fields from **one or more real tables** in the database. 
 
-    view are fields from one or more real tables in the database. 
+  * You can add SQL functions, WHERE, and JOIN statements to a view and present the data **as if the data were coming from one single table**. 
 
-  * You can add SQL functions, WHERE, and JOIN statements to a view and present the data as if the data were coming from one single table. 
-
-  * A view always shows up-to-date data! The database engine recreates the data, using the view's SQL statement, every time a user queries a view. 
+  * A view always shows up-to-date data! The database engine recreates the data(automatically), using the view's SQL statement, every time a user queries a view. 
 
   * When you update record(s) in a VIEW, it updates the records in the underlying tables that make up the View. However, most SQL-based DBMSs restrict that a modification is permitted through a view ONLY IF the view is defined in terms of ONE underlying table. 
 
@@ -906,33 +967,37 @@
   * Relational algebra consists of **a set of operations on relations to generate relations**
   * The result of an operation is a new relation that can  be further manipulated using operations
   * A sequence of relational algebra operations forms a relational algebra expression
-  * provides a formal foundation for relational model
+  * **provides a formal foundation for relational model**
 
 * Overview
 
   * Unary(一元) Relational Operations 
-    * SELECT (symbol: $\sigma$ (sigma)) 
+    * SELECT (symbol: $\sigma​$ (sigma)) 
     * PROJECT (symbol: $\pi​$ (pi)) 
     * RENAME (symbol: $\rho​$ (rho)) 
   * Relational algebra operations from set theory 
     * UNION ($\cup$), INTERSECTION ( $\cap$ ), DIFFERENCE (or MINUS, $-$ ) 
-    * CARTESIAN PRODUCT ( **x**) 
+    * CARTESIAN PRODUCT (**x**) 
   * Binary Relational Operations
-    * JOIN (several variations of JOIN exist) 
-    * DIVISION 
+    * JOIN (several variations of JOIN exist) (cross product and products under some constraints)
+    * DIVISION
   * Additional Relational Operations 
     - OUTER JOINS, OUTER UNION 
     - AGGREGATE FUNCTIONS (These compute summary of information: for example, SUM, COUNT, AVG, MIN, and MAX) 
 
+* The COMPANY relational database schema
+
+  ![image-20190303204441073](image-20190303204441073.png)
+
 * SELECT: Used to select **a subset of the tuples** from a relation based on a selection conditioin(different with the SQL select, similar to WHERE in SQL)
 
-  * only keep tulples satisfying the condition
+  * only keep tulples satisfying the condition => horizontal partitioning
 
   ![image-20190216215059331](image-20190216215059331.png)
 
   * Properties: 
 
-    * (1) selected relation has the same attrbutes with the parent relation; 
+    * (1) selected relation has **the same attrbutes(columns)** with the parent relation; 
     * (2) commutative(order of selected attributes doesn't matter) => A cascade (sequence) of SELECT operation may be applied in any order;
     * (3) A cascade of SELECT operations may be replaced by a single selection with a conjunction (and) of all the conditions
 
@@ -941,31 +1006,35 @@
     * The **number of tuples** in the result of a SELECT operation is **less  than (or equal to)** the number of tuples in the input relation R 
     * The fraction of tuples selected by a selection condition is called the **selectivity of the condition** 
 
-* Unary Relational Operations: PROJECT($\pi$) (similar to SELECT in SQL)
+* Unary Relational Operations: PROJECT($\pi​$) (similar to SELECT in SQL)
 
-  * Keeps certain attributes from a relation and discards the other attributes: create **vertical partitioning** => spercified attributes are kept in each tuple and the other attributes in each tuple are discarded
+  * Keeps certain attributes from a relation and discards the other attributes: create **vertical partitioning** => spercified attributes are kept in each tuple and the other attributes in each tuple are discarded 
 
     ![image-20190217121018846](image-20190217121018846.png)
 
   * General form of the project operation is ${\pi}_{<attribute\ list>}(R)​$ 
 
-  * **Removes duplicate tuples**: Result of the project operation must be a mathmetical set(do not allow duplicate) of tuples => equivalent to SELECT DISTINCT in SQL
+  * **Removes duplicate tuples**: Result of the project operation must be a mathmetical set(do not allow duplicate) of tuples => equivalent to `SELECT DISTINCT` in SQL
 
-  * Number of tuples in the result of projection is always **less or equal** to the number of tuples(duplicate removed)
+  * Number of tuples in the result of projection is always **less or equal** to the number of tuples(duplicate removed => `SELECT DISTINCT`)
 
-  * If the list of attributes **includes a key of R**, then the number of tuples in the result of PROJECT is equal to the number of tuples in R
+  * If the list of attributes **includes a key of R**, then the number of tuples in the result of PROJECT is equal to the number of tuples in R, because it uniquely determine each tuple (i.e. they shares same column space => keys can be treated as bases in Linear algebra)
 
-    * ${\pi}_{Lname,Fname,Salary}(R)$ (with key)and ${\pi}_{Sex, Salary}(R)$ (without key)
+    * ${\pi}_{Lname,Fname,Salary}(R)​$ (with key)and ${\pi}_{Sex, Salary}(R)​$ (without key)
 
       ![image-20190217123017133](image-20190217123017133.png)
 
   * Not commutative: 
+
+    * list1 must be part of list2
 
     ![image-20190217122801028](image-20190217122801028.png)
 
 * Relational Algebra Expressions
 
   * Apply several relational algebra operations one after the other: Either we can write the operations as a single relational algebra expression by nesting the operation(**must select before  projection** because we need to use the DNO as the condition)
+
+  * **if you do not know the order, selecting before projecting is always correct**
 
     ![image-20190217123617305](image-20190217123617305.png)
 
@@ -983,15 +1052,19 @@
 
     Create R and attributes(similar to class init in cpp)
 
+  * *Shorthand* for renaming
+
+    ![image-20190303211829228](image-20190303211829228.png)
+
 * Set Theory : UNION Operation (R$\cup$S)
 
   * Either in R or S; remove duplicate
 
-  * R and S must be "type compatible" (double and int are different types but compatible) (same for R$\cap$S and R-S)
+  * R and S must be "type compatible" (double and int are different types but compatible) (same for R$\cap​$S and R-S)
 
     * R and S have same number of attributes
     * Domains of each corresponding pair of attr must be type compatible
-    * Resulting relation has the same attr names as the first operand relation
+    * Resulting relation has the same attr names as the **first operand relation** as default
 
   * e.g. Retrieve all employees that are either in Dept 5 or supervise an employee in Dept 5
 
@@ -999,22 +1072,22 @@
 
     * SSN and SUPERSSN are compatible
 
-* INTERSECTION and DIFFERENCE ($\cap$ and -)
+* INTERSECTION and DIFFERENCE ($\cap​$ and -)
 
-  * $R\cap S=(R \cup S)-(R-S)-(S-R)$
+  * $R\cap S=(R \cup S)-(R-S)-(S-R)​$
 
 * Some properties of set operation (3 operations above)
 
   * commutative(except minus)
   * associative
 
-* CARTESIAN (or CROSS) PRODUCT 
+* CARTESIAN (or CROSS) PRODUCT
 
-  * $R(A_1,A_2,...,A_n) X S(B_1,B_2,...,B_m)$)
+  * $R(A_1,A_2,...,A_n) \ X\  S(B_1,B_2,...,B_m)$)
 
   * In order take all the possible combination
 
-  * result is a relation Q with degree n+m attributes and $n_R*n_s​$ tuples
+  * result is a relation Q with degree $col_A+col_B$ attributes and $row_A*row_B$ tuples
 
   * R and S **do not have to be compatible**
 
@@ -1031,26 +1104,25 @@
 * Binary Relational Operations: **JOIN** (denote by ![image-20190217130524597](image-20190217130524597.png))
 
   * represents a sequence of CROSS PRODUCT followed by SELECT ![image-20190217133458837](image-20190217133458837.png)
-  * similar property with CROSS PRODUCT but has number of tuples is less than or equal to $n_R*n_s$ 
-  * The general case of JOIN operation is called a Theta-join: R S 
-  * The join condition is called theta 
+  * similar property with CROSS PRODUCT but has number of tuples is less than or equal to $row_A*row_B$ 
+  * The general case of JOIN operation is called a **Theta-join**: R S 
+  * **The join condition is called theta** 
   * Theta can be any general boolean expression on the attributes of R and S
-  *  Most join conditions involve one or more equality conditions
-    “AND”ed together
+  * Most join conditions involve one or more equality conditions “AND”ed together
 
 * **EQUIJOIN**: join conditions with equality comparisons only(the only operator used is =)
 
-  * In the result of an EQUIJOIN, we always have **one or more pairs of attributes that have identical values** in every tuple
+  * In the result of an EQUIJOIN, we always have **one or more pairs of attributes that have identical values** in every tuple(because it is the join condition)
 
 * **NATURAL JOIN** Operation(denoted by \*)
 
-  * created to get rid of the second(superfluous(多余的)) attribute in an EQUIJOIN condition(**attributes in table 2 are not included in the result table**)
+  * created to get rid of the second(superfluous(多余的)) attribute in an EQUIJOIN condition(**attributes as part of condition in table 2 are not included in the result table**)
 
-  * The standard definition of natural join requires that the two join attributes, or each pair of corresponding join attributes, have the **same name in both relations** 
+  * The standard definition of natural join **requires that the two join attributes, or each pair of corresponding join attributes**, have the **same name in both relations** 
 
   * The same name attributes are all included
 
-  * If this is not the case, a **renaming operation is applied first** 
+  * If this is not the case, a **renaming operation is applied first** or specify the join conditions
 
   * e.g.: For 2 relations(DEPARTMENT and DEPT_LOCATIONS) has only 1 same name attributes, sufficient to write:
 
@@ -1072,11 +1144,11 @@
 
 * DIVISION:  The division operation is applied to two relations 
 
-  * R(Z) $\div$ S(X), where X is a subset of Z (both of them are set of attributes)
+  * R(Z) $\div​$ S(X), where X is a subset of Z (both of them are set of attributes)
 
-  * Let Y = Z - X (and hence Z = X $\cup$ Y); that is, let Y be the set of attributes of R that are not attributes of S 
+  * Let Y = Z - X (and hence Z = X $\cup​$ Y); that is, let Y be the set of attributes of R that are not attributes of S 
 
-  * The result of DIVISION is a relation T(Y) that includes a tuple t if tuples $t_R​$ appear in R with $t_R​$ [Y] = t, and with  $t_R​$ [X]=$t_s​$ for every tuple $t_s​$ in S(S X T$\in​$R) 
+  * The **result of DIVISION is a relation T(Y)** that includes a tuple t if tuples $t_R$ appear in R with $t_R$ [Y] = t, and with  $t_R$ [X]=$t_s$ for every tuple $t_s$ in S (**S X T$\subseteq$R**) 
 
   * For a tuple t to appear in the result T of the DIVISION, the values in t must appear in R in combination with every tuple in S 
 
@@ -1092,40 +1164,37 @@
 
 ## Lecture 05 Integrity Constraints
 
-* Integrity Constraints
+* Integrity Constraints (完整性限制)
 
-  * Constraints determine which values are permissible and which are not in the database (table)
-    * Constraints are conditions that must hold on all valid relation states
+  * Constraints determine which values are permissible(许可) and which are not in the database (table)
+    * Constraints are conditions that must hold on **all valid relation states**
   * A relational database schema S is a set of relation schemes S = {R 1 , R 2 , ..., R n } and a set of integrity constraints IC
   * Valid state vs. invalid state 
     * Valid state: a state that satisfies all the constraints in the defined set of integrity constraints
-    * Invalid state: A database state that does not obey all the integrity constraints
+    * Invalid state: A database state that **does not obey all** the integrity constraints
 
-* Three Main Types of Relational Integrity
-  Constraints
+* Three Main Types of Relational Integrity Constraints
 
   * Inherent or Implicit Constraints: characteristics of relations, e.g., no duplicate tuples
-  * Schema-based or Explicit Constraints: Expressed in schemas by DDL (i.e., SQL)
-  * Application-based or Semantic constraints: These are beyond the expressive power of the model (i.e., cannot be expressed in the schemas of the data model) and must be specified and enforced by the application programs(business rules, laws, which cannot be checked in the data base)
+  * **Schema-based** or Explicit Constraints: Expressed in schemas by DDL (i.e., SQL)
+  * Application-based or Semantic(语意的) constraints: These are **beyond the expressive power of the model** (i.e., cannot be expressed in the schemas of the data model) and must be specified and enforced by the application programs(business rules, laws, which cannot be checked in the data base)
 
 * Schema-based Constraints
 
   *  There are three main types of schema-based constraints that can be expressed in the relational mode
-    * Key constraints
-    * Entity integrity constraints
-    * Referential integrity constraints
-  * Another schema-based constraint is the domain constraint
-    * Every value in a tuple must be from the domain of its attribute (or it could be null, if allowed for that attribute) (domain is determined in SQL)
+    * Key constraints (key must be minimal)
+    * Entity integrity constraints (key must be not null)
+    * Referential integrity constraints  (between 2 relation R1 and R2 a **foreign key** must be one-to-one , must have same domain with primary key of referenced relation and must match one of the primary key or be NULL)
+  * Another schema-based constraint is the **domain constraint**
+    * Every value in a tuple **must be from the domain of its attribute** (or it could be null, if allowed for that attribute) (domain is determined in SQL when create the table)
 
-* Keys of Relations: Example
+* **Keys** of Relations: Example
 
-  * A set of one or more attributes {A 1 , A 2 , ..., A n } is a key for a relation if:
-    * The attributes functionally determine **all other** **attributes** of the relation
-    * Relations are sets. It is impossible for two distinct tuples of R to agree on all A 1 , A 2 , ..., A n
-    * No proper subset of {A 1 , A 2 , ..., A n } functionally determines all other attributes
-      of R, i.e., a **key must be minimal**
-  * A functional dependency (FD) on a relation R is a statement of the form: if two tuples of R agree on attributes {A 1 , A 2 , ..., A n } (i.e., the tuples have the
-    same values in their respective components for each of these attributes), then they must also agree on another attribute, “B”, {A 1 , A 2 , ..., A n } → B
+  * A **functional dependency (FD)** on a relation R is a statement of the form: if two tuples of R agree on attributes {$A_1, A_2 , ..., A_n$ } (i.e., the tuples have the same values in their respective components for **each of** these attributes), then they **must also** agree on another attribute, “B”, {$A_1, A_2 , ..., A_n​$ }→ B (i.e. B is dependent on the set)
+  * A set of one or more attributes {$A_1, A_2 , ..., A_n$ } is a key for a relation if:
+    * The attributes *functionally determine* **all other** **attributes** of the relation (can be treated as bases of the relation)
+    * Relations are sets. It is **impossible** for two distinct tuples of R to agree on all $A_1 , A_2 , ..., A_n$ (if agree on the set, will agree on the whole tuple, which means duplicate and violate the implicit constraints)
+    * No proper subset of {$A_1, A_2 , ..., A_n$ } functionally determines all other attributes of R, i.e., a **key must be minimal**
   * e.g. Movies(title, year, length, type, studioName, starName): title, year, starName → length, type, studioName
     * Attributes {title, year, starName} form a key for the relation Movie
     * Suppose two tuples agree on these three attributes: title, year, starName
@@ -1134,22 +1203,22 @@
     * {title, year} does not determine starName since many movies have more than one star
     * {year, starName} is not a key because we could have a star in 2 movies in the same year
 
-* Key Constraints
+* Key Constraints => what is PK(minimal+min size)
 
-  * A set of attributes that contains a key is called a superkey
+  * **super key**: A **set of attributes that contains a key** is called a superkey
   * It is a set of attributes super key SK, e.g., {A 1 , A2 } of R with the following conditions:
     * No two tuples in any valid relation state r(R) will have the same value for SK
     *  For any distinct tuples t1 and t2 in r(R), t1[SK] $\neq$ t2[SK] (i.e., different SK)
-  * Key is also superkey(minimal superkey): remove any attributes, it will not be a superkey
-  * If a relation has several candidate keys, one is chosen arbitrarily to be the primary key(uniquely identify each tuple in a relation)
-  * **General rule**: choose the key with smallest size as the primary key
+  * **Key** is also superkey(minimal superkey): For a key(minimal) remove any attributes, it will not be a superkey
+  * If a relation has several candidate keys(cannot be divided), one is chosen arbitrarily to be the primary key(uniquely identify each tuple in a relation)
+  * **General rule**: choose the key with **smallest size** as the primary key
 
-* Entity Integrity(完整性)
+* Entity Integrity(完整性) => PK not null
 
-  * The primary key attributes PK of each relation schema R cannot have null values in any tuple of R
-    * t[PK] $\neq$ null for any tuple t in R because it need to be used to identify
+  * The primary key attributes PK of each relation schema R **cannot have null values** in any tuple of R
+    * t[PK] $\neq​$ null for any tuple t in R because it need to be used to identify
     * if PK has several attributes, null is not allowed in any of these attributes
-  * Note: Other attributes of R **may be** constrained to disallow null values, even though they are not members of the primary key
+  * Note: Other attributes of R **may be** constrained to disallow null values, even though they are not members of the primary key (domain constraint)
 
 * Referential Integrity
 
@@ -1157,9 +1226,9 @@
   * Referential integrity is a constraint **involving two relations**
     * To specify a relationship among tuples in two relations
     * The referencing relation and the referenced relation (R 1 → R 2 )
-  * Tuples in the referencing relation R 1 have attributes FK (called foreign key attributes) that reference the primary key attributes PK of the referenced relation R 2 if it satisfies:
-    * The attributes in FK have the same domain(s) as the primary key attributes PK of R2
-    * a one-to-one mapping
+  * Tuples in the referencing relation R 1 have attributes **FK (called foreign key attributes)** that reference the primary key attributes PK of the referenced relation R 2 if it satisfies:
+    * The attributes in FK **have the same domain(s) as the primary key attributes PK of R2**
+    * a **one-to-one mapping**
 
 * Displaying a Relational Database Schema and its Constraints
 
@@ -1175,31 +1244,30 @@
 
   * Referential integrity constraints typically arise from the **relationships among the entities represented by the relation**
   * For example, in the EMPLOYEE relation, the attribute Dno refers to DEPARTMENT for which an employee works. We designate Dno to be a foreign key of EMPLOYEE referencing the DEPARTMENT.
-  * **The constraint**: A value of Dno in any tuple t1 of the EMPLOYEE relation **must match** a value of the primary key of DEPARTMENT, Dnumber, in the same tuple t2 of the DEPARTMENT relation or the value of Dno can be NULL if the employee **does not belong to a department** or will be assigned to a department later.
+  * **The constraint**(value matches a tuple in another relation or is null): A value of Dno in any tuple t1 of the EMPLOYEE relation **must match** a value of the primary key of DEPARTMENT, Dnumber, in the same tuple t2 of the DEPARTMENT relation or the **value of Dno can be NULL** if the employee **does not belong to a department** or will be assigned to a department later.
 
 * Update Operations on Relations
 
-  * Update operations: INSERT / DELETE / MODIFY a tuple
+  * Update operations: INSERT / DELETE / MODIFY a tuple (state changing operations)
   * Integrity constraints **should not be violated by the update operations**
-  * Update the department number of “Research” from “001” to “R001”: several update operations **may have to be grouped together**
-  * Updates may propagate to cause other updates automatically. This may be necessary to maintain integrity constraints
+  * Several update operations **may have to be grouped together**
+  * Updates **may propagate to cause other updates automatically**. This may be necessary to maintain integrity constraints
 
 * Possible Violations for Update Operations
 
-  * DELETE may violate only referential integrity
-    If the primary key value of the tuple being deleted is referenced from other tuples in the database
+  * DELETE may violate only referential integrity: If the primary key value of the tuple being deleted is referenced from other tuples in the database
   * INSERT may violate any of the constraints(INSERT any entry break the law)
     * **Domain constraint**: if one of the attribute values provided for the new tuple is not of the specified attribute domain
-    * **Key constraint**: if the value of a key attribute in the new tuple already exists in another tuple in the relation (cannot maintain unique)
+    * **Key constraint**: if the value of a key attribute in the new tuple already exists in another tuple in the relation (can be duplicate)
     * **Referential integrity**: if a foreign key value in the new tuple references a primary key value that does not exist in the referenced relation
     * **Entity integrity**: if the primary key value is null in the new tuple
 
 * Integrity Violation: In case of integrity violation, several actions can be taken:
 
-  * Cancel the operation that causes the violation
-  * Perform the operation but inform the user of the violation
-  * Trigger additional updates so the violation is corrected
-  * Execute a user-specified error-correction routine
+  * **Cancel the operation** that causes the violation
+  * Perform the operation but **inform the user** of the violation
+  * **Trigger additional updates** so the violation is corrected
+  * Execute a **user-specified error-correction routine**
 
 * Adding constraints in SQL
 
@@ -1229,3 +1297,171 @@
     * ALTER TABLE COUNTRY ADD CONSTRAINT PK_country PRIMARY KEY(cntry_cd);
     * ALTER TABLE EXCHANGE ADD CONSTRAINT PK_exchange PRIMARY KEY(exchg_cd);
     * ALTER TABLE EXCHANGE ADD CONSTRAINT FK_exchg_cntry FOREIGN KEY(cntry_cd) REFERENCES COUNTRY(cntry_cd);.
+
+-------------
+
+## Lecture 6 : Functional Dependency & Normalization
+
+-------
+
+### Functional Dependency
+
+* Functional Dependency
+
+  * Functional dependency is a constraint between two sets of attributes from the database：For example, deptno and dname in DEPARTMENT, if you know the department number, you know the department name 
+  * A functional dependency denoted by X → Y specifies a constraint on the possible tuples between two sets of attributes X and Y that are subsets of a relation R that can form a relation state r of R(R is a relation(table)) 
+    - The constraint is that, for any two tuples t1 and t2 in r that have t1[X] = t2[X], they must also have t1[Y] = t2[Y] 
+    - The values of the Y component of a tuple in r depend on, or are determined by the values of the X component 
+    - If you know his student ID, then I know his name (student ID → student Name) 
+
+* Formal definition : ![image-20190227121221568](image-20190227121221568.png)
+
+  * e.g.Movies(title, year, length, type, studioName, starName): {title, year, starName} → {length, type, studioName} 
+  * Attributes {title, year, starName} form a key for the relation Movie 
+  * If two tuples agree on these three attributes, title, year, and starName, they must agree on the other attributes, length, type and studioName. 
+    * No **proper subset** of {title, year, starName} functionally determines all other attributes(**in the first set**)
+    * {title, year} does not determine starName since many movies have more than one star 
+    * {year, starName} is not a key because we could have a star in two movies in the same year 
+  * Can it be {title, year, starName, length} → type? Yes 
+
+* Candidate Key(minimal super key)
+
+  * If a constraint on R states X is a candidate key of R, then X → Y for any subset  of attributes Y of R 
+  * A candidate key **uniquely identifies a tuple** 
+  * The values of all remaining attributes are determined 
+  * If X → Y in R, this does not say whether or not Y → X in R 
+    * {length, type, studioName} → {title, year, starName}? No 
+  * A functional dependency is property of the semantics or meaning of the attributes 
+
+* Trivial Functional Dependency
+
+  * Some functional dependencies are “trivial”, since they are always satisfied by all relations: 
+    * E.g.,A→A,AB→A
+    * E.g., {Ename, Salary} → Ename 
+  * A functional dependency is trivial if and only if the right-hand side (the dependent) is a subset of the left-hand side (the determinant) 
+
+* Inference Rules for FDs
+
+  ![image-20190227123117984](image-20190227123117984.png)
+
+  * IR1, IR2, IR3 form a sound and complete set of inference rules
+
+    * Sound: These are true
+    * Complete: other true rules can be deducted from these rules
+      * X -> XY; XY->YZ;X->YZ
+
+    ![image-20190227123334436](image-20190227123334436.png)
+
+    ![image-20190227123350706](image-20190227123350706.png)
+
+  * Closure of a set of FDs: Given a set of FD says F, F+ is closure of the set which contains all FDs implies by F
+
+    ![image-20190227123552746](image-20190227123552746.png)
+
+* Closure of Attribute Sets
+
+  * ![image-20190227123903949](image-20190227123903949.png)
+
+    * Recall : superkey is the one contains candidate key, but not supposed to be minimal
+    * Attribute sets is the set contains all attributes that one attribute can determine
+
+  * The algorithm (iteratively add the entry in **second set of FD where first set in FD is already in X** into the closure until nothing can be added)
+
+    ![image-20190227124351801](image-20190227124351801.png)
+
+  * e.g.![image-20190227124405424](image-20190227124405424.png)
+
+* Equibalence of Sets of FDs
+
+  * A set of functional dependencies F is said to cover another set of functional dependency E i**f every FD in E is also in** F+(E is a subset of F+)
+  * Two sets of FDs F and G are equivalent if: **every FDs in F and G can be inferred from one of each others' FD**, hence F and G are equivalent if F+=G+
+
+### Normalization forms
+
+* Relational Database design
+
+  * Logical/conceptual DB design 
+  * Schema 
+    * What relations (tables) are needed? 
+    * What their attributes should be? 
+  * What is a “bad” DB design? 
+    - **Repetition** of data/information 
+    - Potential inconsistency(潜在矛盾) 
+    - **Inability** to represent certain information 
+    - **Loss** of data/information 
+
+* Normalization: Take relation schema through a series of tests to certify whether it satisfies a certain normal form
+
+  * Analyzing the relation schema based on FD and primary keys to achieve
+
+    * Minimizing redundancy 
+    * Minimizing the insertion, deletion and update anomalies 
+
+  * Properties:
+
+    * Non-additive or lossless join 
+      * Decomposition is **reversible** and no information is loss
+      * No spurious tuples (tuples that should not exist) should be generated by doing a **natural-join**(according to the samename attributes) of any relations (extremely important) 
+    * Preservation of the functional dependencies
+      * Ensure each functional dependency is represented in **some**(thus primary key can be broken) individual relation (sometimes can be sacrificed) 
+
+    ![image-20190227173609676](image-20190227173609676.png)
+
+* First normal form:
+
+  * Disallowed: **Mutivalued attributes, composite attributes and their combination; mutivalued attributes that themselves composite; domain of attribute must be atomic values; No repeating groups(nested relations)**
+
+    ![image-20190227173847996](image-20190227173847996.png)
+
+    ![image-20190227174113329](image-20190227174113329.png)
+
+* Second Normal Form with Primary Key
+
+  * **Full functional dependency**: remove one attr in the first set, the FD does not hold anymore
+
+  * **Partial functional dependency**: If some attr removed => still hold FD
+
+  * **Prime attribute**: An attr R is called prime attributes if it is a member of *some* candidate key of R
+
+  * **A relation R is in 2NF iff every non-prime attr A in R is fully functional dependent on the primary kety of R**
+
+  * Change a relation to 2NF: split the relation for the non-prime **attrs that can be determined by part of the primary key** => no reduandent dependent on the primary key
+
+  * e.g.
+
+    ![image-20190227175153085](image-20190227175153085.png)
+
+* Third Normal Form with Primary key(only super key can determine non-prime attributes, original: super key can determine all attribute => now: super key is the only type of attr sets that can determine non-prime attributes)
+
+  * A relation schema R is in 3NF iff whenever a non-trivial(X does not have A) FD **X -> A** holds in R, either
+    * X is a superkey of R  **or**
+    * A is a prime attribute of R
+  * Why non-trivial? => if it is a candidate key X, and A is an non-prime attribute, then (X+A)=>A always holds
+  * **Transitive dependent**: As we know, super key can determine all attires, such that the existence of a super key **X** -> **Z** where  **Z->Y** and Y is a set of non-prime attrs and Z is not a super key(neither a candidate key nor a subset of any key, **b.c. we can use argumentation rule to make it becomes a superkey if Z is a subset of some key**) will violate 3NF
+  * 3NF = 2NF + no non-prime attrs of R is **transitively depdent on the primary key**
+  * 2NF 和 3NF交集不为0
+
+* summary of Normalization
+
+  ![image-20190227211304885](image-20190227211304885.png)
+
+* Boyce-Codd Normal Form
+
+  * BCNF was proposed as a simpler form of 3NF, but it was found to be stricter than 3NF => every BCNF relation is a 3NF, 3NF is not necessary to be BCNF
+
+  * A relation R is BCNF iff a non-trivial function dependentcy **X->A** holds in R, then **X is a superkey of R**(only first situation in 3NF is ok)
+
+  * Following relation is 3NF but not BCNF
+
+    ![image-20190227211709750](image-20190227211709750.png)
+
+  * Algorithm for BCNF Decomposition
+
+    ![image-20190227211751153](image-20190227211751153.png)
+
+    * Primary key is possible to be broken
+
+  * e.g.![image-20190227212145477](image-20190227212145477.png)
+
+----------
+

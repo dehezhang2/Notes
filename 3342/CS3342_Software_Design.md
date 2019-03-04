@@ -900,4 +900,113 @@
 
   * Reverse Engineering SD
 
-    * 
+
+------------
+
+## Lecture 06 Software Design Principles
+
+----
+
+* Reason of writing code that functions well:
+  * Development(add new functionality) <=> Maintenance(Fix bug, improve the algorithm , porting a program from one platform to another(iOS->android)
+  * Programs are so large that, if functionalities in
+    a real-life program is not well-designed,
+    a small change in a program is extremely painful!   
+
+### Reveiw Basic OO concepts
+
+### Learn OO Design Principles
+
+* Class Design Principles
+
+  * Open-Closed Principle (OCP)
+  * Liskov Substitution Principle (LSP)
+  * Dependency Inversion Principle (DIP)
+  * Single Responsibility Principle (SRP)
+  * Interface Segregation Principle (ISP)
+  * Law of Demeter Principle (LoD)
+  * or SOLID
+
+* OCP(open-closed principle)
+
+  * open for extension closed for modification(core should not be changed, important attrs shouldn't be directly accessible)
+
+  * ***Modules should be*** ***written so they can be extended without*** ***requiring them to be modified***
+
+  * Bad design
+
+    ![image-20190228133542769](image-20190228133542769.png)
+
+  * Improved
+
+    ![image-20190228133625263](image-20190228133625263.png)
+
+  * **Get rid of IF…THEN…ELSE**
+
+  * **make all obj-data, variables with in an obj private**
+
+    * **Maintaining** public variable/data is always risky, because it may “open” the module for other objects to perform some harmful tasks.
+    * They may produce a **rippling effect** requiring maintenance at many unexpected locations, due to code dependencies. 
+    * Errors are difficult to be located and fixed. : Fixes may cause undesirable errors elsewhere because of such data dependencies.
+
+  * Implementation:
+
+    * class abstraction(java interface, abstract class,virtual class in cpp)
+    * Polyorphism
+
+* Liskov Substitution Principle
+
+  * Key word: Substitutability / Replaceable
+
+  * Definition/Measure of subtyping relation
+
+  * Strong behavioural subtyping
+
+  * An extension of OCP
+
+    * Ensure that new derived subclasses only extending the **base-class**
+    * **without changing their behaviour**
+
+  * **Derived subclasses must be completely substitutable for their parent class**(can be changed to other set of implementations)
+
+    ![image-20190228142129867](image-20190228142129867.png)
+
+  * **Understand class relationships before** **you design**
+
+    * Don’t guess, have a deeper understanding.
+    * Lack of understanding before designing the inheritance hierarchy is likely to beach LSP, which is undesirable.
+    * Make sure subclasses can be used to “replace” their parent class. 
+    * Subclass could have additional features.  
+    * Subclass **should not inherit features don’t exist in the actual context**! (see last example, penguin don’t fly. ).  
+
+  * e.g.: Rectangle / Square
+
+    ![image-20190228142414162](image-20190228142414162.png)
+
+    ![image-20190228142653672](image-20190228142653672.png)
+
+    * different output because of the bad inherance
+
+* Dependency Inversion Principle(DIP)
+
+  * A specific form of decoupling software modules
+
+  * direction of dependency matters
+
+  * *High-level modules* ***should*** ***not*** depend on **Low**-level modules.: Both should depend on abstractions.
+
+  * Abstractions should not depend on details.: Details should depend on abstractions.
+
+  * e.g. powersword:![image-20190228143026009](image-20190228143026009.png)
+
+    * highlevel knight should not depend on the low level existence of power sword => should depends on dinamic-binding
+
+    * high level class should provide interface for low level to implement
+
+      ![image-20190228143248077](image-20190228143248077.png)
+
+      ![image-20190228143259898](image-20190228143259898.png)
+
+  * 
+
+### Learn General Software Coding Best Practices
