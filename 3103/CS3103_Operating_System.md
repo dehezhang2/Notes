@@ -832,13 +832,13 @@
   * Difficult for OS to manage the allocation of resources optimally: Multiple processes may request use of the same resource.(the example of the multithreaded hello program => same resource: screen)
   * Difficult to locate programming errors: Results are not deterministic and reproducible
 
-* **Race Condition**: Occurs when multiple processes or threads read and write shared data items
+* **Race Condition**: Occurs when multiple processes or **threads read and write shared data items**
 
   * Final result depends on how the execution of instructions in the multiple processes interleaves
 
-  * "Loser" of the race is the process that updates last and will determine => finish last process(loser) determine the final value of shared variable
+  * "Loser" of the race is the process that **updates last** and will determine => finish last process(loser) determine the final value of shared variable
 
-  * e.g.: P1 P2 are 2 threads can access X, each instruction are inorder from a process point of view, **and 2 process use different registers**
+  * e.g.: P1 P2 are 2 threads can access X, each instruction are in order from a process point of view, **and 2 process use different registers**
 
     ![image-20190217192559555](image-20190217192559555.png)
 
@@ -847,7 +847,7 @@
 * OS Concerns: What design and management issues are raised by the existence of concurrency?
 
   * keep track of various processes
-  * allocate and de-allocate resources for each active process; multiple processes want access to the same resource
+  * allocate and de-allocate resources for each active process; multiple processes want to access to the same resource
   * protect the data and physical resources of each process against interference by other processes
   * **ensure that a process and its output must be independent of the speed at which its execution is carried out relative to the speed of other concurrent processes**
 
@@ -884,6 +884,7 @@
   * Mutual exclusion must be **enforced**: only one process at a time is allowed into its critical section, among all processes that have critical sections for the same resource
   * A process that halts in its noncritical section must do so **without interfering(插足) with other processes**
   * No **deadlock or starvation**
+    * deadlock: high priority process occupying the resource(memory), low priority process occupying the critical section => they locked each other
     * Starvation: Process keep waiting resources forever
   * When no process is in a critical section, any process that request entry to its critical section must be permitted to enter without delay
     * process with higher priority can be switch to the front by this requirement 
@@ -892,7 +893,7 @@
 
 * Hardware Support: (software solution is difficult to deal with the situation)
 
-  * Disabling Interrupt (**Do not work for multiprocess systems !!!**)
+  * Disabling Interrupt (**Do not work for multi-process systems !!!**)
 
     * Uniprocessors only allow interleaving, no overlapping:
 
@@ -910,7 +911,7 @@
       }
       ```
 
-  * Another hardware solutino: Special Machine Instructions![image-20190222155851819](image-20190222155851819.png)
+  * Another hardware solution: Special Machine Instructions![image-20190222155851819](image-20190222155851819.png)
 
     
 
@@ -938,7 +939,7 @@
     * Disadvantage
       * *Busy-waiting* consumes processor time
       * **Starvation is possible**
-        * When a process leaves a critical section and more than one process is waiting, the selection of a waiting process is arbitrary; some process could i**ndefinitely be denied access.**
+        * When a process leaves a critical section and more than one process is waiting, the selection of a waiting process is arbitrary; some process could **indefinitely be denied access.**
       * **Deadlock is possible**
         * P1 enters its critical section and is then preempted(制止) by a higher-priority P2.
         * P2 attempts to use the same resource as P1 but is denied access because of the mutual exclusion mechanism. 
@@ -989,6 +990,8 @@
 
   * Binary Semaphore Primitive(allows only one process executing => mutual exclusive)
 
+    * Actually using the compare -and-swap instructions instead of using STL queue to implement the semaphore, following is just a basic idea
+
     ```cpp
     struct semaphore{
       	enum {zero,one} value;
@@ -1026,7 +1029,7 @@
     * mutex not locked => acquire a lock
     * mutex locked => fail and enter in waiting mode if the mutes is being locked
   * When a process tries to unlock a mutex : It releases the lock and makes the mutex available for another process to lock
-  * A key difference between binary semaphore and mutex is that the **process that locks the mutex must be the one to unlock it**, i.e., a process cannot unlock a mutex that is not locked by itself.(cannot change priority??)
+  * A key difference between binary semaphore and mutex is that the **process that locks the mutex must be the one to unlock it**, i.e. a process cannot unlock a mutex that is not locked by itself.
 
 * Strong/Weak Semaphore
 
@@ -1296,7 +1299,6 @@ Workshop 2: Threads
       //A total of 3000 ice-creams sold
       
       ```
-
 
 -------
 
