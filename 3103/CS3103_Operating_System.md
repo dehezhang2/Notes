@@ -956,7 +956,7 @@
     * Initialize to a non-negative integer value
     * **semWait** decrements the semaphore value: to receive a signal
     * **semSignal** increments the semaphore value: to transmit a signal
-  * The semaphore is i**nitialized to zero or a positive value.** 
+  * The semaphore is **initialized to zero or a positive value.** 
   * When the value is positive, that value equals the number of processes that can issue a **wait** and **immediately continue** to execute. (maximum processes that can be executed simultaneously)
   * When the value is zero, the next process to issue a **wait** is blocked, and the semaphore value goes negative. 
     * Each subsequent **wait** further decrements the value. 
@@ -990,7 +990,7 @@
 
   * Binary Semaphore Primitive(allows only one process executing => mutual exclusive)
 
-    * Actually using the compare -and-swap instructions instead of using STL queue to implement the semaphore, following is just a basic idea
+    * Actually using the compare-and-swap instructions instead of using STL queue to implement the semaphore, following is just a basic idea
 
     ```cpp
     struct semaphore{
@@ -1034,7 +1034,7 @@
 * Strong/Weak Semaphore
 
   * Waiting queue for processes waiting on the semaphore
-  * strong/weak determined by the order are processes are removed from the queue
+  * strong/weak determined by the order of processes are removed from the queue
   * **strong semaphores** use FIFO
   * **weak semaphores** do not specify the order of removal from the queue
 
@@ -1071,17 +1071,26 @@
 
   ![1550901479859](1550901479859.png)
 
-  ![IMG_7FA60C91C07B-1](IMG_7FA60C91C07B-1.jpeg)
+  ![IMG_A847B1E37D8A-1](IMG_A847B1E37D8A-1.jpeg)
+
+  * d is set to be 0 at first, to block the consumer for the first time, if the information(nonempty=>empty) is sent by the producer, then the consumer thread will be unblocked
+    * cause problem when process switch happens after the consumer do the job for the first time
+    * now the buffer is empty, but since next iteration of consumer didn't call wait(d), d is still 0
+    * producer add one to the buffer, but the empty message d is incorrectly increased to 1
+    * now consumer calls wait for 2 iterations, the first iteration will empty the buffer, and second iteration will cause segmentation fault because buffer is already empty
+
+  ![IMG_4C2D5E220809-1](IMG_4C2D5E220809-1.jpeg)d is set to be zero at first
 
   * Correct solution : each time let producer goes first if there is no inserted
 
     * e: size of buffer
-    * n: inserted number
+    * n: inserted number(d in the previous version)
 
   * A consumer is :
 
     * blocked when removing from empty buffer
     * unblocked when an item is inserted by the producer(i.e. >0 number of items in the buffer)
+    * whenever the buffer is empty or not, consumer will wait for one producer to produce
 
   * A semaphore, n=number of items in the buffer, can be used to implement the idea
 
@@ -1090,51 +1099,102 @@
 
     ![image-20190301161138092](image-20190301161138092.png)
 
-    * for finite buffer
+* for finite buffer => also need to consider the situation of insert into a full buffer
 
-      ![image-20190301161220246](image-20190301161220246.png)
+  * Use e to recordm producer will be blocked when e is decreased to negative
 
-  
+  ![image-20190301161220246](image-20190301161220246.png)
 
 ### IPC - Message Passing
 
 * Message passing
 
   - When processes interact with one another, they may need to satisfy two fundamental requirements: 
-    - synchronization: to enforce mutual exclusion
-    - communication: to exchange information
+    - **synchronization**: to enforce mutual exclusion
+    - **communication**: to exchange information
+
   - Message Passing is one approach to providing both of these functions.
 
-* direct
+  - Actual function is normally provided in the form of a pair of primitives:
 
-* Indirect(send to mail box)
+    ```cpp
+    void send(dest, message);
+    void receive(src, message);
+    ```
+
+  - if P1 and P2 wish to communicate, a **communication link** must exist between them
+
+* Direct Communication
+
+  * Processes names each other explicitly
+
+    ```cpp
+    void send(P1, message);
+    void receive(P2, message);
+    ```
+
+  * Properties of communication link:
+
+    * Processes need to know each other's identity to communicate
+    * A link is associated with **exactly two processes**
+    * Between each pair of processes, there is **exactly one link**
+
+* Indirect Communication(send to mail box)
+
+  * Messages are directly send to or receive from **mailboxes** (one sends to mailbox, another picks from mailbox)
+
+    ```cpp
+    boxid = mailbox-create(IDENTIFIER);
+    send(boxid, message);
+    receive(boxid, message);
+    ```
+
+  * Properties of communication link:
+
+    * A link is established between a pair of processes only if they have a shared mailbox.
+    * A link may be **associated with many processes**.
+    * Each pair of processes may have **several links**, **each link corresponds to one mailbox**.
+    * m-to-n relation avaliable
+
+  * Relationship can be implemented
+
+    * One-to-one: allows a private communications link to be set up between two processes
+    * Many-to-one relationship: useful for client/server interaction, one process provides service to a number of other processes (**mailbox is often referred to as a port)**
+    * One-to-many relationship: allows for one sender and multiple receivers => useful to applications where a message is to be broadcast to a set of processes
+    * Many-to-many relationship: allows multiple server processes to provide concurrent service to multiple clients 
 
 * Synchronization
 
   * Message passing may be either blocking or non-blocking
   * Blocking is considered synchronous
-  * **Blocking send**: the sender is blocked until the message is received
-  * **Blocking receive**: the receiver is blocked until a message arrives
+    * **Blocking send**: the sender is blocked until the message is received
+    * **Blocking receive**: the receiver is blocked until a message arrives
   * Non-blocking is considered asynchronous
-  * **Non-blocking** send: the sender sends the message and continues
-  * **Non-blocking** receive: the receiver receives the message or abandons the attempt to receive and continues
+    * **Non-blocking** send: the sender sends the message and continues
+    * **Non-blocking** receive: the receiver receives the message or abandons the attempt to receive and continues
 
 * Mutual exculsion by using message
 
-  * Receive will be blocked
+  * Receive will be blocked (synchronous sending)
 
-  * send will unlock
+  * send will unlock blocked receive
 
   * critical section will wait until receive the message
+
+  * `send(box,null)` in main activate one of the 2 threads
 
     ![image-20190301162135315](image-20190301162135315.png)
 
 * Producer/consumer problem
 
-  * mayconsume mailbox is also a buffer
-  * Empty buffer <=> empty mailbox <=> no message
-  * Need send in main because need to activate producer
-  * mayproduce means available space
+  * **mayconsume mailbox** is also a buffer of data
+    * producer store the data in the buffer and sent the message to consumer
+    * Empty buffer <=> empty mailbox <=> no message
+  * mayproduce means available space: max number of items can be produced
+    * **Need send in main because need to activate producer**
+    * decrease by `receive(mayproduce)` and increase by `send(mayproduce)`
+  * producer and consumer wait for each other, but producer activated first
+  * `pmsg` represents the real data you want to send or push into the buffer
 
   ![image-20190301162201086](image-20190301162201086.png)
 
@@ -1146,29 +1206,147 @@
   * Conditions to satisfy:
     * **Any number of readers** may simultaneously read the file.
     * **Only one** writer at a time may write to the file.
-    * **If a writer is writing to the file, no reader may read it.**
+    * **If a writer is writing to the file, no reader may read it.** => block all readers established after the writer(writer priority version) or insert all incoming reader before the writer(reader priority version)
 
-* Solution without achieve multiple reader
+* Solution without achieve multiple reader => just lock the reader and writer respectively(similar idea in the assignment2)
 
   ![image-20190301163309703](image-20190301163309703.png)
 
-* Add readcount to record number of readers, Add one more semaphore to deal with the add or minus of readcount 
+* Add readcount to record number of readers : add **one more semaphore** to deal with the add or minus of readcount => make sure that no readers can change the `readcount` at the same time
 
-  * Reader priority solution(it is difficult for writer to access because there may be many readers); writer may suffer from **starvation**
+  * Reader priority solution
+    * if reader is the first reader => lock writer
+    * If there is not readers at all => unlock writer
+    * `semWait(wsem)` does not lock reader, because it will only be called by the first reader => multiple reader achieved
+    * it is difficult for writer to access because there may be many readers and if there is at least one reader, writer will not write. Therefore,  writer may suffer from **starvation**
 
   ![image-20190301163631512](image-20190301163631512.png)
 
-* An alternative solution: no new readers are allowed to access to the data area once at least one writer wants to write
+* Writer priority version: **no new readers are allowed to access to the data area once at least one writer wants to write** (put **incoming** readers after writer)
 
-  * semWait(rsem) block readers except the first one
+  * Writer:
+    * Use another semaphore `y` to make sure no 2 writers increase `writecount` at the same time (different with mutiple writing, because it is controlled by `wsem`, here `y` controls count of writer)
+    * if there is at least one writer didn’t write => block reader by `rsem`
+    * multiple writer is disallowed(queued) by `wsem`
+    * incomming reader is queued by `z`
+    * `semWait(rsem)` block readers except the reader comes before the writer
 
   ![image-20190301163951772](image-20190301163951772.png)
 
-  * 
+  * only one reader is allowed to queue on `rsem`, with any additional readers queuing on `z` (**in order to make sure writer will at least be put on the second position**): 
+
+    * suppose at first there is no writer
+
+    * there is one reader occupying `z` and `rsem`, and many readers blocked by `z` 
+
+    *  the reading reader cannot be interruptted by writer, because it is occupying `rsem`
+
+    * after the first reader finshed the task, it will unlock `rsem` first, writer will occupy it, then it will allow one of the reader occupy `z` => writer is placed into the second order
+
+    * since the code block `semWait(z)` to `semSignal(z)` is faster than `READUNIT()` , multi-reader is still achieved
+
+    * Is it possible to omit the first `semWait(x)`?
+
+      ![IMG_2E34118A1683-1](IMG_2E34118A1683-1.jpeg)
+
+  ![image-20190305144856336](image-20190305144856336.png)
+
+  * The priority:
+
+    ![image-20190305152515705](image-20190305152515705.png)
+
+  * e.g.
+
+    ![image-20190305170813648](image-20190305170813648.png)
+
+  * A(read), B(read), C(write), D(read) with write priority => must be A,C,B,D
+
+    * with read priority => A,B,C,D or A,B,D,C
+      * when D comes after B finished => A,B,C,D
+      * when D comes before B finished => A,B,D,C (because write is always put to the last when new read comes)
+
+* Writer Priority version with message passing
+
+  ```cpp
+  // count is initialized as the maximum size of mailbox(for number of reader threads), here initially count = 100
+  // i and j are just IDs of threads
+  void reader(int i){
+      message rmsg;
+      while(true){
+          rmsg = i;
+          send(readrequest, rmsg);	// ask for permission
+          receive (mbox[i],rmsg);		// wait for permission
+          READUNIT();
+          rmsg = i;
+          send(finished, rmsg);		// report finish
+      }
+  }
+  void writer(int j){
+      message rmsg;
+      while(true){
+          rmsg = j;
+          send(writerequest, rmsg);
+          receive(mbox[j],rmsg);
+          WRITEUNIT();
+          rmsg = j;
+          send(finished, rmsg);
+      }
+  }
+  // a server called controller
+  void controller(){
+      while(true){
+          if(count>0){
+              if(!empty(finished)){
+  // collect finished threads and allocate spaces
+                  receive(finished, msg);
+                  count++;
+              } else if(!empty(writerequest)){
+  // each writer request will change count to -(num of running reader)
+                  receive(writerequest,msg);
+                  write_id = msg.id;
+                  count -= 100;
+              } else if(!empty(readrequest)){
+  // each reader takes one permission, reader request is impossible to cause a negative value
+                  receive(readrequest, msg);
+                  count--;
+                  send(msg.id,"OK");
+              }
+          }
+          if(count==0){
+  // if there is no running reader, run the writer
+              send(writer_id, "OK");
+          }
+          while(count < 0){
+  // wait for every reader before last writer
+              receive(finished, msg);
+              count++;
+          }
+      }
+  }
+  ```
+
+  * Description
+    * Processes wishing to access the data area send a request message to the controller
+      * Granted access with an “OK” reply message
+      * Completion of access with a “finished” message
+    * **count** is initialized to 100 (> the maximum possible number of readers)
+    * **count** > 0: no writer is waiting, clear active readers first, then service write requests and then read requests
+    * **count** = 0: the only request outstanding is a write request
+    * **count** < 0: a writer has made a request and is being made to wait to clear all active readers
+  * Priority: 
+    * Writers have priority: The controller services **write requests before read requests**.
+    * Readers only and readers can read simultaneously: After receiving a read request, the controller sends “OK” and does not block to receive “finished” (count > 0) -> can continue to receive other read requests.
+    * Writers only and only one writer can write at a time: After receiving a write request, the controller sends “OK” and blocks to receive “finished” (count == 0) -> cannot continue until the writer finishes.
+    * Both readers and writers and read first (i.e., a writer arrives while the first reader is reading)
+      * The controller receives the write request and makes the writer to wait until receiving “finished” from the first reader (count < 0).
+      * When the first reader finishes, the controller sends “OK” to the writer and blocks to receive “finished” (count == 0).
+    * Both readers and writers and write first (i.e., a reader arrives while the first writer is writing)
+      * The controller blocks to receive “finished” while the first writer is writing (count == 0).
+      * When the first writer finishes, the controller receives the read request and send “OK” to the reader” (count > 0).
 
 --------
 
-Workshop 2: Threads
+## Workshop 2: Threads
 
 -------
 
@@ -1302,3 +1480,40 @@ Workshop 2: Threads
 
 -------
 
+## Tutorial 05
+
+* A possible approach of mutual exclusion by using software approach(only for 2 threads)
+
+  ```cpp
+  boolean blocked[2];
+  int turn;
+  void P(int id){
+      while(true){
+          blocked[id] = true;
+          while(turn != id){
+              while(blocked[1-id]);
+              turn = id;
+          }
+          /* critical section */
+          blocked[id] = false;
+          /* remainder */
+      }
+  }
+  void main(){
+      blocked[0] = blocked[1] = 0;
+      turn = 0;
+      parbegin(P(0),P(2));
+  }
+  ```
+
+  * Find out the basic idea:
+    * turn means the running one, it is either activated by main or given to corresponding process after it is unblocked
+    * if it is not his turn, check whether the other is running, if running, busy waiting; after waiting change turn to itself
+  * prove it is incorrect
+    * The root reason for its incorrectness is it is software level => **not atomic**
+    * for process 0 and 1, if 1 runs first, it steps into the `while(turn != id)` loop
+    * Because p0 is not running, it will not busy waiting
+    * However, before running `turn = id`, process switch occurs, since turn is still 0, p0 will enter the critical section
+    * Then p1 get its turn, and also enter the critical section
+
+* 

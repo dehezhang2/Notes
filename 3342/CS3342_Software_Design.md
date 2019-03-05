@@ -900,7 +900,6 @@
 
   * Reverse Engineering SD
 
-
 ------------
 
 ## Lecture 06 Software Design Principles
