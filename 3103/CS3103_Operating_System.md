@@ -1259,7 +1259,7 @@
 
     ![image-20190305170813648](image-20190305170813648.png)
 
-  * A(read), B(read), C(write), D(read) with write priority => must be A,C,B,D
+  * A(read), B(read), C(write), D(read) with write priority => A,C,B,D or A,B,C,D(B finished before C came)
 
     * with read priority => A,B,C,D or A,B,D,C
       * when D comes after B finished => A,B,C,D
@@ -1515,5 +1515,3 @@
     * Because p0 is not running, it will not busy waiting
     * However, before running `turn = id`, process switch occurs, since turn is still 0, p0 will enter the critical section
     * Then p1 get its turn, and also enter the critical section
-
-* 
