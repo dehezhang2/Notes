@@ -1228,7 +1228,6 @@
     * The referencing relation and the referenced relation (R 1 → R 2 )
   * Tuples in the referencing relation R 1 have attributes **FK (called foreign key attributes)** that reference the primary key attributes PK of the referenced relation R 2 if it satisfies:
     * The attributes in FK **have the same domain(s) as the primary key attributes PK of R2**
-    * a **one-to-one mapping**
 
 * Displaying a Relational Database Schema and its Constraints
 

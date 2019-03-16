@@ -1515,3 +1515,309 @@
     * Because p0 is not running, it will not busy waiting
     * However, before running `turn = id`, process switch occurs, since turn is still 0, p0 will enter the critical section
     * Then p1 get its turn, and also enter the critical section
+
+-------------
+
+## Lecture05 Deadlock and Starvation
+
+---------
+
+* **Deadlock**: The *permanent* blocking of a set of processes that either **compete for system resources** or **communicate** with each other.
+
+  * A set of processes is deadlocked when each process in the set is blocked awaiting an *event* that can only be triggered by another blocked process in the set.
+  * The event is typically the freeing up of some requested and obtained resources
+  * No efficient solution![image-20190308151410735](image-20190308151410735.png)
+
+* Two general categories of resources:
+
+  * **Reusable resources**: Can be safely used by only one process at a time and ***is not depleted(耗尽)*** by that use.
+
+    * Examples: processors, main memory, storage space, devices, and data structures such as files, databases, and **semaphores**
+
+    * Deadlock cases:
+
+      * E.x1 : Consider two processes that compete for exclusive access to a disk file D and a tape drive T.
+
+      * Deadlock occurs if each process holds one resource and requests the other, e.g., execution of p0 -> p1 -> q0 -> q1 -> p2 -> q2.
+
+        ![image-20190308152423309](image-20190308152423309.png)
+
+      * Ex2: Space is available for allocation of 200Kbytes, and the following sequence of events occur.(when both of the 2 processes run to their second request)
+
+        ![image-20190308152516438](image-20190308152516438.png)
+
+  * Consumable resources: One that can be created (***produced***) and destroyed (***consumed***).
+
+    * Examples: interrupts, signals, **messages**, and information in I/O buffers
+
+    * Dead lock case: Consider a pair of processes, in which each process attempts to receive a message from the other process and then send a message to the other process.
+
+      * Deadlock occurs if the Receive is blocking (i.e., the receiving process is blocked until the message is received).
+
+      * Need to activate one of the processes in main thread
+
+        ![image-20190308152627021](image-20190308152627021.png)
+
+* Resource allocation graphs: A useful tool that characterizes the allocation of resources to processes
+
+  * **Directed Graph** that depicts(描画) the state of the system of resources and processes
+
+  * A point represents an instance of the corresponding resource
+
+    ![image-20190315145000016](image-20190315145000016.png)
+
+* Conditions for **possible** Deadlock (**nessesary but not sufficient**)
+
+  * Mutal exclusion: Only one process may use a resource at a time, no process may access a resourced unit that has been allocated to another process
+  * Hold-and-wait: A process may **hold allocated resources**(subset of the total needed set) **while awaiting** assignment of others.ss
+  * No pre-emption: No resource can be forcibly(强力的) removed from a process holding it
+
+* Actual Deadlock requires: **Circular wait** (Given that the first 3 conditions exit, a sequence of events may occur that lead to the following fourth condition)
+
+  * A closed chain of processes exits, such that each process holds at least one resource needed by the next process in the chain
+  * In fact, it is the **definition** of deadlock
+  * **notice**: it is possible that a process outof the deadlock cycle being locked => ask for resource that is being deadlocked
+
+* **Four conditions**, taken together, constitute necessary and sufficient conditions for deadlock
+
+  * Example of deadlock
+
+  ![image-20190315153350961](image-20190315153350961.png)
+
+  * Example of non-deadlock
+
+    * No deadlock because multiple instance
+    * no cycle or several instances per resource in the cycle => no deadlock
+    * cycle with only one instance per resource
+
+    ![image-20190315153734098](image-20190315153734098.png)
+
+### Deadlock Prevention
+
+* Deadlock prevention: Disallow one of the three necessary conditions for deadlock occurrence, or prevent circular wait
+
+* Main concept: Design a system to exclude one of the deadlock condition
+
+  * Indirect: prevent one of the 3 necessary conditions
+
+    * Mutual exclusion: If access to a resource requires mutual exclusion, it must be supported by the OS (cannot be implemented because mutual exclusion is what we want)
+    * Hold and wait: Allow execution only when all resources required by it are available, otherwise block it until all requests can be granted simultaneously
+      * **disadvantage** : inefficient and may be impractical
+        * *Inefficient* : You can ask one resource for one time, after using it, you can release it which is more efficient than wait for all the resources at one time
+        * *Impractical* : Maybe don’t know how many resources in total
+    * No preemption: Two ways
+      * **First way (requester release)**: If a process holding certain resources is denied a further request, that process must release its original resources and request them again 
+      * **Second way (requested release)**: If a process requests a resource that is **currently held by another process**, the OS may preempt the second process and require it to release its resources
+      * **disadvantage**: Practical only for resources whose state can be easily saved and restored later
+
+  * Direct: prevent circular wait
+
+    * Define a **linear ordering** of resource types => A process can only request resources that following(**after**) R in the ordering
+
+    * Principle : If ==R is the last one== of the linear order, and a thread has R, it ==cannot ask for the first one== => avoid cycle, it can easily going on and release R
+
+    * Implemented by the nested semaphore
+
+      * e.x. in the tutorial => following code will cause deadlock if we run the first semwait of each processes
+
+      ```cpp
+      void T1(){
+          ...
+          semWait(s3);
+          ...
+          semWait(s1);
+          ...
+          semSignal(s3);
+          ...
+          semSignal(s1);
+      }
+      void T2(){
+          ...
+          semWait(s2);
+          ...
+          semWait(s3);
+          ...
+          semSignal(s2);
+          ...
+          semSignal(s3);
+      }
+      void T3(){
+          ...
+          semWait(s1);
+          ...
+          semWait(s2);
+          ...
+          semSignal(s1);
+          ...
+          semSignal(s2);
+      }
+      void main(){
+          parbegin(T1,T2,T3);
+      }
+      ```
+
+      * To solve the problem: 
+
+        ```cpp
+        void T1(){
+            ...
+            semWait(s1);
+            ...
+            semWait(s3);
+            ...
+            semSignal(s3);
+            ...
+            semSignal(s1);
+        }
+        ```
+
+      * defined a linear order(**actually an acyclic graph**):
+
+        * `T1()`: s1 -> s3
+        * `T2()`: s2 -> s3
+        * `T3()`: s1 -> s2
+
+    * **disadvantage**: Inefficient => slowing down processes and denying resource access unnecessarily
+
+### Deadlock avoidance
+
+* Deadlock avoidance: Do not grant a resource request if this allocation might lead to a deadlock
+
+* Main concept: Make decision dynamically whether the **current incoming (main difference with deadlock prevention)** resource allocation request will, **if granted**, potentially lead to deadlock
+
+* Advantage: Allow **more concurrency** than prevention
+
+* Disadvantage: Requires knowledge of future process requests => need to estimate the resource required by the process in total
+
+* Two methods: 
+
+  * **Process initiation denial(拒绝)**: Do not start a process if **its demands might lead** (consider the worst case => all processes ask for the maximum resource) to deadlock
+
+    * A process is only started if the ***maximum claim*** of all current processes plus those of the new process can be met by the total amount of resources in the system
+    * Not optimal: assume the **worst case** that **all** processes will make their **maximum** claims together
+
+  * **Process allocation denial**: Do not grant an incremental resource request to a process if this allocation might lead to deadlock
+
+    * ***Banker’s algorithm***(strategy for resource allocation denial) => consider a system with fixed number of resourses
+
+    * ***State*** of the system is the ***current*** allocation of resources to processes
+
+    * ***Safe state*** is one in which there is **at least one ==sequence==** of resource allocations to processes that does not result in deadlock, i.e., all processes can be run to completion.
+
+    * ***Unsafe state*** is a state that is not safe
+
+    * **Principle explanation**: A system consisting of four processes and three resources with a state to be determined => check whether following state is safe
+
+      ![image-20190315183623236](image-20190315183623236.png)
+
+      ![image-20190315184605189](image-20190315184605189.png)
+
+      ![image-20190315184612164](image-20190315184612164.png)
+
+      ![image-20190315184626833](image-20190315184626833.png)
+
+      * A process $i$ can run to completion if it meets the following condition: $C_{ij}-A_{ij}\leq V_{ij}$ 
+      * If there exists row $i$ , s.t. $C_{ij}-A_{ij}\leq V_{ij}$ for all $j$ , i.e. it can be finished, add the corresponding vector in $A​$ to the remain vector
+
+    * Steps: 
+
+      * When a process makes a request of a set of resources, **assume** that the request is granted and update the system state accordingly
+      * Then judge whether the current state is safe, it not safe do not grant the request 
+        * Not safe doesn’t mean must exist deadlock => can use deadlock prevention to preempty  some processes
+        * If deadlock exist, it must be unsafe state
+      * change the allocation matrix, residual matrix and avaliable vector
+
+    * 2 example of process allocation denial checking
+
+      - A safe request:![image-20190316113303880](image-20190316113303880.png)
+
+      - A non-safe request:
+
+        ![image-20190316113608840](image-20190316113608840.png)
+
+* Deadlock avoidance logic (*By using the banker’s algorithm*)
+
+  ```cpp
+  // global data structure
+  #define m num_of_resources
+  #define n num_of_processes
+  struct state{
+  	int resource[m];
+      int avaliable[m];
+      // residual = claim - alloc
+      int claim[n][m];	// initial request
+      int alloc[n][m];
+  };
+  
+  // resouce alloc algorithm
+  if(alloc[i,:] + request[:] > claim[i,:])	// invalid request
+      <error>;
+  else if(request[:] > avaliable[:])		// request more than left
+      <suspend process>;
+  else{
+  	<define newstate by:
+      alloc[i,:] = alloc[i,:] + request[:];
+      available[:] = available[:] - request[:];>;
+  }
+  if(safe(newstate))
+      < carry out allocation >;
+  else{
+      < restore original state>;
+      < suspend process >;
+  }
+  ```
+
+  
+
+### Deadlock Detection
+
+* Deadlock detection: Grant resource request **whenever possible**, but **periodically check** for the presence of deadlock and take action to recover
+* Deadlock prevention: Too conservative => **limit access** to resources and impose restrictions on processes
+* Deadlock detection strategies do the opposite
+  * Resource requests are granted **whenever possible**.
+  * Regularly check for deadlock.
+* Main idea: 
+  * Find and **mark** a process whose resource requests can be satisfied with the available resources
+  * Assume that those resources are granted
+    and that the process runs to completion and releases all its resources
+  * Look for another process to satisfy
+  * A deadlock exists if and only if there
+    are **unmarked** processes at the end
+* A common detection algorithm
+  * Same datastructures with bank’s algorithm
+  * New request matrix **Q**
+* Steps:
+  * Firstly, mark each process that has a row in the allocation matrix of all zeros
+  * 
+
+* Difference with avoidance and detection
+  * Avoidance: decide process whether run out not(whenever processes comes it will run)
+  * Detection: run the process with a specific period
+
+--------
+
+## Lecture 06 Uniprocessor Scheduling
+
+### Types of Processor Scheduling
+
+* Scheduling: 
+
+  * An OS must allocate resources amongst(在…中) competing processes.
+  * The resource provided by a processor is execution time.
+  * Processor resource is allocated by means of **scheduling** - determines which processes will wait and which will progress.
+  * The aim of processor scheduling is to assign processes to be executed by the processor in a way that meets system objectives, such as **response time**, **turnaround time**, **throughput**, and **processor utilization**. 
+
+* Objective: Scheduling function should
+
+  * Share time **fairly** among processes
+  * Prevent **starvation**(always cannot execute) of a process
+  * Use the processor efficiently
+  * Have low overhead
+  * Prioritise processes when necessary (e.g. real time deadlines)
+
+* Types of Scheduling
+
+  ![image-20190315154623399](image-20190315154623399.png)
+
+* 
+

@@ -1006,6 +1006,14 @@
 
       ![image-20190228143259898](image-20190228143259898.png)
 
-  * 
 
 ### Learn General Software Coding Best Practices
+
+----------------
+
+## Lecture 05 Software Design Principles Part II
+
+----
+
+### Single Responsibility Principle
+
