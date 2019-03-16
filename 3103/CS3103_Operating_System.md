@@ -1673,9 +1673,9 @@
 
       * defined a linear order(**actually an acyclic graph**):
 
-        * `T1()`: s1 -> s3
-        * `T2()`: s2 -> s3
-        * `T3()`: s1 -> s2
+        * `T1()`: s1 => s3
+        * `T2()`: s2 => s3
+        * `T3()`: s1 => s2
 
     * **disadvantage**: Inefficient => slowing down processes and denying resource access unnecessarily
 
@@ -1684,10 +1684,6 @@
 * Deadlock avoidance: Do not grant a resource request if this allocation might lead to a deadlock
 
 * Main concept: Make decision dynamically whether the **current incoming (main difference with deadlock prevention)** resource allocation request will, **if granted**, potentially lead to deadlock
-
-* Advantage: Allow **more concurrency** than prevention
-
-* Disadvantage: Requires knowledge of future process requests => need to estimate the resource required by the process in total
 
 * Two methods: 
 
@@ -1755,6 +1751,7 @@
   else if(request[:] > avaliable[:])		// request more than left
       <suspend process>;
   else{
+      < store current state >;
   	<define newstate by:
       alloc[i,:] = alloc[i,:] + request[:];
       available[:] = available[:] - request[:];>;
@@ -1765,34 +1762,155 @@
       < restore original state>;
       < suspend process >;
   }
+  
+  // test for safety algorithm (banker's algorithm)
+  bool safe(state S) {
+      int currentavail[m];
+      Process rest[n];
+      currentavail = available;
+      rest = {all processes};
+      possible = true;
+      // actually possible is enough
+      while(possible && !rest.empty()){
+  		<find a process p_k in rest such that
+           claim[k,:]-alloc[k,:] <= currentavail;>;
+          if(found){
+              currentavail += alloc[k,:];		// notice to add the allocation row
+              rest -= {p_k};
+          }
+          else possible = false;
+      }
+      return rest.empty();
+  }
   ```
 
-  
+* Advantage: Allow **more concurrency** than prevention (less restrictive than deadlock prevention) and **not necessary to preempt** and rollback processes, as in deadlock detection
+
+* Disadvantage: 
+
+  - Requires knowledge of future process requests => need to estimate the resource required by the process in total
+  - Maximum resource requirement for each process must be stated in advance
+  - Processes under consideration must be independent and with no synchronization requirement
+    - Dependent: Suppose that by using banker’s algorithm, you eliminate a process that is a child process of others ( must finish. when parent is finished. For example, a process must wait for the data manipulated by the parent process is eliminated first )
+  - There must be a **fixed number of resources **(not flexible because you fix the Resource vector and the claim matrix) to allocate
+  - No process may exit while holding resources => no preemption
 
 ### Deadlock Detection
 
 * Deadlock detection: Grant resource request **whenever possible**, but **periodically check** for the presence of deadlock and take action to recover
-* Deadlock prevention: Too conservative => **limit access** to resources and impose restrictions on processes
-* Deadlock detection strategies do the opposite
-  * Resource requests are granted **whenever possible**.
-  * Regularly check for deadlock.
-* Main idea: 
-  * Find and **mark** a process whose resource requests can be satisfied with the available resources
-  * Assume that those resources are granted
-    and that the process runs to completion and releases all its resources
-  * Look for another process to satisfy
-  * A deadlock exists if and only if there
-    are **unmarked** processes at the end
-* A common detection algorithm
-  * Same datastructures with bank’s algorithm
-  * New request matrix **Q**
-* Steps:
-  * Firstly, mark each process that has a row in the allocation matrix of all zeros
-  * 
 
-* Difference with avoidance and detection
-  * Avoidance: decide process whether run out not(whenever processes comes it will run)
-  * Detection: run the process with a specific period
+* Difference between deadlock prevention and deadlock detection
+
+  * Deadlock prevention: Too conservative => **limit access** to resources and impose restrictions on processes
+  * Deadlock detection strategies do the opposite
+    - Resource requests are granted **whenever possible**.
+    - Regularly check for deadlock by using a method very similar to *banker’s algorithm*
+
+* Difference between deadlock avoidance and deadlock detections
+
+  - Avoidance: decide process to run or not to run (whenever processes comes **the algorithm will run**)
+  - Detection: always allow process to run, but check the system state periodically ( run the algorithm with a specific period )
+
+* Main idea: 
+
+  * Find and **mark** a process whose resource requests can be satisfied with the available resources (find the process can be done)
+  * Assume that those resources are granted and that the process runs to completion and releases all its resources
+  * Look for another process to satisfy until there is no process can be finished by avaliable vector
+  * A deadlock exists if and only if there are **unmarked** processes at the end
+
+* A common detection algorithm
+
+  * Same datastructures with bank’s algorithm (Allocation matrix $A$ and avaliable vector $V$ )
+  * New request matrix **Q** : current request by the process instead of total request(not the **claim**) 
+
+* Steps:
+
+  * First, unmark all the processes
+  * Mark each process that has a row in the allocation matrix of all zeros (because it is not holding the resource therefore they are impossible to cause deadlock)
+  * Initialize a temporary vector **W** to equal the available vector
+  * Find an index $i$ such that process $i$ is currently unmarked and the $i$ th row of **Q** is less than or equal to **W**; 
+  * if cannot find , terminate, else mark process $i$ and only if there are unmarked processes at the end
+  * Each unmarked process is deadlocked
+
+* Example:
+
+  ![image-20190316130031997](image-20190316130031997.png)
+
+* The detection period can be set:
+
+  * As frequently as each resource request: Leads to early detection; relatively simple but frequent check consume **considerable processor time**
+  * less frequently, depending on **how likely** it is for a deadlock to occur
+
+* Recovery strategies after find deadlock
+
+  1. Abort all deadlocked processes
+  2. Back up (rollback) each deadlocked process to some previously defined checkpoint, and restart all processes => **risk of deadlock recurring**, because same situation may happen again by one of deadlock trigger process
+  3. Successively abort deadlocked processes **until** deadlock no longer exists
+  4. Successively preempt resources and rollback the preempted process until deadlock no longer exists
+
+### Summary of three ways to solve deadlock
+
+![image-20190316130847422](image-20190316130847422.png)
+
+* What is incremental resource requests?
+
+### Dining Philosophers Problem
+
+![image-20190316131328200](image-20190316131328200.png)
+
+* Problem: Each philosopher can only use 2 forks to eat, no philosopher can use same fork at the same time (mutual exclusion) => find a way that no deadlock or starvation
+
+* First not correct algorithm => circular wait exists
+
+  ```cpp
+  semaphore fork[5] = {1};
+  int i;
+  void philosopher(int i){
+  	while(1){
+  		think();
+          // each philosopher pick the fork on the left hand side
+          wait(fork[i]);
+          // wait for the fork one the right hand side
+          wait(fork[(i+1)%5]);	// circular exists
+          eat();
+          signal(fork[(i+1)%5]);
+          signal(fork[i]);
+      }
+  }
+  int main(){
+  	parbegin(philosopher(0),philosopher(1),philosopher(2),
+  			 philosopher(3),philosopher(4));        
+  	return 0;
+  }
+  ```
+
+  
+
+* Second algorithm => one of the solution
+
+  ```cpp
+  /* program diningphilosophers */
+  semaphore fork[5] = {1};
+  semaphore room = 4;
+  int i;
+  void philosopher(int i){
+  	while(1){
+  		think();
+          // each philosopher pick the fork on the left hand side
+          wait(room);
+          wait(fork[i]);
+          // wait for the fork one the right hand side
+          wait(fork[(i+1)%5]);	// circular exists
+          eat();
+          signal(fork[(i+1)%5]);
+          signal(fork[i]);
+          signal(room);
+      }
+  }
+  
+  ```
+
+  
 
 --------
 
@@ -1805,12 +1923,12 @@
   * An OS must allocate resources amongst(在…中) competing processes.
   * The resource provided by a processor is execution time.
   * Processor resource is allocated by means of **scheduling** - determines which processes will wait and which will progress.
-  * The aim of processor scheduling is to assign processes to be executed by the processor in a way that meets system objectives, such as **response time**, **turnaround time**, **throughput**, and **processor utilization**. 
+  * The aim of processor scheduling is to assign processes to be executed by the processor in a way that **meets system objectives**, such as **response time**, **turnaround time**, **throughput**, and **processor utilization**. 
 
 * Objective: Scheduling function should
 
   * Share time **fairly** among processes
-  * Prevent **starvation**(always cannot execute) of a process
+  * Prevent **starvation**(always cannot execute) of a process => need to consider the “age” of process as part of the priority
   * Use the processor efficiently
   * Have low overhead
   * Prioritise processes when necessary (e.g. real time deadlines)
@@ -1819,5 +1937,142 @@
 
   ![image-20190315154623399](image-20190315154623399.png)
 
+* Classify the scheduling in the state diagram
+
+  * **Long-term scheduling** is performed when a new process is **created**.
+  * **Medium-term scheduling** is a part of the **swapping function**. ( includes suspend and unsuspend not like the direct arrow in the following graph )
+  * **Short-term scheduling** is the actual decision of **which ready process to execute next**. => runtime decision to decide which one in ready buffer can execute
+
+  ![image-20190316133246816](image-20190316133246816.png)
+
+  ![image-20190316133256190](image-20190316133256190.png)
+
+* Another point of view: Scheduling is a matter of managing queues to minimize queuing delay and to optimize performance; different kinds of scheduling is just solving different kinds of queue
+
+  ![image-20190316133806909](image-20190316133806909.png)
+
+  * Why there is no blocked suspend => blocked?
+
+* Long-Term Scheduling
+
+  * Determines which programs are admitted to the system for processing
+    * May be first-come-first-served
+    * Or, according to criteria such as priority, I/O requirements or expected execution time
+  * Controls the ***degree of multiprogramming*** to provide satisfactory service to the current set of processes
+  * the more processes that are created, the smaller the percentage of time that each process can be executed
+
+* Medium-Term Scheduling
+
+  * Part of the swapping function
+  * Swapping-in decisions are based on:
+    * the need to manage the degree of multiprogramming
+    * the memory requirements of the swapped-out processes (suspend is a memory concern decision)
+
+* Short-Term scheduling (**main focus of this chapter**)
+
+  * Short-term scheduler is also known as the **dispatcher**
+  * Executes **most frequently** to decide which process to execute next
+  * Invoked when an event occurs that may lead to the **blocking of the current process** or that may provide an opportunity to **preempt a currently running process** in favor of another
+    * Clock interrupts
+    * I/O interrupts
+    * Operating system calls
+    * Signals (e.g., semaphores)
+
+* Short-Term Scheduling Criteria( standard ): 
+
+  * Main objective is to allocate processor time to optimize certain aspects of system behavior 
+
+  * A set of criteria:
+
+    * Orientation
+      * User oriented (respond time): Behavior of the system as perceived(observed) by individual user or process
+      * System-oriented criteria (throughput): Effective and efficient utilization of the processor
+    * Performance
+      * Performance related(respond time and throughput): Quantitative(量化), easily measured
+      * non-performance related (predictability): Quantitative(量化), hard to measure
+
+  * Definitions:
+
+    ![image-20190316135606424](image-20190316135606424.png)
+
+    ![image-20190316135613674](image-20190316135613674.png)
+
+* Interdependent Scheduling Criteria
+
+  * Impossible to optimize all criteria simultaneously: **Response time vs. throughput** (response time increase will cause switching overhead which increases system overhead, reducing throughput)
+  * Design of a scheduling policy involves compromising(妥协) among competing requirements
+
+* Priorities:
+
+  * In many systems, each process is assigned a priority.
+
+  * Scheduler will always choose a process of higher priority over one of lower priority
+
+    * Problem: lower-priority may suffer **starvation** if there is a steady supply of high priority processes
+    * Solution: allow a process to change its priority based on **its age or execution history**
+
+  * Mutiple read queues, in descending order of priority: RQ0, RQ1, … , RQn => start with RQ0
+
+    ![image-20190316141913292](image-20190316141913292.png)
+
+### Alternative Scheduling Algorithms(policies)
+
+* Selection Function: Determines which process is selected next for execution
+
+  * Important quantities based on execution characteristics:
+    * $w$ = time spent **waiting in system so far** (unexecuted process initialization -> now)
+    * $e$= **time** spent in **execution** so far
+    * $s$ = total **service time** required by the process, including $e$; generally, this quantity must be estimated or supplied by the user
+
+* Decision Mode: Specifies the instants in time at which the selection function is exercised. 
+
+  * **Non-preemptive (keep running)**: Once a process is in the running state, it will continue until it **terminates or blocks itself** for I/O or OS service
+  * **Preemptive (interrupt allowed)**: Currently running process may be **interrupted** and moved to ready state by the OS
+    * Preemption may occur 
+      * when a **new process arrives**(switch in SRT)
+      * when an interrupt occurs that **places a blocked process in the Ready state**, or 
+      * periodically, based on a clock interrupt (RR)
+
+* An Process scheduling example used:
+
+  * Example set of processes:
+
+    | Process | Arrival Time | Service Time |
+    | ------- | ------------ | ------------ |
+    | A       | 0            | 3            |
+    | B       | 2            | 6            |
+    | C       | 4            | 4            |
+    | D       | 6            | 5            |
+    | E       | 8            | 2            |
+
+  * Process requires alternate use of the processor and I/O in a repetitive fashion
+
+  * The service times represent the processor time required in one cycle
+
+  * CPU burst: a time interval that contains pure CPU operation
+
+    ![image-20190316143701188](image-20190316143701188.png)
+
+#### FCFS (First-Come-First-Serve)
+
+* Also known as FIFO or a strict queuing scheme
+
+* when the current process ceases to execute, select the process that has been in the ready queue the longest
+
+  ![image-20190316144126806](image-20190316144126806.png)
+
 * 
 
+#### RR (Round-Robin)
+
+#### SPN (Shortest-Process-Next)
+
+#### SRT (Shortest-Remaining-Time)
+
+#### HRRN (Highest-Response-Ratio-Next)
+
+#### FB (Feedback)
+
+#### Summary
+
+![image-20190316142014067](image-20190316142014067.png)
