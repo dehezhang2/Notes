@@ -1349,9 +1349,9 @@
 
     * there is one reader occupying `z` and `rsem`, and many readers blocked by `z` 
 
-    * the reading reader cannot be interrupted by writer, because it is occupying `rsem`
+    * the first reader cannot be interrupted by writer, because it is occupying `rsem`
 
-    * after the first reader finished the task, it will unlock `rsem` first, writer will occupy it, then it will allow one of the reader occupy `z` => writer is placed into the second order
+    * After the first reader finished the ordering(first half part), it will unlock `rsem` first, writer will occupy it, one of the reader occupying `z` will be unblocked and further blocked by `rsem` => writer is placed into the second order
 
     * after reader finish first half (to `semWait(wsem)`), it is reading, thus writer cannot override anymore
 
@@ -1359,11 +1359,22 @@
 
     * Is it possible to omit the first `semWait(x)`? => No, because there may be one reader is decreasing the `readcount`
 
+    * Actually, `if(readcount==1)` can allow multiple reader and block writer, `if(writecount==1)` can allow multiple writer and block reader
+
       ![IMG_2E34118A1683-1](IMG_2E34118A1683-1.jpeg)
 
   
 
   * The priority:
+
+    * reader only: `wsem` will only be set by the first reader
+    * writer only: `rsem` will only be set by the first reader, and since there is no `if` , `wsem` will block writers
+    * both readers and writers with read first: 
+      * reader set `wsem` to make sure once reader is reading, no writer can write (all writer queue on `wsem`)
+      * writer set `rsem` to make sure that once there is at least one writer, the incoming reader will be blocked. Besides, if one reader is blocked by `rsem`, it will not release `z` , such that other readers will be blocked by `z` , in this way the first writer can always be at least the second order(`rsem` released earlier than `z`) (1 reader queue on `rsem`, others on `z`)
+    * both readers and writers with write first: 
+      * writer set `wsem` and the `rsem`
+      * writer queue on `wsem`, reader queue one `rsem` and `z`
 
     ![image-20190305152515705](image-20190305152515705.png)
 
@@ -1371,13 +1382,14 @@
 
     ![image-20190305170813648](image-20190305170813648.png)
 
-  * A(read), B(read), C(write), D(read) with write priority => A,C,B,D or A,B,C,D(B finished before C came)
+  * Four process with the following order: A(read), B(read), C(write), D(read)
 
+    * with write priority => A,C,B,D or A,B,C,D (A,B read at the same time and B finished before C came)
     * with read priority => A,B,C,D or A,B,D,C
       * when D comes after B finished => A,B,C,D
       * when D comes before B finished => A,B,D,C (because write is always put to the last when new read comes)
 
-* Writer Priority version with message passing
+* Writer Priority version with **message passing**
 
   ```cpp
   // count is initialized as the maximum size of mailbox(for number of reader threads), here initially count = 100
@@ -1409,7 +1421,7 @@
       while(true){
           if(count>0){
               if(!empty(finished)){
-  // collect finished threads and allocate spaces
+  // collect finished threads and allocate spaces until there is no finished
                   receive(finished, msg);
                   count++;
               } else if(!empty(writerequest)){
@@ -1421,6 +1433,7 @@
   // each reader takes one permission, reader request is impossible to cause a negative value
                   receive(readrequest, msg);
                   count--;
+  // reader will only permitted when count > 0
                   send(msg.id,"OK");
               }
           }
@@ -1441,12 +1454,12 @@
     * Processes wishing to access the data area send a request message to the controller
       * Granted access with an “OK” reply message
       * Completion of access with a “finished” message
-    * **count** is initialized to 100 (> the maximum possible number of readers)
+    * **count** is initialized to 100 (the maximum possible number of readers can read at the same time)
     * **count** > 0: no writer is waiting, clear active readers first, then service write requests and then read requests
     * **count** = 0: the only request outstanding is a write request
     * **count** < 0: a writer has made a request and is being made to wait to clear all active readers
   * Priority: 
-    * Writers have priority: The controller services **write requests before read requests**.
+    * Writers have priority: The controller services **write requests before read requests if writer comes before readers**.
     * Readers only and readers can read simultaneously: After receiving a read request, the controller sends “OK” and does not block to receive “finished” (count > 0) -> can continue to receive other read requests.
     * Writers only and only one writer can write at a time: After receiving a write request, the controller sends “OK” and blocks to receive “finished” (count == 0) -> cannot continue until the writer finishes.
     * Both readers and writers and read first (i.e., a writer arrives while the first reader is reading)
@@ -1614,7 +1627,7 @@
   void main(){
       blocked[0] = blocked[1] = 0;
       turn = 0;
-      parbegin(P(0),P(2));
+      parbegin(P(0),P(1));
   }
   ```
 
@@ -1666,6 +1679,8 @@
 
       * Deadlock occurs if the Receive is blocking (i.e., the receiving process is blocked until the message is received).
 
+      * difficult to detect this error
+
       * Need to activate one of the processes in main thread
 
         ![image-20190308152627021](image-20190308152627021.png)
@@ -1680,15 +1695,15 @@
 
 * Conditions for **possible** Deadlock (**nessesary but not sufficient**)
 
-  * Mutal exclusion: Only one process may use a resource at a time, no process may access a resourced unit that has been allocated to another process
-  * Hold-and-wait: A process may **hold allocated resources**(subset of the total needed set) **while awaiting** assignment of others.ss
+  * Mutual exclusion: Only one process may use a resource at a time, no process may access a resourced unit that has been allocated to another process
+  * Hold-and-wait: A process may **hold allocated resources**(subset of the total needed set) **while awaiting** assignment of others
   * No pre-emption: No resource can be forcibly(强力的) removed from a process holding it
 
-* Actual Deadlock requires: **Circular wait** (Given that the first 3 conditions exit, a sequence of events may occur that lead to the following fourth condition)
+* Actual Deadlock requires: **Circular wait** (Given that the first 3 conditions exist, a sequence of events may occur that lead to the following fourth condition)
 
   * A closed chain of processes exits, such that each process holds at least one resource needed by the next process in the chain
   * In fact, it is the **definition** of deadlock
-  * **notice**: it is possible that a process outof the deadlock cycle being locked => ask for resource that is being deadlocked
+  * **notice**: it is possible that a process out of the deadlock cycle being locked => ask for resource that is being deadlocked
 
 * **Four conditions**, taken together, constitute necessary and sufficient conditions for deadlock
 
@@ -1699,7 +1714,7 @@
   * Example of non-deadlock
 
     * No deadlock because multiple instance
-    * no cycle or several instances per resource in the cycle => no deadlock
+    * no cycle or several instances **for any one of** the resources in the cycle => no deadlock
     * cycle with only one instance per resource
 
     ![image-20190315153734098](image-20190315153734098.png)
@@ -1718,7 +1733,7 @@
         * *Inefficient* : You can ask one resource for one time, after using it, you can release it which is more efficient than wait for all the resources at one time
         * *Impractical* : Maybe don’t know how many resources in total
     * No preemption: Two ways
-      * **First way (requester release)**: If a process holding certain resources is denied a further request, that process must release its original resources and request them again 
+      * **First way (requester release)**: If a process holding certain resources is denied by a further request, that process must release its original resources and request them again 
       * **Second way (requested release)**: If a process requests a resource that is **currently held by another process**, the OS may preempt the second process and require it to release its resources
       * **disadvantage**: Practical only for resources whose state can be easily saved and restored later
 
@@ -1726,11 +1741,11 @@
 
     * Define a **linear ordering** of resource types => A process can only request resources that following(**after**) R in the ordering
 
-    * Principle : If ==R is the last one== of the linear order, and a thread has R, it ==cannot ask for the first one== => avoid cycle, it can easily going on and release R
+    * Principle : If ==R is the last one== of the linear order, and a thread has R, it ==cannot ask for the first one== => avoid cycle, it can finish and release R
 
     * Implemented by the nested semaphore
 
-      * e.x. in the tutorial => following code will cause deadlock if we run the first semwait of each processes
+      * e.x. in the tutorial => following code will cause deadlock if we run the first `semwait `of each processes
 
       ```cpp
       void T1(){
@@ -1806,7 +1821,7 @@
 
   * **Process allocation denial**: Do not grant an incremental resource request to a process if this allocation might lead to deadlock
 
-    * ***Banker’s algorithm***(strategy for resource allocation denial) => consider a system with fixed number of resourses
+    * ***Banker’s algorithm***(strategy for resource allocation denial) => consider a system with fixed number of resources
 
     * ***State*** of the system is the ***current*** allocation of resources to processes
 
@@ -1824,14 +1839,14 @@
 
       ![image-20190315184626833](image-20190315184626833.png)
 
-      * A process $i$ can run to completion if it meets the following condition: $C_{ij}-A_{ij}\leq V_{ij}$ 
-      * If there exists row $i$ , s.t. $C_{ij}-A_{ij}\leq V_{ij}$ for all $j$ , i.e. it can be finished, add the corresponding vector in $A​$ to the remain vector
+      * A process $i​$ can run to completion if it meets the following condition: $C_{ij}-A_{ij}\leq V_{ij}​$ 
+      * If there exists row $i$ , s.t. $C_{ij}-A_{ij}\leq V_{ij}$ for all $j$ , i.e. it can be finished, add the corresponding row vector in **allocation matrix** $A$ to the remain vector
 
     * Steps: 
 
       * When a process makes a request of a set of resources, **assume** that the request is granted and update the system state accordingly
       * Then judge whether the current state is safe, it not safe do not grant the request 
-        * Not safe doesn’t mean must exist deadlock => can use deadlock prevention to preempty  some processes
+        * Not safe doesn’t mean must exist deadlock => can use deadlock prevention to preempt  some processes
         * If deadlock exist, it must be unsafe state
       * change the allocation matrix, residual matrix and avaliable vector
 
@@ -1927,22 +1942,22 @@
 
   * Find and **mark** a process whose resource requests can be satisfied with the available resources (find the process can be done)
   * Assume that those resources are granted and that the process runs to completion and releases all its resources
-  * Look for another process to satisfy until there is no process can be finished by avaliable vector
+  * Look for another process to satisfy until there is no process can be finished by available vector
   * A deadlock exists if and only if there are **unmarked** processes at the end
 
 * A common detection algorithm
 
-  * Same datastructures with bank’s algorithm (Allocation matrix $A$ and avaliable vector $V$ )
+  * Same data structures with bank’s algorithm (Allocation matrix $A$ and available vector $V$ )
   * New request matrix **Q** : current request by the process instead of total request(not the **claim**) 
+    * run time request is totally different because at run time, you don’t need all the resources through the process
 
 * Steps:
 
   * First, unmark all the processes
   * Mark each process that has a row in the allocation matrix of all zeros (because it is not holding the resource therefore they are impossible to cause deadlock)
   * Initialize a temporary vector **W** to equal the available vector
-  * Find an index $i$ such that process $i$ is currently unmarked and the $i$ th row of **Q** is less than or equal to **W**; 
-  * if cannot find , terminate, else mark process $i$ and only if there are unmarked processes at the end
-  * Each unmarked process is deadlocked
+  * Find an index $i​$ such that process $i​$ is currently unmarked and the $i​$ th row of **Q** is less than or equal to **W**; 
+  * if cannot find , terminate, else mark process $i$ and only if there are unmarked processes at the end each unmarked process is deadlocked
 
 * Example:
 
