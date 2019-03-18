@@ -884,10 +884,16 @@
 * OS design is concerned with the management of processes and threads in different systems
 
   * Multiprogramming: Multiple processes, one core
-  * Multiprocessing: Multiple processes, multiple cores (shared memory)
-  * Distributed Processing: Multiple process, multiple nodes (distributed memory)
+  * Multiprocessing: Multiple processes, multiple cores (shared main memory)
+  * Distributed Processing: Multiple process, multiple nodes (distributed main memory)
 
-* Processes not only interleave(插入) but also overlapped on multi-processors
+* Processes not only interleave(插入) but also overlapped on multi-processors (execute at the same time)
+
+  * interleaving
+
+    ![1552896825745](1552896825745.png)
+
+  * Overlapping
 
   ![image-20190217190445211](image-20190217190445211.png)
 
@@ -895,14 +901,14 @@
 
   * The relative speed of execution of processes cannot be predicted.
     * depends on activities of other processes
-    * the way the OS handles interrupts
-    * scheduling policies of the OS
+    * the way the OS **handles interrupts**
+    * **scheduling** policies of the OS
 
 * Difficulties of Concurrency
 
-  * Sharing of global resources: global variables(may be changed)
-  * Difficult for OS to manage the allocation of resources optimally: Multiple processes may request use of the same resource.(the example of the multithreaded hello program => same resource: screen)
-  * Difficult to locate programming errors: Results are not deterministic and reproducible
+  * Sharing of **global resources**: global variables(may be changed at the same time)
+  * Difficult for OS to manage the **allocation of resources** optimally: Multiple processes may request use of the same resource. (the example of the multithreaded hello program => same resource: screen)
+  * Difficult to **locate programming errors**: Results are not deterministic and reproducible => difficult to find the resource of error
 
 * **Race Condition**: Occurs when multiple processes or **threads read and write shared data items**
 
@@ -910,26 +916,27 @@
 
   * "Loser" of the race is the process that **updates last** and will determine => finish last process(loser) determine the final value of shared variable
 
-  * e.g.: P1 P2 are 2 threads can access X, each instruction are in order from a process point of view, **and 2 process use different registers**
+  * e.g. of loser determine principle : P1 P2 are 2 threads can access X, each instruction are in order from a process point of view, **and 2 process use different registers**
 
     ![image-20190217192559555](image-20190217192559555.png)
 
     ![image-20190217192623378](image-20190217192623378.png)
 
-* OS Concerns: What design and management issues are raised by the existence of concurrency?
+* OS Concerns: What design and management issues are raised by the existence of concurrency? => OS must
 
   * keep track of various processes
   * allocate and de-allocate resources for each active process; multiple processes want to access to the same resource
   * protect the data and physical resources of each process against interference by other processes
   * **ensure that a process and its output must be independent of the speed at which its execution is carried out relative to the speed of other concurrent processes**
 
-* Resouce Competition
+* Resource Competition
 
   * Concurrent processes come into conflict when they are competing for use of the same resource such as I/O devices, memory, and processor time.
   * Three control problems must be faced:
     * **Need for mutual exclusion**
     * Deadlock： wait for each other(one process wait for memory while using process and another using processor while using memory)
-    * Starvation: wait for resources forever
+    * Starvation: wait for resources forever.
+      * for example, a low priority process is waiting for the resource, but high priority processes are always generated and occupy the ready buffer
 
 ### Mutual Exculsion
 
@@ -947,7 +954,7 @@
 
     ![image-20190222152241932](image-20190222152241932.png)
 
-    - The two functions: **entercritical** and **exitcritical** (进出关键) are used to enforce mutual exclusion: any process that attempts to enter its critical section while another process is in its critical section is made to wait.
+    - The two functions: **entercritical** and **exitcritical** (进出关键) are used to enforce mutual exclusion: any process that attempts to enter its critical section while another process is in its critical section is made to wait. 
     - if one is in its critical section, other processes cannot access the shared resouce
     - BUT, how to provide the functions entercritical and exitcritical?
 
@@ -960,19 +967,19 @@
     * Starvation: Process keep waiting resources forever
   * When no process is in a critical section, any process that request entry to its critical section must be permitted to enter without delay
     * process with higher priority can be switch to the front by this requirement 
-  * No assumptions are made about **relative process speeds or number of processes**
-  * A process remains inside its critical section **for a finite time only**
+  * No assumptions are made about **relative process speeds or number of processes** (regardless of speed and number, mutual exclusion must work)
+  * A process remains inside its critical section **for a finite time only** => avoid starvation
 
 * Hardware Support: (software solution is difficult to deal with the situation)
 
-  * Disabling Interrupt (**Do not work for multi-process systems !!!**)
+  * Disabling Interrupt: do not permit process switching while in the critical section (**Do not work for multi-process systems !!!**)
 
     * Uniprocessors only allow interleaving, no overlapping:
 
       * Recall: operation system switch the processes
-      * IO is disabled to access control
+      * I/O is disabled to access control
 
-    * to guarantee mutual exclusion: sufficient to prevent a process from being interrupted while it is in the critical section
+    * To guarantee mutual exclusion: sufficient to prevent a process from being interrupted while it is in the critical section
 
       ```pseudocode
       while(1){
@@ -983,9 +990,9 @@
       }
       ```
 
-  * Another hardware solution: Special Machine Instructions![image-20190222155851819](image-20190222155851819.png)
+  * Another hardware solution: Special Machine Instructions
 
-    
+    ![image-20190222155851819](image-20190222155851819.png)
 
     ```cpp
     int compare_and_swap(int* word, int testval, int newval);
@@ -993,13 +1000,23 @@
     // testval: test value
     // newval: new value
     // if testval==oldval swap
-    // always return oldval (in memory)
-    // bolt is a global variable, (means existCritical)
-    // when in the critical section, set bolt to 1 to disable the ability to access, after finish, reset the bolt to 0
-    // if one is occupying the critical area others will busy-waiting for the bolt reset to 1
+    // always return oldval of bolt(in memory)
+    // bolt is a global variable, (means existCritical), bolt==1 means 	    occupied
+    // when in the critical section, set bolt to 1 to disable the ability    to access, after finish, reset the bolt to 0
+    // if one is occupying the critical area others will busy-waiting for    the bolt reset to 0
     ```
 
-    
+    * Actual meaning:
+
+      ```cpp
+      int compare_and_swap(int* bolt){
+          int oldval = *bolt;
+          if(oldval == 0) *bolt = 1;
+          return oldval;
+      }
+      ```
+
+      
 
     * Compare-and-Swap (CAS) Instruction: ***atomic*** CPU instruction that cannot be interrupted (interrupt occurs: must finish the current instruction, thus atomic(only one) instructions cannot be interrupted)
     * A **compare** is made between a memory value and a test value.
@@ -1007,30 +1024,31 @@
     * Advantage: 
       * Applicable to **any number** of processes on either a **single processor or multiple processors** sharing main memory
       * Simple and easy to verify
-      * It can be used to support **multiple critical sections**; each critical section can be defined by its own variable
+      * It can be used to support **multiple critical sections**; each critical section can be defined by its own variable (`bolt`)
     * Disadvantage
-      * *Busy-waiting* consumes processor time
-      * **Starvation is possible**
-        * When a process leaves a critical section and more than one process is waiting, the selection of a waiting process is arbitrary; some process could **indefinitely be denied access.**
+      * *Busy-waiting* consumes processor time (occupy the processor and cannot be suspended)
+      * **Starvation is possible** 
+        * When a process leaves a critical section and more than one process is waiting, the selection of a waiting process is arbitrary; some process could **indefinitely be denied access.** (bad luck)
+        * solved by semaphore with a fix buffer to store the blocked processes
       * **Deadlock is possible**
-        * P1 enters its critical section and is then preempted(制止) by a higher-priority P2.
+        * P1 enters its critical section and is then preempted(制止) by a higher-priority P2. (resource is held by P2)
         * P2 attempts to use the same resource as P1 but is denied access because of the mutual exclusion mechanism. 
         * P2 goes into a busy waiting loop.
         * The lower-priority P1 will never be dispatched
 
 ### Semaphores
 
-* Semaphore: (**An OS service which is possible to be interruptted, different with the swap-compare instruction**)
+* Semaphore: (**An OS service which is possible to be interrupted, different with the swap-compare instruction**, actually it calls some **atomic** instructions)
 
   * Fundamental principle: multiple processes can cooperate by means of simple signals such that a **process can be forced to stop at a specified place** until it has received a specific signal.
-  * Semaphore: an integer value used for signalling among processes.(**shared as a global variable**)
-  * **Three operations**(but not the semaphore is atomic) on a semaphore are all *atomic*:
-    * Initialize to a non-negative integer value
+  * Semaphore: an integer value used for signaling among processes. (**shared as a global variable**)
+  * **Three operations** on a semaphore are all *atomic*: (but not the semaphore is atomic)
+    * Initialize to a non-negative integer value (The maximum number of concurrent processes)
     * **semWait** decrements the semaphore value: to receive a signal
     * **semSignal** increments the semaphore value: to transmit a signal
   * The semaphore is **initialized to zero or a positive value.** 
   * When the value is positive, that value equals the number of processes that can issue a **wait** and **immediately continue** to execute. (maximum processes that can be executed simultaneously)
-  * When the value is zero, the next process to issue a **wait** is blocked, and the semaphore value goes negative. 
+  * When the value is zero, the next process to issue a **wait** is blocked, and the semaphore value goes negative. (the value becomes -(# of blocked))
     * Each subsequent **wait** further decrements the value. 
     * The negative value equals the number of processes waiting to be unblocked. (equals to the number of process in the waiting queue)
   * Each **signal** *unblocks* **one of** the waiting processes, if any.
@@ -1053,14 +1071,15 @@
   }
   void semSignal(semaphore s){
       s.count++;
-      if(s.count<0){
+      // if there are some processes in the queue
+      if(s.count <= 0){
           /* rmove a process P from s.queue */;
           /* place process P on ready list */;
       }
   }
   ```
 
-  * Binary Semaphore Primitive(allows only one process executing => mutual exclusive)
+  * Binary Semaphore Primitive (allows only one process executing => mutual exclusion)
 
     * Actually using the compare-and-swap instructions instead of using STL queue to implement the semaphore, following is just a basic idea
 
@@ -1082,7 +1101,7 @@
         // no waiting => reset value
             s.value = one;
         else{
-        // waiting => pop one
+        // waiting => pop one and execute it
             /* P=queue.front();
                queue.pop();
                place P one readylist
@@ -1108,9 +1127,9 @@
   * Waiting queue for processes waiting on the semaphore
   * strong/weak determined by the order of processes are removed from the queue
   * **strong semaphores** use FIFO
-  * **weak semaphores** do not specify the order of removal from the queue
+  * **weak semaphores** do not specify the order of removal from the queue (may have starvation problem)
 
-* Mutual Excusion Using Semaphores
+* Mutual Exclusion By Using Semaphores
 
   ![1550901280234](1550901280234.png)
 
@@ -1134,7 +1153,7 @@
 * Producer/Consumer Problem
 
   * General Statement:
-    * One or more producers are generating data and placing these in a buffer.
+    * One or more producers are generating data and placing them in a buffer.
     * A single consumer is taking items out of the buffer one at time.
     * Only one producer or consumer may access the buffer at any one time.
   * The Problem : Ensure that the Producer can’t add data into full buffer and Consumer can’t remove data from empty buffer.
@@ -1145,35 +1164,43 @@
 
   ![IMG_A847B1E37D8A-1](IMG_A847B1E37D8A-1.jpeg)
 
-  * d is set to be 0 at first, to block the consumer for the first time, if the information(nonempty=>empty) is sent by the producer, then the consumer thread will be unblocked
+  * d is set to be 0 at first, to block the consumer for the first time, if the information(nonempty=>empty) is sent by the producer, then the consumer thread will be unblocked (**always consider process switching for mutual exclusion problems**)
     * cause problem when process switch happens after the consumer do the job for the first time
     * now the buffer is empty, but since next iteration of consumer didn't call wait(d), d is still 0
     * producer add one to the buffer, but the empty message d is incorrectly increased to 1
     * now consumer calls wait for 2 iterations, the first iteration will empty the buffer, and second iteration will cause segmentation fault because buffer is already empty
+    * Consumer `signal(s)` (n=0,d = 0) => producer from `produce()` to `signal(d)` (n=1, d=1) => consumer run for 2 iterations, first n!=0 it can execute, second d!=0 it can execute => pop from empty  buffer => root reason `if(n==0)` is not atomic, if n is zero, d is not zero, program will also execute
+  * d is set to be zero at first
 
-  ![IMG_4C2D5E220809-1](IMG_4C2D5E220809-1.jpeg)d is set to be zero at first
+  ![IMG_4C2D5E220809-1](IMG_4C2D5E220809-1.jpeg)
 
-  * Correct solution : each time let producer goes first if there is no inserted
+  * Correct solution : each time let producer goes first if there is no inserted => use **nearly atomic semaphore** to represent n
 
     * e: size of buffer
     * n: inserted number(d in the previous version)
 
   * A consumer is :
 
-    * blocked when removing from empty buffer
-    * unblocked when an item is inserted by the producer(i.e. >0 number of items in the buffer)
-    * whenever the buffer is empty or not, consumer will wait for one producer to produce
+    * blocked when removing from empty buffer (when the buffer is empty, consumer will wait for one producer to produce)
+    * unblocked when an item is inserted by the producer (i.e. >0 number of items in the buffer)
+    * decrease(wait) n and increase(signal) e
 
-  * A semaphore, n=number of items in the buffer, can be used to implement the idea
+  * A producer is :
 
-    * Producer => not full => produce
-    * For infinite buffer
+    * blocked when inserting in full buffer
+    * unblocked when an item is removed by the consumer (i.e. >0 number of space in the buffer)
 
-    ![image-20190301161138092](image-20190301161138092.png)
+    * decrease(wait) e and increase(signal) n
+
+* for infinite buffer
+
+  ![image-20190301161138092](image-20190301161138092.png)
 
 * for finite buffer => also need to consider the situation of insert into a full buffer
 
-  * Use e to recordm producer will be blocked when e is decreased to negative
+  * Use e to record producer will be blocked when e is decreased to negative
+
+    ![1552900941866](1552900941866.png)
 
   ![image-20190301161220246](image-20190301161220246.png)
 
@@ -1186,6 +1213,9 @@
     - **communication**: to exchange information
 
   - Message Passing is one approach to providing both of these functions.
+
+    - block until recieve
+    - message can also contains communication informations
 
   - Actual function is normally provided in the form of a pair of primitives:
 
@@ -1223,12 +1253,16 @@
 
   * Properties of communication link:
 
-    * A link is established between a pair of processes only if they have a shared mailbox.
+    * A link is established between a pair of processes only if they have a ==shared mailbox==.
     * A link may be **associated with many processes**.
     * Each pair of processes may have **several links**, **each link corresponds to one mailbox**.
-    * m-to-n relation avaliable
+    * m-to-n relation available
 
   * Relationship can be implemented
+
+    ![1552901792210](1552901792210.png)
+
+    ![1552901802057](1552901802057.png)
 
     * One-to-one: allows a private communications link to be set up between two processes
     * Many-to-one relationship: useful for client/server interaction, one process provides service to a number of other processes (**mailbox is often referred to as a port)**
@@ -1238,20 +1272,22 @@
 * Synchronization
 
   * Message passing may be either blocking or non-blocking
-  * Blocking is considered synchronous
-    * **Blocking send**: the sender is blocked until the message is received
+  * Blocking is considered ==synchronous==
+    * **Blocking send**: the sender is blocked until the message is received by the receiver
     * **Blocking receive**: the receiver is blocked until a message arrives
-  * Non-blocking is considered asynchronous
+  * Non-blocking is considered ==asynchronous==
     * **Non-blocking** send: the sender sends the message and continues
     * **Non-blocking** receive: the receiver receives the message or abandons the attempt to receive and continues
 
-* Mutual exculsion by using message
+* Mutual exclusion by using message
 
   * Receive will be blocked (synchronous sending)
 
-  * send will unlock blocked receive
+  * sender will unlock blocked receiver
 
   * critical section will wait until receive the message
+
+  * receive represent a process wishing to enter its critical section attempts to receive a message, the process places the message back to the mailbox by send => like pass the token among processes
 
   * `send(box,null)` in main activate one of the 2 threads
 
@@ -1259,10 +1295,10 @@
 
 * Producer/consumer problem
 
-  * **mayconsume mailbox** is also a buffer of data
+  * **`mayconsume` mailbox** is also a buffer of data => reuse
     * producer store the data in the buffer and sent the message to consumer
     * Empty buffer <=> empty mailbox <=> no message
-  * mayproduce means available space: max number of items can be produced
+  * `mayproduce` means available space: max number of items can be produced
     * **Need send in main because need to activate producer**
     * decrease by `receive(mayproduce)` and increase by `send(mayproduce)`
   * producer and consumer wait for each other, but producer activated first
@@ -1280,16 +1316,16 @@
     * **Only one** writer at a time may write to the file.
     * **If a writer is writing to the file, no reader may read it.** => block all readers established after the writer(writer priority version) or insert all incoming reader before the writer(reader priority version)
 
-* Solution without achieve multiple reader => just lock the reader and writer respectively(similar idea in the assignment2)
+* Solution without achieve multiple reader => just lock the reader and writer respectively (similar idea in the assignment2 because it is the same way that can be achieved by mutex)
 
   ![image-20190301163309703](image-20190301163309703.png)
 
-* Add readcount to record number of readers : add **one more semaphore** to deal with the add or minus of readcount => make sure that no readers can change the `readcount` at the same time
+* Add `readcount` to record number of readers : add **one more semaphore** to deal with the add or minus of `readcount` => make sure that no readers can change the `readcount` at the same time
 
   * Reader priority solution
     * if reader is the first reader => lock writer
     * If there is not readers at all => unlock writer
-    * `semWait(wsem)` does not lock reader, because it will only be called by the first reader => multiple reader achieved
+    * `semWait(wsem)` does not lock reader, because it will only be called by the first reader => multiple reader can read the resource at the same time
     * it is difficult for writer to access because there may be many readers and if there is at least one reader, writer will not write. Therefore,  writer may suffer from **starvation**
 
   ![image-20190301163631512](image-20190301163631512.png)
@@ -1297,7 +1333,7 @@
 * Writer priority version: **no new readers are allowed to access to the data area once at least one writer wants to write** (put **incoming** readers after writer)
 
   * Writer:
-    * Use another semaphore `y` to make sure no 2 writers increase `writecount` at the same time (different with mutiple writing, because it is controlled by `wsem`, here `y` controls count of writer)
+    * Use another semaphore `y` to make sure no 2 writers increase `writecount` at the same time (different with multiple writing, because it is controlled by `wsem`, here `y` controls count of writer)
     * if there is at least one writer didn’t write => block reader by `rsem`
     * multiple writer is disallowed(queued) by `wsem`
     * incomming reader is queued by `z`
@@ -1305,23 +1341,27 @@
 
   ![image-20190301163951772](image-20190301163951772.png)
 
-  * only one reader is allowed to queue on `rsem`, with any additional readers queuing on `z` (**in order to make sure writer will at least be put on the second position**): 
+  * only one reader is allowed to queue on `rsem`, with any additional readers queuing on `z` (**in order to make sure writer will at least be put on the second position, because it compete with only one reader for `rsem`**): 
+
+    ![image-20190305144856336](image-20190305144856336.png)
 
     * suppose at first there is no writer
 
     * there is one reader occupying `z` and `rsem`, and many readers blocked by `z` 
 
-    *  the reading reader cannot be interruptted by writer, because it is occupying `rsem`
+    * the reading reader cannot be interrupted by writer, because it is occupying `rsem`
 
-    * after the first reader finshed the task, it will unlock `rsem` first, writer will occupy it, then it will allow one of the reader occupy `z` => writer is placed into the second order
+    * after the first reader finished the task, it will unlock `rsem` first, writer will occupy it, then it will allow one of the reader occupy `z` => writer is placed into the second order
+
+    * after reader finish first half (to `semWait(wsem)`), it is reading, thus writer cannot override anymore
 
     * since the code block `semWait(z)` to `semSignal(z)` is faster than `READUNIT()` , multi-reader is still achieved
 
-    * Is it possible to omit the first `semWait(x)`?
+    * Is it possible to omit the first `semWait(x)`? => No, because there may be one reader is decreasing the `readcount`
 
       ![IMG_2E34118A1683-1](IMG_2E34118A1683-1.jpeg)
 
-  ![image-20190305144856336](image-20190305144856336.png)
+  
 
   * The priority:
 
