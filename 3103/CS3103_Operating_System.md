@@ -595,7 +595,7 @@
 
       ![image-20190125125613564](image-20190125125613564.png)
 
-      * Steps: 
+      * Steps: (**context, state, resource allocation**)
         1. Save context of processor including program counter and other registers
         2. Update the PCB of the process currently in the Running state (change the status, store the process state information)
         3. Move the **PCB of this process to appropriate queue**- ready; blocked;ready/suspend
@@ -650,6 +650,10 @@
     * Transfer control to the child process: The child process **begins executing at the same point in the code as the parent**, namely at the return from the fork call
     * Transfer control to another process: Both parent and child are left in the ***Ready to Run*** state (switch to the ready buffer)
 
+  * Wait in parent process to wait for collecting zombie child (explicit system call), parent process will be blocked by `wait()`
+
+    ![1552885061098](1552885061098.png)
+
 --------
 
 ## Chapter 04 Threads
@@ -658,23 +662,23 @@
 
 ### Threads: Resource ownership and execution
 
-* Processes and Threads
-  * Resource ownership: 
-    * A process is allocated ownership of resources including a virtual address space to hold **process image**(user data, user program, stack, PCB)
-    * OS performs a protection function to prevent unwanted interference between processes with respect to resource
-  * Dispatching/scheduling/execution
+* **Processes revision** :
+  * Resource ownership : (process unit)
+    * A process is allocated ownership of resources including a ==virtual address space== to hold **process image** (user data, user program, stack, PCB)
+    * OS performs a **protection function** to prevent unwanted interference between processes with respect to resource (process cannot access memory block of other processes)
+  * Dispatching/scheduling/execution : (Thread unit)
     * The execution of a process follows an **execution path** that may be **interleaved with other processes**
-    * A process has an **execution state(Running, Ready,etc) and a dispatching priority**, and is the entity that is **scheduled and dispatched by the OS**
+    * A process has an **execution state (Running, Ready, blocked etc.) and a dispatching priority**, and is the entity that is **scheduled and dispatched by the OS**
 
 * Multithreading
   * These two characteristics can be treated independently by the OS
     * The ==unit of dispatching== is referred to as a ***thread*** or lightweight process
     * The unit of ==resource ownership== is referred to as a ***process*** or task
-  * ***Multithreading*** is the ability of an OS to support multiple, ==concurrent paths of execution== within **a single process**.
+  * ***Multithreading*** is the ability of an OS to support multiple, ==concurrent (happening or existing at the same time) paths of execution== within **a single process**.
 
 ![image-20190210183331621](image-20190210183331621.png)
 
-* Single-threaded Approaches: A single thread of execution per process(concept of thread is not recognized)
+* Single-threaded Approaches: A single thread of execution per process (concept of thread is not recognized)
 
   * MS-DOS supports a ==single-user process and a single thread==
   * Some variants of UNIX support multiple user processes but only support one thread per process
@@ -688,16 +692,18 @@
 
   * Process (in OS): 
 
-    * A **unit of resource allocation**: a virtual address space that holds the ***process image*** (code + data + stack + PCB)
+    * A **unit of resource allocation**: a virtual address space that holds the ***process image*** (program + changeable data + address calling stack + PCB)
     * A **unit of protection**: protected access to processors, other processes (for inter-process communication), files, I/O resources
 
   * Thread(in Process):
 
-    * An execution **state** (running, ready, etc.)
-    * A saved thread **context** when not running
-    * An execution **stack**
-    * Some per-thread **static storage** for local variables
+    * Threads have
+      * An execution **state** (running, ready, etc.)
+      * A saved thread **context (上下文)** when not running
+      * An execution **stack** (for return)
+      * Some per-thread **static storage** for local variables
     * Access to the memory and resources of its process, **shared by all threads** in that process
+    * From the following graph, you can find that PCB (process identifier, process state information **because suspend is a process level state**, process control information) and User Address Space (user data, user program) are shared
 
     ![image-20190210184018024](image-20190210184018024.png)
 
@@ -728,17 +734,17 @@
 * **Activities Similar to Processes**: Similar to processes, threads have *execution states* and need to *synchronize* with one another.
 
   * Execution states
-    * Reminder: In an OS that supports threads, scheduling and dispatching is done on a thread basis.
+    * ==Reminder: In an OS that supports threads, scheduling and dispatching is done on a thread basis.==
     * Most of the **state information dealing with execution** is maintained in **thread-level** data structures.
-    * The key states for a thread are: Running, Ready, Blocked.
+    * The key states for a thread are: **Running, Ready, Blocked.** (no suspend)
     * Some states are at process-level
       * Suspending a process involves ==suspending all threads== of the process because they share the address space.
       * ==Termination of a process terminates all threads within the process==.
-  * Threads need to **synchronize** with one another so that they **don't interfere with each other or corrupt data structures**
+  * Threads need to **synchronize** with one another so that they **don't interfere with each other or corrupt data structures** (need mutual exclusion)
     * All threads of a process share the **same address space and other resources**.
     * ==Any alteration of a resource by one thread affects the other threads in the same process.==
 
-* Multithreading on a Uniprocessor(单处理器): Mutiprogramming enables the interleaving(插入) of multiple threads within multiple processes
+* Multithreading on a Uniprocessor(单处理器): Mutiprogramming enables the interleaving(插入) of multiple threads within multiple processes => Because thread itself is a light-weight process
 
   ![image-20190210215255338](image-20190210215255338.png)
 
@@ -750,7 +756,7 @@
 
   * Asynchronous processing: 
 
-    In a Web server, multiple threads can work independently and simultaneously, such as issuing SQL queries and invoking Web services, to gather information that are required to build a Web response page
+    In a Web server, multiple threads can work independently and simultaneously, such as issuing SQL queries and invoking Web services, to gather information that are required to build a Web response page => concurrently call SQL and get data from database
 
   * Speed of execution
 
@@ -759,29 +765,29 @@
 * *Benefits of Threads*: If an application is implemented as **a set of related units of execution**, it is far more efficient to do so as a collection of threads rather than a collection of separate processes. Reasons include: 
 
   * less time to **create & terminate & switch** new thread than a process
-  * Ehance efficiency in communication because threads within the same process ==share memory and files==, they can ==communicate== with each other ==without invoking the kernel==
+  * Enhance efficiency in communication because threads within the same process ==share memory and files== (do not need to copy all the data), they can ==communicate== with each other ==without invoking the kernel==
 
 -------
 
 ### Categories of thread implementation
 
-* User Level Thread(ULT): All thread management is done within the application by calling a threads library
+* **User Level Thread(ULT)** : All thread management is done within the application by calling a threads library
 
   ![image-20190210220658787](image-20190210220658787.png)
 
   * The application and its threads are allocated to a single process managed by the kernel
   * The kernel is not aware of the existence of threads
-  * Kernel scheduling is done on a process basis
+  * Kernel scheduling is done on a **process basis**
   * e.g.: GNU Portable Threads
-  * Pros: 
-    * Process does not switch to the kernel mode to do thread management -> saves the overhead of two mode switches
-    * Scheduling can be application specific
-    * Can run on ==any OS== because the threads library is a set of application-level functions(already based on the OS)
+  * Pros: good for single processor with multiple threads
+    * **Saves the overhead**: does not switch to the kernel mode to do thread management -> saves the overhead of two mode switches
+    * **Flexible** : Scheduling can be application specific (application determines the order which is more flexible for tasks that self-define the order of execution)
+    * **Multiple platform support** : Can run on ==any OS== because the threads library is a set of application-level functions (already based on the OS)
   * Cons: 
-    * Only a single thread within a process can execute at a time -> a multithreaded application cannot take advantage of multiprocessing(processor just for one process's threads)
-    * When a ULT executes a blocking system call, all of the threads within the process are blocked
+    * **Not efficient for multiprocessor** : Only a single thread within a process can execute at a time -> a multithreaded application cannot take advantage of multiprocessing (processor just for one process's threads), **cannot let 2 threads of the same process work on different processors**
+    * **Kernel doesn’t have information of state** : When a ULT executes a blocking system call, all of the threads within the process are blocked
 
-* Kernel level Thread(KLT), also called(kernel-supported threads or lightweight processes): Thread management is done by the kernel
+* Kernel level Thread(KLT), also called (kernel-supported threads or lightweight processes): Thread management is done by the kernel
 
   ![image-20190210221107012](image-20190210221107012.png)
 
@@ -790,23 +796,24 @@
   * Kernel maintains context information for the whole process ==and individual threads within the process==.
   * Scheduling is done ==on a thread basis==.
   * e.g. : Windows, Linux
-  * time comparation for three different kinds of the execution modes(for uni-processor)
+  * time comparation for three different kinds of the execution modes (**for uni-processor**)
 
   ![image-20190210222123084](image-20190210222123084.png)
 
   * Pros:
-    * The kernel can simultaneously schedule multiple threads from the same process onto multiple processors.
-    * If one thread in a process is blocked, the kernel can schedule another thread of the same process.
-    * Kernel routines themselves can be  multithreaded.
+    * **Good for multiprocessor** : The kernel can simultaneously schedule multiple threads from the same process onto multiple processors.
+    * **Kernel has information** : If one thread in a process is blocked, the kernel can schedule another thread of the same process.
+    * **Reuse for kernel mode** : Kernel routines themselves can be  multithreaded. (In user level thread, kernel level does not implement multithreading, so kernel level cannot be multithreaded)
   * Cons:
-    * The transfer of control from one thread to another within the same process requires a mode switch to the kernel.(conversion overhead)
-    * Managing KLTs is slower than ULTs.
-    * KLT implementation needs ==OS support==.
+    * **conversion overhead** : The transfer of control from one thread to another within the same process requires a mode switch to the kernel.
+      * Managing KLTs is slower than ULTs.
+    * **OS support** : KLT implementation needs ==OS support==.
 
 * Combined Approach: **m-to-n hybrid** implementation
 
-  * ![image-20190210222324632](image-20190210222324632.png)Application creates *m* ULTs.
-  * OS provides pool of *n* KLTs(n processors to manage).
+  * ![image-20190210222324632](image-20190210222324632.png)
+  * Application creates *m* ULTs.
+  * OS provides pool of *n* KLTs (n processors to manage multithreading).
   * Multiple ULTs are mapped onto a ==smaller or equal number of KLTs==.
   * Multiple threads within the same application can run in parallel on multiple processors.
   * A blocking system call need not block the entire process.
@@ -818,13 +825,12 @@
 
 ------
 
-* Thread Libraries: Provide programmer with API (application program interface) for creating
-  and managing threads.
+* Thread Libraries: Provide programmer with API (application program interface) for creating and managing threads.
 
   * Three main thread libraries are in use today:
-    * POSIX Pthreads
+    * **POSIX Pthreads**
     * Win32
-    * Java
+    * **Java**
   * UNIX and Linux systems often use Pthreads.
 
 * Pthreads(POSIX Threads)
@@ -840,7 +846,7 @@
   * Implemented with a `pthread.h` header/include file and a thread library
   * This makes it easy for programmer to develop *portable* threaded applications
 
-* The Pthreads API: The subroutines which comprise the Pthreads API can be informally grouped into four major groups: 
+* The Pthreads API: The **subroutines** which comprise the Pthreads API can be informally grouped into four major groups: 
 
   * ***Thread management*** 
 
@@ -857,7 +863,7 @@
 
     ![image-20190210223323989](image-20190210223323989.png)
 
-  * Naming conventions: All identifiers in the threads library begin with `pthread`
+  * Naming conventions: All identifiers in the threads library begin with `pthread_`
 
 * Multithreading Consequences: Because threads within the same process share resources
 
@@ -865,7 +871,7 @@
   * Two pointers having the same value point to the same data
   * Reading and writing to the same memory locations is possible
   * No guarantee as to the order that threads will run
-  * Therefore requires ==explicit *synchronization* by the programmer==
+  * Therefore requires ==explicit *synchronization* by the programmer== (mutual exclusion)
 
 -------------
 
