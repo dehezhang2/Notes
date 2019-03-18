@@ -429,12 +429,17 @@
   * Two suspend states (blocked/suspend and ready/suspend)
 
     * Because block and suspend are 2 independent states(block: whether waiting for resources; suspend: whether in the main memory)
-    * May be there is a program waiting for user input, and at this time OS decide to move it
-    *  outof the main memory
+    * May be there is a program waiting for user input, and at this time OS decide to move it out of the main memory
 
     ![image-20190125114715372](image-20190125114715372.png)
 
-  * Reason for Process Suspension
+  * **Reason for Process Suspension**
+
+    * swapping: free memory
+    * Other OS reason: error handling
+    * interactive user request: user explicit call
+    * timing: suspend periodical processes when they are idle
+    * parent process request: Child process suspended by parents => coordinate the activity of various descendants
 
     <img src="image-20190125114813156.png" width="100%">
 
@@ -442,7 +447,7 @@
 
 ### Data structures used to manage process
 
-* Processes and Resources: OS manages **the use of system resources by processes**
+* Processes and Resources: OS manages **the use of system resources (CPU, I/O, memory, files) by processes**
 
   ![image-20190125115213818](image-20190125115213818.png)
 
@@ -456,7 +461,7 @@
 
 * Memory Tables
 
-  * Memory tables are used to keep track of both main(real) and secondary(virtual memory)
+  * Memory tables are used to keep track of **both main(real) and secondary(virtual memory)**
   * Must include this information
     * **Allocation of main memory** to processes
     * **Allocation of secondary memory** to processes
@@ -466,7 +471,7 @@
 * I/O Tables
 
   * Used by the OS to **manage the I/O devices** and channels of the computer.
-  * At any given time, an I/O device may be **available or assigned to a particular process.** : I/O device( particular process, status, memory)
+  * At any given time, an I/O device may be **available or assigned to a particular process.** : I/O device( particular process(process identifier), status, memory)
   * If an I/O operation is in progress, the OS needs to know
     * The **status of the I/O operation**
     * The **location in main memory being used as the source or destination of the I/O transfer**
@@ -492,7 +497,7 @@
 
   <img src="image-20190125122112852.png" width="30%">
 
-  * Each process has associated with it a number of attributes that are used by the OS for process control.
+  * Each process has associated with it a number of ==attributes that are used by the OS for process control==.
   * The attributes are stored in a data structure called a ***process control block*** (PCB), created and managed by the OS.
   * It contains **sufficient information so that it is possible to interrupt a running process and later resume its execution.**
 
@@ -500,23 +505,23 @@
 
   * Process Identification: Each process is assigned a unique numeric identifier. (`pid`)
 
-    * Many of the tables controlled by the OS may use process identifiers to **cross-reference process tables**(relationship relation), e.g., memory tables may be organized to provide **a map of main memory with an indication of which process is assigned to each region** (process ID -> memory block)
-    * When processes **communicate with one another**, the process identifier informs the OS of the **destination of a particular communication**
-    * When processes are allowed to create other processes, identifiers **indicate the parent and descendants** of each process
+    * Cross reference: Many of the tables controlled by the OS may use process identifiers to **cross-reference process tables**(relationship relation), e.g., memory tables may be organized to provide **a map of main memory with an indication of which process is assigned to each region** (memory block <-> process identification -> process)
+    * Inter-process communication:  When processes **communicate with one another**, the process identifier informs the OS of the **destination of a particular communication**
+    * Reference to parent process: When processes are allowed to create other processes, identifiers **indicate the parent and descendants** of each process
 
   * Process State Information: Consists of processor registers' content
 
     * User-visible registers
     * **Control and status** registers
       * Program counter: address of the next instruction
-      * Program status word(PSW)
+      * Program status word (PSW)
         * Condition codes: result of the **most recent arithmetic or logical operation** (e.g., sign, zero, carry, equal, overflow)
         * Status information: e.g. **interrupt enabled/disabled flags, execution mode**
-      * Stack pointers (need to back to the orignal stack pointer)
+      * Stack pointers (need to back to the original stack pointer)
 
   * Process Control Infromation: The additional information needs by the OS to control and coordinate the various active processes
 
-    * Process **state**
+    * Process **state** (block / suspend)
     * Priority
     * Scheduling-related info
     * Waiting event (for blocked process)
@@ -526,14 +531,18 @@
 
     ![](屏幕快照 2019-01-25 下午12.40.59.png)
 
-* Structure of Process Images in Virtual Memory![image-20190125124220632](image-20190125124220632.png)
+* Structure of Process Images in Virtual Memory
+
+  * Private User address space: User data and User program
+
+  ![image-20190125124220632](image-20190125124220632.png)
 
 * Role of the Process Control Block
 
   * Most important data structure in an OS
     * contains all of the information about a process that is needed by the OS
     * **Read and/or modified** by virtually every module in the OS such as scheduling, resource allocation, interrupt processing and performance monitoring
-    * Defines the state of the OS
+    * ==Defines the state of the OS==
   * **Requires protection, which is difficult**
     * A faulty (有缺陷的) routine could damage PCBs, which could destroy the OS's ability to manage the affected processes
     * Any design change to the PCB could affect many modules of the OS
@@ -552,7 +561,7 @@
     * More-privileged mode
     * *Kernel* of the operating system (central module of an OS)
       * Loads first when the system starts
-      * Resides in memory (in a protected area) all the time
+      * Resides in main memory (in a protected area) all the time
 
 * Typical Functions of an OS Kernel
 
@@ -562,9 +571,9 @@
 
   * **Assigns a unique process identifier** and adds a new entry to the process table
   * **Allocates space** for the process (process image)
-  * Initializes process control block
+  * Initializes **process control block**
   * Sets up appropriate **linkages such as putting the new process** in the Ready list
-  * Creates or expands other data structures such as an ==accounting file for performance assessment==
+  * Creates or expands **other data structures** such as an ==accounting file for performance assessment==
 
 * Process Switching
 
@@ -574,23 +583,26 @@
 
     * What events trigger a **process switch**: A process switch may occur any time that OS has **gained control from the currently running process**. Possible events giving OS control are:
 
-      | **Mechanism**                   | **Cause**                                                    | **Use**                                              |
-      | ------------------------------- | ------------------------------------------------------------ | ---------------------------------------------------- |
-      | ***Interrupt***                 | External to the execution of the  current instruction, e.g., clock interrupt, I/O   interrupt. | Reaction to an asynchronous   external event         |
-      | ***Trap***                      | Associated with the execution of the **current instruction**, e.g., illegal file   access | ==Handling of an error== or an exception   condition |
-      | ***System   /supervisor call*** | Explicit request, e.g., file open                            | Call to an operating system function                 |
+      | **Mechanism**                          | **Cause**                                                    | **Use**                                            |
+      | -------------------------------------- | ------------------------------------------------------------ | -------------------------------------------------- |
+      | ***Interrupt***(system)                | External to the execution of the  current instruction, e.g., clock interrupt, I/O   interrupt. | Reaction to an asynchronous external event         |
+      | ***Trap***(process)                    | Associated with the execution of the **current instruction**, e.g., illegal file access | ==Handling of an error== or an exception condition |
+      | ***System   /supervisor call*** (user) | Explicit request, e.g., file open                            | Call to an operating system function               |
 
     * What must the OS do to the various data structures to achieve such a process switch?(steps in a process switch)
 
+      * idle means the process may wait for some resources or I/O input
+
       ![image-20190125125613564](image-20190125125613564.png)
 
-      * Save context of processor including program counter and other registers
-      * Update the PCB of the process currently in the Running state
-      * Move the **PCB of this process to appropriate queue**- ready; blocked;ready/suspend
-      * Select another process for execution
-      * Update the PCB of the process for execution
-      * Update memory management data structures
-      * **Restore** context of the processor to that which existed at the time the selected process was **last switched out**
+      * Steps: 
+        1. Save context of processor including program counter and other registers
+        2. Update the PCB of the process currently in the Running state (change the status, store the process state information)
+        3. Move the **PCB of this process to appropriate queue**- ready; blocked;ready/suspend
+        4. Select another process for execution
+        5. Update the PCB of the process for execution
+        6. Update memory management data structures
+        7. **Restore** context of the processor to that which existed at the time the selected process was **last switched out**
 
   * Mode Switching
 
@@ -602,17 +614,18 @@
 
 ### Discuss process management in UNIX
 
-* System processes run in kernel mode 
+* System processes run in kernel mode : executes operating system code to perform administrative and housekeeping functions
 
-  * executes operating system code to perform administrative and housekeeping functions
 * User processes
   * operate in user mode to execute user programs and utilities
 
   * operate in kernel mode to execute instructions that belong to the kernel
 
-  * enter kernel mode by issuing a system call, when an exception is generated, or when an interrupt occurs
+  * enter kernel mode by issuing a system call, when an exception is generated, or when an interrupt occurs **user mode <= system call => kernel mode**
 
     ![image-20190201145410802](image-20190201145410802.png)
+
+  * preempted: While returning from kernel to user, process switching occurs
 
   ![image-20190201172404002](image-20190201172404002.png)
 
@@ -622,24 +635,20 @@
 
   * This causes the OS, in kernel mode, to:
 
-    1. Allocate a slot in the process table for the new process.
-
+    1. **Allocate** a slot in the process table for the new process.
     2. Assign a unique process ID to the child **process**.
-
-    3. **Make a copy of the process image of the parent**, with the exception of any shared memory.
-
+    3. **Make a copy of the process image of the parent**, with the exception of any shared memory. (Copy the data to other places, do not share the data)
     4. Increment counters for any files owned by the parent, to reflect that an additional process now also owns those files.
-
     5. Assign the child process to the Ready to Run state.
-
-    6. Return the ID number of the child to the parent process, and a 0 value to the child process.
+    6. Return the ID number of the child to the parent process, and a 0 value to the child process. 
+       * The child process copy from the line `fork()`, and have different value returned from `fork()`
     7. Their data are independent with each other even if they has a same variable name 
 
-  * After creation (different choices **for OS**, different with the explicit system call by user, brecause it means whose **next instruction to be called**)
+  * After creation (different choices **for OS**, different with the explicit system call to wait (`wait()` in parent process) by user, because it means whose **next instruction to be called**)
 
     * Stay in the parent process: Control returns to ***user mode*** at the point of the fork call of the parent
     * Transfer control to the child process: The child process **begins executing at the same point in the code as the parent**, namely at the return from the fork call
-    * Transfer control to another process: Both parent and child are left in the ***Ready to Run*** state
+    * Transfer control to another process: Both parent and child are left in the ***Ready to Run*** state (switch to the ready buffer)
 
 --------
 
