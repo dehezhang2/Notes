@@ -285,6 +285,80 @@
 
 ----------------
 
+## Tutorial 01
+
+--------
+
+* Do you know why most of applications are platform dependent? E.g., an iPhone Apps can only work on iPhones while Android Apps can only work on Android devices. 
+
+  * The term *platform* often refers to the **combination of the type of hardware and the type of** **operating system running on it**. 
+
+    * A *hardware platform* can refer to a **computer’s architecture or processor architecture**. 
+    * A *software platform* can either be an **operating system or programming environment**, though more commonly it is a combination of both. 
+
+  * Any operating system is **hardware dependent**, from interrupt handling, process scheduling to memory management, device I/O.  (OS <=> hardware)
+
+  * Application software is built on top of OS and dependent on the OS to interact with the hardware (such as keyboard input and printer output). Hence, most application software is  platform dependent. (OS <=> Applications)
+
+  * However, developing cross-platform software is also possible, but it can be a very time- 
+
+    consuming task. Read more about cross-platform programming/development at: 
+
+    http://en.wikipedia.org/wiki/Cross-platform 
+
+* What are the interfaces available for users to interact with operating systems? What is
+  the difference between user interface and programming interface to interact with the
+  operating system?
+
+  * The user interfaces for users to interact with the operating system can be 
+    * command interpreter (MS-DOS as command.com or UNIX as shell) 
+    * window manager (MS Windows, macOS or UNIX X Window) as graphical interface 
+  * <u>User interfaces</u> allow users to use system commands or mouse selections to interact with the operating system. User can develop or execute programs or applications, control I/O operations, monitor the system status, e.g., access file directory, display file content, print a file.
+  * Programming interface (a.k.a. API) is used by **application developers** to access (via system calls) operating system functions (system programs), hardware devices or system resources, e.g., display results on an I/O device (screen), write data to a file (disk device), instead of implementing those functions from scratch. 
+
+--------
+
+## Tutorial 02
+
+* What could happen when the I/O operations take much more time than executing segment 2,3 => reach second write before the first is finished 
+
+  * It is a typical case especially for devices like printer
+  * The result is that the user program is **hung up at that point**. When the preceding I/O operation completes, the new WRITE call may be processed, and a new I/O operation may be started. 
+  * Though the processor might still need to wait in this situation, the waiting time is noticeably shortened. There is still a gain in efficiency because ==part of the time during which the I/O operation is underway overlaps with the execution of the user instructions==. 
+
+  ![](屏幕快照 2019-01-14 下午8.04.59.png)
+
+  
+
+  ![屏幕快照 2019-03-19 下午1.18.57](屏幕快照 2019-03-19 下午1.18.57.png)
+
+* Multiprogramming and Multiprocessing
+
+  * A multiprogramming system runs more than one program “simultaneously” on **one processor**. The system attempts to **keep several programs resident in main memory** and **switches the processor rapidly between them**. Multiprogramming was developed to improve **processor and I/O resource utilization**. 
+  * A multiprocessor is a computer system with **more than one processor**. Multiprocessing was developed in an effort to increase processing speeds by allowing truly parallel computation. 
+  * When there is only one task, multiprogramming will be faster
+
+* The ***principle of locality*** states that memory references tend to cluster. In the literature, there is a distinction between ***spatial locality*** and ***temporal locality***. 
+
+  * Spatial locality refers to the tendency of execution to involve a number of memory locations that are ==clustered== => achieved by large cache block
+
+  * Temporal locality refers to the tendency for a processor to access memory locations that have been used ==recently==. => achieved by keep the most recent memory in the cache
+
+  * e.g.: 
+
+    ```cpp
+    for(int i=0;i<20;i++){
+      	for(int j=0;j<10;j++){
+    				a[i] *= j;
+      	}
+    }
+    ```
+
+    * Instructions `++`, `*=` are loaded in to the cache as a block
+    * Array `a` has been loaded into the cache as the most recent variable
+
+-------
+
 ## Chapter 3 Process Description and Control
 
 ### How are processes represented and controlled by the OS
@@ -380,8 +454,40 @@
 
   ![image-20190125111931505](image-20190125111931505.png)
 
-  * Distinguish between blocked and ready state
+  * State Description:
+
+    - *New*: a process that has just been **created but not yet been admitted to the** 
+
+      **pool** of executable processes by the OS 
+
+    - *Ready*: a process that is **prepared to execute when given the opportunity** 
+
+    - *Running*: the process is currently being executed (occupying the processor)
+
+    - *Blocked*: a process that **cannot execute until some event occurs**, such as the 
+
+      completion of an I/O operation 
+
+    - *Exit*: a process that has been **released from the pool of executable processes** 
+
+      **by the OS**, either because it halted or because it aborted for some reason. Process in exit state might be kept for calculate some status
+
+  * State transaction
+
+    1. *Ready* => *Running*: OS scheduler picks this process to run (short-term scheduling)
+    2. *Running* => *Ready*: OS scheduler picks another process to run (according to the scheduling algorithm)
+    3. *Running* => *Blocked*: the process waits for an event 
+    4. *Blocked* => *Ready*: the event for which the process has been waiting occurs
+
+  * 2 other transactions (is it possible?)
+
+    * *Blocked* => *Running*: it is possible. Suppose that a process is blocked on an I/O operation and **there is no more processes are in the ready queue**. When the I/O finishes, if the CPU happens to be idle at that moment, the process could go directly from blocked to running. 
+    * *Ready* => *Blocked*: it is not likely. A ready process is currently queueing for its CPU time, so it cannot do I/O or anything else that might block it. Typically, a ready process cannot be blocked until it has run. 
+
+  * Reaseon of 5 states model: Distinguish between blocked and ready state
+
   * While some processes in the Not Running state are ready to execute, **others may be blocked**(e.g., **waiting for an I/O operation to complete**, or timer interrupt) , while ready state represent process that **run out of its instructions for this turns** (timeout)
+
   * Using Two Queues/Multiple Blocked Queues
 
   ![image-20190125112106945](image-20190125112106945.png)
@@ -430,6 +536,12 @@
 
     * Because block and suspend are 2 independent states(block: whether waiting for resources; suspend: whether in the main memory)
     * May be there is a program waiting for user input, and at this time OS decide to move it out of the main memory
+    * State transaction:
+      * Blocked => Blocked/Suspend (**which is the first thing to do to free up memory**): This can make room for another process that is not blocked, in particular, when the currently running process or a ready process that the OS would like to dispatch requires more main memory to maintain adequate performance.
+      * Ready => Ready/Suspend: If this is the only way to ==free up a sufficiently large block== of main
+        memory or the OS may choose to **suspend a lower-priority ready process rather than a higher-priority blocked process** if it believes that the blocked process will be ready soon.
+      * Ready/Suspend => Ready: If the process in the **Ready/Suspend state has higher priority**(there might be a higher priority process with the state: Blocked/Suspend has been triggered by the corresponding event) than any of the ready processes. Otherwise, there is swapping cost.
+      * Blocked/Suspend => Ready/Suspend: The existence of this transaction proved that not all data of process are swapped into the second memory
 
     ![image-20190125114715372](image-20190125114715372.png)
 
@@ -654,6 +766,27 @@
 
     ![1552885061098](1552885061098.png)
 
+## Tutorial 03
+
+* Including the initial parent process, how many processes are created by the following program? => $2^4$ 
+
+  ![IMG_71FD234FD29B-1](IMG_71FD234FD29B-1.jpeg)
+
+  ```cpp
+  #include <stdio.h>
+  #include <unistd.h>
+  
+  int main(){
+    int i;
+    for(i=0;i<4;i++){
+  		fork();
+    }
+    return 0;
+  }
+  ```
+
+  
+
 --------
 
 ## Chapter 04 Threads
@@ -872,6 +1005,59 @@
   * Reading and writing to the same memory locations is possible
   * No guarantee as to the order that threads will run
   * Therefore requires ==explicit *synchronization* by the programmer== (mutual exclusion)
+
+--------
+
+## Tutorial 04
+
+* How does thread creation differ from process creation in terms of resource requirements?
+
+  * Thread creation needs less resources
+  * Thread creation: When a thread is created, it **shares the resources (such as code and data) of its parent process** or parent thread, so, no allocation of memory for the shared resources is necessary. Instead, only **a stack and a small thread control block containing register values and other thread related state information are required.**
+  * Process creation: Space for code and data **has to be allocated for individual processes**. Moreover, creating a process requires allocating space for a process control block (PCB) which is a rather large data structure.
+
+* What kind of program in which multithreading does not provide better performance than a single-threaded solution? => A program cannot be divided into parts that can be executed concurrently (Any kind of sequential program)
+
+* Can a multithreaded solution using multiple kernel-level threads provide better performance than a single-threaded solution on a single-processor system?
+
+  * Yes: In a kenel-level threads solution, if one thread is blocked, another kernel-level thread can be switched and continue running
+
+* Specify the output of the following program: 
+
+  
+
+  ```cpp
+  #include <pthread.h>
+  #include <stdio.h>
+  #include <unistd.h>
+  #include <sys/wait.h>
+  
+  int value=0;
+  void *runner(void *param);
+  int main(int argc, char *argv[])
+  {
+  		pid_t pid; pthread_t tid; pthread_attr_t attr;
+      pid=fork();
+      if (pid>0) {
+  				wait(NULL);
+          printf("Value1 = %d\n", value);
+      }
+  		else if (pid==0) {
+  				pthread_attr_init(&attr); 
+        	pthread_create(&tid, &attr, runner, NULL); 					      
+        	pthread_join(tid, NULL);
+          printf("Value2 = %d\n", value);
+      } 
+  }
+  void *runner(void *param) {
+  		value = 5;
+  		pthread_exit(0);
+  }
+  // Value2 = 5 => because shared memory with the main thread
+  // Value1 = 0 => because it copies the data and code
+  ```
+
+  
 
 -------------
 
@@ -1615,8 +1801,10 @@
   void P(int id){
       while(true){
           blocked[id] = true;
+          // turn cannot be 0 and 1 at the same time => no deadlock
           while(turn != id){
               while(blocked[1-id]);
+            // process switch here => cause problem
               turn = id;
           }
           /* critical section */
@@ -1635,15 +1823,28 @@
     * turn means the running one, it is either activated by main or given to corresponding process after it is unblocked
     * if it is not his turn, check whether the other is running, if running, busy waiting; after waiting change turn to itself
   * prove it is incorrect
-    * The root reason for its incorrectness is it is software level => **not atomic**
+    * The root reason for its incorrectness is the busy waiting part is software level => **not atomic**
     * for process 0 and 1, if 1 runs first, it steps into the `while(turn != id)` loop
     * Because p0 is not running, it will not busy waiting
     * However, before running `turn = id`, process switch occurs, since turn is still 0, p0 will enter the critical section
     * Then p1 get its turn, and also enter the critical section
 
+* Refer to the solution to the readers/writers problem using semaphore with **writers have priority**. Assume that a reader is reading and no writer and reader are waiting for the time being. rsem = 1, wesm = 0, x = 1, y = 1, z = 1
+
+  * What will be the values of the semaphores when a writer wants to write while the first reader is reading? rsem = 0, wesm = -1, x = 1, y = 1, z = 1
+  * Continue with a), what will be the values of the semaphores when a second reader wants to read while the first reader is still reading? rsem = -1, wesm = -1, x = 1, y = 1, z = 0
+  * c) Continue with b), what will be the values of the semaphores when a third reader wants to read while the first reader is still reading? rsem = -1, wesm = -1, x = 1, y = 1, z = -1
+  * Continue with c), what will be the values of the semaphores when a second writer wants to write while the first reader is still reading? rsem = -1, wesm = -2, x = 1, y = 1, z = -1
+  * Which one will resume first when the first reader finishes reading, assuming all the semaphores are ***strong semaphores***? The first writer
+
+* Refer to the solution to the bounded-buffer producer/consumer problem using semaphore. Assume that the size of the buffer is 10. What is the value of each semaphore when **a producer is inserting data into an empty buffer** while no consumer is waiting?
+
+  * Because the producer is inserting, there are only 9 left
+  * s = 1, e = 9, n = 0
+
 -------------
 
-## Lecture05 Deadlock and Starvation
+## Chapter06 Deadlock and Starvation
 
 ---------
 
@@ -2037,11 +2238,16 @@
   
   ```
 
-  
+
+------
+
+## Tutorial 06
+
+
 
 --------
 
-## Lecture 06 Uniprocessor Scheduling
+## Chapter 07 Uniprocessor Scheduling
 
 ### Types of Processor Scheduling
 
