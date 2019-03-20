@@ -1485,3 +1485,39 @@
 
 ----------
 
+## Lecture 07 Files and Hash Files
+
+* Storage Medium for Databases: 
+
+  * Memory hierarchy
+    - CPU cache > main memory > flash memory/Phase change memory > magnetic disks/optical  disks
+    - Slower in access delay but larger in memory size (less expensive)
+  * Primary storage (volatile) 
+    * The storage media that can be operated **directly by the CPU** 
+    * Include main memory and cache memory 
+  * Secondary and tertiary storage (non-volatile) 
+    * Slower in access 
+    * Include magnetic disks, optical disks and flash memory 
+  * A database could be huge in size (several hundred GB or even larger) 
+    * Need to be resided in secondary/tertiary storage (non-volatile/persistent storage) 
+
+* Disk Storage Devices (Preferred secondary storage device for **high storage capacity and low cost**)
+
+  ![](屏幕快照 2019-03-20 下午2.30.40.png)
+
+  * Data are stored as magnetized areas on magnetic disk surfaces 
+  * A disk pack contains several magnetic disks connected to a rotating spindle 
+  * Disks are divided into concentric **circular tracks** on each disk surface 
+    * Track capacities vary typically from 4 to 50 Kbytes or more 
+
+  - A track is divided into **fixed size sectors and then into blocks** 
+    - Typical block sizes range from B=512 bytes to B=4096 bytes 
+    - Whole blocks are transferred between disk and main memory for processing 
+  - Disk pack -> Disk -> Track -> Sectors -> Blocks  
+
+* Disk Storage Devices
+
+  * A read-write head moves to find the track contains the block to be transferred, and disk rotation moves the block under the read-write head
+  * To access a physical disk block: 
+    * identify track number (seek time 3 to 8 ms)
+    * 
