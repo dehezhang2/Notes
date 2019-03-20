@@ -1624,4 +1624,98 @@
 
   * binary tree data structure is also available
 
-* 
+* Hashed Files: A way to hash different block and combine them as a file
+
+  * External hashing: Hashing for disk files
+
+  * File blocks are divided into M equal-sized buckets, numbered $bucket_0, bucket_1,...,bucket_{m-1}​$
+
+  * **Hashed field**: One of the file fields is designated to be the hash key of the file
+
+  * **Bucket array**: a array(bucket) holds the header of $m$ list 
+
+    * A bucket is either one disk block or a cluster of contiguous disk blocks. The
+      hashing function **maps a key into a relative bucket number**, rather than assigning an
+      absolute block address to the bucket. A table maintained in the file header ==converts
+      the bucket number into the corresponding disk block address== (key <=>array <=> list <=> disk block address)
+
+  * If a record has search key K, we store the record by linking it to the bucket list for the
+    bucket numbered h(K) where h is the hash function
+
+  * Hash function take the hash key as an argument to compute an integer between 0 and m-1
+
+    ![](Capture-1553082717954.PNG)
+
+* Collision:
+
+  * Each bucket has a capacity => if full collision happens
+
+  * solve:
+
+    * open addressing (search for empty slots): 
+
+      * Linear probing: Each time increase one => bucket_id +1 , bucket_id +2 , … , bucket_id+n
+      * Quadratic probing: Each time increase to square => bucket_id + 1, bucket_id + 4, .. , bucket_id + n^2
+
+    * Chaining:
+
+      * Extending the array with a number of overflow positions, each bucket has a pointer to the header of overflowed list, each overflowed block will have pointer of next overflowed block
+      * placing the new record in an unused overflow bucket and setting the pointer of the occupied hash address bucket to the address of that overflow bucket
+
+      ![](Capture-1553083931999.PNG)
+
+    * Multiple hashing: 
+
+      * The program applies a second hash function if the first results in
+        a collision
+      * If another collision results, the program uses open addressing or
+        applies a third hash function and then uses open addressing if
+        necessary
+
+  * To reduce collision hash file is typically kept 70% - 80% full
+
+  * The hash function h should distribute the records **uniformly among the buckets**
+
+    * Otherwise, search time will be increased because many overflow records
+      will exist (Searching overflow records are more expensive)
+
+  * Main disadvantages of static external hashing:
+
+    * Fixed number of buckets M is a problem if the number of records in the file
+      grows or shrinks
+    * Ordered access on the hash key is quite inefficient (requires sorting the
+      records)
+
+* Extendible and Dynamic Hashing (extend hashing tech to allow dynamic growth and shrinking of file records)
+
+  * Hash key: Use binary representation 
+  * Data structure: dynamic hashing(the directory is a binary tree); extendible hashing (use an array of size $2^d$ as the directory (d is global depth))
+    * difference between the data structure and B-tree: B-tree actually is the truth data structure to store the data, but hash is use the tree to store the bucket of address
+    * The depth of the tree for hashing will not be so large
+  * **Directory**: The directories can be stored on disk, and they expand or shrink dynamically: Directory entries point to the disk blocks that contain the stored records
+  * Insertion to a full block => split the block
+
+* Extendible hashing:
+
+  ![](Capture-1553085871556.PNG)
+
+  - A directory consisting of an array of 2d bucket addresses is maintained, d is called the global depth of the directory
+    - At first all directories point to the same bucket
+    - bucket point to the memory address
+  - The integer value corresponding to the first (high-order) d bits of a hash value is used as an **index to the array** to determine a directory entry and the address in that entry determines the bucket storing the records
+  - **A location d’** (called, local depth stored with each bucket) specifies the
+    number of bits on which the bucket contents are based
+  - The value of d’ can be increased or decreased by one at a time to handle
+    overflow or underflow respectively
+
+* e.g.: d = 4, at first d’ = 1 => there are only 2 bucket => if one is full and insert => split to 2
+
+  ![](Capture-1553086217861.PNG)
+
+* Dynamic Hashing (similar concept with b-tree but different location of data)
+
+  * Dynamic and extendible hashing do not require an overflow area in
+    general
+  * Dynamic hashing maintains tree-structured directory with two types of nodes 
+    * Internal nodes that have two pointers: the left pointer corresponding to the 0 bit (in the hash address) and a right pointer corresponding to the 1 bit
+    * Leaf nodes: these hold a pointer to the actual bucket with records
