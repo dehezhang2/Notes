@@ -1497,15 +1497,14 @@
     * Include main memory and cache memory 
   * Secondary and tertiary storage (non-volatile) 
     * Slower in access 
-    * Include magnetic disks, optical disks and flash memory 
-  * A database could be huge in size (several hundred GB or even larger) 
-    * Need to be resided in secondary/tertiary storage (non-volatile/persistent storage) 
+    * Include magnetic **disks**, optical **disks** and flash memory 
+  * A database could be huge in size (several hundred GB or even larger) : Need to be resided in secondary/tertiary storage (non-volatile/persistent storage) 
 
 * Disk Storage Devices (Preferred secondary storage device for **high storage capacity and low cost**)
 
   ![](屏幕快照 2019-03-20 下午2.30.40.png)
 
-  * Data are stored as magnetized areas on magnetic disk surfaces 
+  * Data are stored as **magnetized areas** on magnetic disk surfaces 
   * A disk pack contains several magnetic disks connected to a rotating spindle 
   * Disks are divided into concentric **circular tracks** on each disk surface 
     * Track capacities vary typically from 4 to 50 Kbytes or more 
@@ -1517,7 +1516,112 @@
 
 * Disk Storage Devices
 
-  * A read-write head moves to find the track contains the block to be transferred, and disk rotation moves the block under the read-write head
+  * A read-write head moves to find the track contains the block to be transferred, and **disk rotation moves the block** under the read-write head
   * To access a physical disk block: 
-    * identify track number (seek time 3 to 8 ms)
-    * 
+    * identify track number (**seek time** e.g., 3 to 8 ms)
+    * The block number (within the cylinder) (**rotation delay**, e.g., 2ms)
+    * get the block data (**transfer delay**)
+  * **Disk access delay = seek time(track) + rotational delay(block) + transfer delay(load block)**
+  * First 2 delays are time counsuming
+  * **Double buffering** can be used to speed up the transfer of contiguous disk blocks
+
+* Double buffering
+
+  * Problem : Have a file with a sequence of n blocks $B-1, B_2, ... , B_n$ to be **fetched and executed**, suppose $R$ is time to read each block and $P$ is time to process each block
+
+  * Single buffer solution: Read and process doesn’t overlap => Total time = $n(R+P)$
+
+    ![](Capture.PNG)
+
+  * Double buffer solution(**assume $P>R$**): Except the first period, other period can do the work at the same time => Total time = $R+nP$
+
+    ![](Capture-1553072338397.PNG)
+
+* Simplified Database System Environment
+
+  ![](Capture-1553072653858.PNG)
+
+  * DBMS(database manage system): A collection of programs that enables users to created and maintain a database
+  * General-purpose software that facilitates the process of defining  **constructing**
+    **and manipulating databases** for **various applications**
+  * Database System = DBMS Software + Database
+
+* Database Records: 
+
+  * Database: data file(records) + meta-data(database definition)
+  * **fixed/variable(changeable or not) length records**
+  * The file records are of the same record type, but one or more of the fields
+    may have multiple values for individual records; such a field is called a
+    **repeating field** and a group of values for the field is often called a repeating
+    group.
+  * Records contains fields (attributes), field can contain **multiple attributes**
+  * Fields may be fixed length or variable length: Different with fixed or variable length record, it represents the single field instead of the record
+  * **Variable length fields can be mixed** into one record => Separator characters or length fields are needed so that the record can be “parsed” , **specify the variable length**
+    * In (b), there are 2 variable, and three fixed contained in the variable-length fields. Fixed-length fields are fixed because they already have the specific value
+    * In (c), the terminate record is a sign of variable record
+
+  ![](Capture-1553072891651.PNG)
+
+  * **Blocking** : Refer to storing a number of records into one block on the disk
+  * Blocking factor ($bfr​$) refers to the number of records per block
+  * There may be empty space in a block if an **integral number of records do not fit into one block**
+  * Suppose the block size is $B$ for fixed-length records of size $R$ with $B>= R$
+  * $bfr = floor(B/R)$ block per record
+  * The ==unused space== in each block = $B – (bfr * R)$ bytes
+
+* Files of Records:
+
+  * A file (e.g., table) is a sequence of records (e.g., tuples), where each
+    record is a collection of data values (fields)
+
+  * A file can have fixed-length records or variable-length records
+
+  * A file descriptor (or file header) includes information that describes the file, such as the **field names and their data types**, and the addresses of the file blocks on disk
+
+  * File records are stored on disk blocks: The physical disk blocks that are allocated to hold the records of a file can be contiguous (one by one), linked (using pointers), or indexed (a table to describe their locations)
+
+  * File records can be unspanned or spanned
+
+    ![](Capture-1553074827368.PNG)
+
+    * Unspanned: no record can span two blocks (usually used in fixed-length records => fix length determine the concrete block)
+    * Spanned: a record can be stored in **more than one block** (usually used in variable-length records => need additional information to be stored for variable-length records, such as sperator characters)
+
+* Typical operations on Files:
+
+  * OPEN: makes the ==file ready for access==, and associates a ==pointer== that will
+    ==refer to a current file record== at each point in time
+  * FIND: searches for the== first file== record that ==satisfies a certain condition==,
+    and ==makes it the current file record==
+  * FINDNEXT: searches for the ==next file record== (from the current record) that
+    ==satisfies a certain condition==, and makes it the current file record
+  * READ: reads the current file record into **a program variable**
+  * INSERT: inserts a **new record into the file**, and makes it the current file
+    record
+  * DELETE: **removes the current file record** from the file, usually by marking the record to indicate that it is **no longer valid**
+  * MODIFY: changes the values of some fields of the current file record
+  * CLOSE: terminates access to the file
+  * REORGANIZE: reorganizes the file records. For example, the records marked “deleted” are physically removed from the file or a new organization of the file records is created
+  * READ_ORDERED: reads the **file blocks in order** of a specific field of the file
+
+* Unordered Files (heap file => Records are unordered)
+
+  * New record inserted at the end of the file (O(1)) : Arranged in their insertion sequence
+  * Linear search to find (worst case O(n), average O(n/2)) 
+  * Reading the records in order need to sort
+
+* Ordered Files (Sequential file)
+
+  * File records are kept sorted by the values of an ordering field
+
+  * insertion is expensive => can be improved by hold a unordered temporary buffer for insertion
+
+    ![](Capture-1553075666648.PNG)
+
+  * Find (O(log(n)) => binary search
+
+    ![](Capture-1553075694734.PNG)
+
+  * binary tree data structure is also available
+
+* 
