@@ -1017,3 +1017,18 @@
 
 ### Single Responsibility Principle
 
+----------
+
+## Week 9
+
+* Software Design Pattern: 
+  * A “General” and **“Reusable”** solution to a commonly occurring software design problem.
+  * A design **“Template”** can be used in many situations. 
+  * **Best practices** collected from professional programmers. 
+* Observer Pattern (For broadcasting messages to subscribers)
+  * Needs to “Notify/update ALL its dependents”
+    * Defines one-to-many dependency amongst objects so that when one object changes its state, all its dependents are notified.
+    * Broadcasting
+  * Needs to **separate presentation layer with the data layer**, i.e. separate views and data.
+    * Change in one view automatically reflects in other views. Any changes in the application data will be reflected in all views.
+* 
