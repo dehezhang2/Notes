@@ -1489,6 +1489,7 @@
     * decrease by `receive(mayproduce)` and increase by `send(mayproduce)`
   * producer and consumer wait for each other, but producer activated first
   * `pmsg` represents the real data you want to send or push into the buffer
+  * Different with the semaphore approach, `main() ` distribute the permission of produce, and each consumer is permitted by one producer message => the total capacity can be limited by the total number of messages
 
   ![image-20190301162201086](image-20190301162201086.png)
 
@@ -1564,7 +1565,7 @@
 
     ![image-20190305152515705](image-20190305152515705.png)
 
-  * e.g.
+  * e.g. **Always notice that whether it is queuing others while it is queued**
 
     ![image-20190305170813648](image-20190305170813648.png)
 
@@ -1626,6 +1627,8 @@
           if(count==0){
   // if there is no running reader, run the writer
               send(writer_id, "OK");
+              receive(finished, msg);
+              count = 100;
           }
           while(count < 0){
   // wait for every reader before last writer
@@ -1637,6 +1640,7 @@
   ```
 
   * Description
+    * not empty make sure receive cannot be blocked
     * Processes wishing to access the data area send a request message to the controller
       * Granted access with an “OK” reply message
       * Completion of access with a “finished” message
@@ -2237,7 +2241,6 @@
   }
   
   ```
-
 
 ------
 
