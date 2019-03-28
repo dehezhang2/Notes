@@ -2400,9 +2400,22 @@
 
   ![image-20190316144126806](image-20190316144126806.png)
 
-* 
+* Disadvantage: 
+
+  * Favors long processes over short ones (short ones has large normalized turnaround time) : A short process has to wait a long time when it arrives just after a long process
+  * Favors CPU-bound processes over I/O-bound ones => result in inefficient use of both the processor and the I?O devices => May result in inefficient use of both the processor and the I/O devices
+    * CPU-bound processes: Long CPU bursts
+    * I/O-bound processes: Short CPU bursts
+    * CPU bound occupy CPU at first, alots of I?O bound waiting for it => I/O utilization wasted
+    * CPU bound blocked by I/O, I/O bound finish CPU operation very fast
+    * Now all processes are in the blocked queue => idle processor
 
 #### RR (Round-Robin)
+
+* Uses **preemption** based on a clock
+  * clock interrupts are generated at periodic intervals
+  * when an interrupts are generated at periodic intervals
+  * 
 
 #### SPN (Shortest-Process-Next)
 
@@ -2415,3 +2428,4 @@
 #### Summary
 
 ![image-20190316142014067](image-20190316142014067.png)
+
