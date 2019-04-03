@@ -1719,3 +1719,94 @@
   * Dynamic hashing maintains tree-structured directory with two types of nodes 
     * Internal nodes that have two pointers: the left pointer corresponding to the 0 bit (in the hash address) and a right pointer corresponding to the 1 bit
     * Leaf nodes: these hold a pointer to the actual bucket with records
+
+--------
+
+## Lecture 8: Indexing Techniques
+
+* Indexes as access path: 
+
+  * index file is a file that have partial information of the data file
+  * Entries are ordered in the index file, each entry consists of 2 parts: field value(the index) and pointer to record(address of one entry in the data file)
+  * The operation: 
+    * Access index file in the secondary disk (do binary search)
+    * Load the searched block into the main memory
+    * Since it is faster to search in memory, overhead search a certain entry in the loaded block can be ignored
+
+* Simple level index: only one index file
+
+  * Primary Index: Use primary key as the base of order and order the data file
+
+    * Sparse index : The entry is smaller than the number of record (a entry has many records in a block)
+
+    * Each entry hold the first record of the block in the data file as the key field value(index), we call it **block anchor**
+
+    * The way to calculate: The binary search is actually done on the index file and multiple entries of index file are also arranged in blocks. After that, the corresponding block $i$ ==whose block anchor $K(i) < K < K(i+1) $ where $K​$ is the searched value== will be loaded into the main memory 
+
+    * B is block size, R is record size, r is number of records, following is the cost with out the primary index
+      $$
+      Bfr(record\ per\ block)={B\over R}\\
+      b(block\#)={r \over Bfr} \\
+      cost = log_2b
+      $$
+
+    * Following is the cost with primary index
+      $$
+      r_1 = b \\
+      R=size(index)+size(pointer) \\
+      b_1 = {r_1 \over Bfr_1} \\
+      cost = log_2b_1 +1(load\ into\ memory)
+      $$
+
+  * Cluster index: Use the non-key field as the base of order => duplicate possible
+
+    * The pointer point to the first **unoccupied** block in the file that includes the first existence of the index value
+
+  * Secondary index: When there is a order design for a existing primary index or cluster index file, we cannot reorder the data file by another key or non-key => use secondary
+
+* Mutiple-level indexes: Index file for the previous index file, the first-level index file is for data file
+
+  ![IMG_127713678B27-1](IMG_127713678B27-1.jpeg)
+
+  * Because index is ordered and identical, all the non-first-level index can use primary index
+
+  * $bfr$ is fixed besides the first layer, because record size fixed and equals to size of pointer plus size of key
+
+  * block number $b$ is equals to the previous $b$ divide by $bfr$
+
+  * $$
+    cost = level\ of\ blocks + 1
+    $$
+
+    
+
+* Tree index structure: Mutiple index actually form a tree => insert into deletion becomes a problem
+
+* Common things of B-tree and B+-tree
+
+  * Each node correspond a disk block
+  * Each node is kept between full(split => which will propagate to higher level) and half full(merge)
+
+* Difference of B-tree and B+-tree
+
+  * In a B-tree, pointers to data records exist at all levels of the tree ($P_i$ points to the lower level, $K_i$ points to data)
+
+    * at most p tree pointers and at least p/2
+    * Only the middle value is kept in the root node and the rest of the values are split evenly between the other two nodes 
+    * When a non-root node is full and a new entry is inserted into it, that node is split into two nodes at the same level, and the middle entry is moved to the parent node along with two pointers to the new split nodes (parent full also split parent)
+
+    ​	![](屏幕快照 2019-04-03 下午5.47.19.png)
+
+    ![](屏幕快照 2019-04-03 下午5.50.08.png)
+
+  * In a B+-tree, all pointers to data records exists at the leaf-level nodes => less levels
+
+    ![](屏幕快照 2019-04-03 下午9.02.41.png)
+
+    ![](屏幕快照 2019-04-03 下午9.03.09.png)
+
+    * Internal node => only store pointer to tree node, no need to store the data pointer => more space to store key => larger capacity and smaller level
+    * Leaf node => only store pointer to data node
+    * Notice $P_{leaf}$ is the degree of the tree minus one
+
+  * 

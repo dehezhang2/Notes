@@ -2392,6 +2392,14 @@
 
     ![image-20190316143701188](image-20190316143701188.png)
 
+---------------------
+
+### $\color{red}{From\ now\ on, all\ the\ notes\ are\ supplementary\ of\ lecture\ note} $
+
+Turnaround time($T_r$): finish - submit
+
+service time($T_s$): processor time
+
 #### FCFS (First-Come-First-Serve)
 
 * Also known as FIFO or a strict queuing scheme
@@ -2403,29 +2411,142 @@
 * Disadvantage: 
 
   * Favors long processes over short ones (short ones has large normalized turnaround time) : A short process has to wait a long time when it arrives just after a long process
-  * Favors CPU-bound processes over I/O-bound ones => result in inefficient use of both the processor and the I?O devices => May result in inefficient use of both the processor and the I/O devices
+  * Favors CPU-bound processes over I/O-bound ones => result in inefficient use of both the processor and the I?O devices => **May result in inefficient use of both the processor and the I/O devices** 
     * CPU-bound processes: Long CPU bursts
     * I/O-bound processes: Short CPU bursts
-    * CPU bound occupy CPU at first, alots of I?O bound waiting for it => I/O utilization wasted
+    * CPU bound occupy CPU at first, a lots of I/O bound waiting for it => I/O utilization wasted
     * CPU bound blocked by I/O, I/O bound finish CPU operation very fast
     * Now all processes are in the blocked queue => idle processor
 
 #### RR (Round-Robin)
 
+##### Page 27
+
 * Uses **preemption** based on a clock
-  * clock interrupts are generated at periodic intervals
-  * when an interrupts are generated at periodic intervals
-  * 
+* time slicing
+* order is based on FCFS
+* Continous time slot exists when there is **no waiting process in the queue** 
+
+##### Page 28
+
+* Short time quantum(of RR) => large overhead of switching
+* Time quantum should be slightly greater than the time required for typical interaction (larger than the largest CPU burst)
+
+##### Page 29
+
+* Favors CPU-bound => I/O-bound will be **blocked before joining the ready queue** again while a CPU-bound process uses a ***complete*** time quantum while executing and ***immediately*** returns to the ready queue.
 
 #### SPN (Shortest-Process-Next)
 
+* **nonpreemptive**: Change order only for non-executing
+* shortest expected processing time goes first
+* Notice that the picture on the slide doesn’t mension the arriving time
+* starvation possible, need estimate expected time
+
 #### SRT (Shortest-Remaining-Time)
+
+* preemptive
+* shortest expected remaining processing time goes first
+* **shortest processes has normalized turnaround time 1**
+* No additional interrupts(>RR), better turnaround time than SPN(short preempt long)
+* starvation, estimation
 
 #### HRRN (Highest-Response-Ratio-Next)
 
+* Non-preemptive
+* Highest ration goes first: $ratio={current\ time-arriving\ time+expected\ time\over expected\ time}​$
+* Exp increase ratio decrease => 糖水不等式
+* Consider both age and processing time of the process
+* Prefer shorter and older
+* need estimate
+
 #### FB (Feedback)
+
+* hard to estimate expected processing time => preemptive and dynamic priority way needed
+* Penalize jobs runs longer by denoting it to the lower priority queue, favors shorter jobs
+* increasing processor allocation time slot(before interrupt): $2^i$ where i is the priority number
+* A process is too old => increase priority
 
 #### Summary
 
 ![image-20190316142014067](image-20190316142014067.png)
 
+### Fair-share scheduling
+
+* Use cares more about efficiency of applications (groups of process) than process
+
+* Fare-share scheduling: based on process sets => can extend to groups of users
+
+* Fraction of the processor allocated into fair-share groups
+
+  ![image-20190401214923486](image-20190401214923486.png)
+
+* Scheduling bases on priority: The fair-share groups are prioritized by how close they are to achieving their fair share.
+
+  * groups doing poorly receive higher priority
+  * Groups doing well receive lower priority
+  * To give ***fewer*** resources to users who have had ***more than their fair share*** and 
+  * To give ***more*** to those who have had ***less than their fair share***
+
+--------------------
+
+## Chapter 7&8 Memory Management and Virtual Memory
+
+----
+
+### Basic requirements of Memory Management
+
+#### Page 7
+
+* The meaning of relocation: Change the main memory **location** of the part of the process 
+* **Why we need relocation**: Multiprgramming system, available main memory is generally shared among a number of processes
+* Problem caused by relocation: Address problem => we need to translate the address at runtime => need a relative address inside the code and a translate mechanism to translate the relative address to physical address
+* The physical addresses are determined when program is loaded into memory.
+* Reason of compaction: There might be some hole between different process image => shift to occupy the hole and make the use of memory efficient
+
+### Basic blocks of memory management
+
+#### Paging
+
+##### Page 17
+
+* Frame size == page size
+* each page has a unit of identification (byte or word)
+* A process is loaded by loading all of its pages into available, but ***not necessarily contiguous*** frames.
+* Internal fragment
+
+##### Page 19
+
+* logical address in paging = page# + offset
+* relative address(treat the some known point of as 0) and logical address are the same => need to use page size (number of entries insize the pages) as power of **2** 
+
+#### Segmentation
+
+##### Page 24
+
+* A process is loaded by loading all of its segments that ***need not be contiguous***.
+* Each segmentation correspond to a module in the process, each module must be contiguous
+* Need relocation when allocate new space for a module (like linked list) => make the external fragmentation becomes smaller
+  * Extend to the neighbor empty fragment => make it smaller
+  * Occupy another bigger fragment(when neighbor is another process => use one of the big fragment reduce the average size of fragment
+* External fragment
+
+##### Page 26
+
+* The relative address is no longer same as logical address => because the size is not identical anymore
+* segment table: 
+  * Key : segment id
+  * Value: the starting point in physical memory base, and the length of the fragment limit
+* Need to compare the offset value and the limit, if offset is larger, segmentation fault exist
+
+### Virtual Memory (VM) Basics
+
+### Hardware and Control Structures of VM
+
+#### Paging
+
+#### Segmentation
+
+#### Combined Paging and Segmentation
+
+### VM Management
