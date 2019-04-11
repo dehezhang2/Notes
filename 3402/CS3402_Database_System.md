@@ -1809,4 +1809,44 @@
     * Leaf node => only store pointer to data node
     * Notice $P_{leaf}$ is the degree of the tree minus one
 
-  * 
+
+-----------------------
+
+## Lecture 9: Transaction
+
+* ACID principle, a transaction is : 
+  * Atomicity: A transaction is either performed completely or not performed at all
+  * Consistency: A correct execution of a transaction must take the database from one consistent state to another
+  * Isolation: Only after a transaction is committed, it can be visible to other transactions
+  * Durability: Once a transaction is committed, these changes must never be lost because of subsequent failure
+* Transaction = DB operations + transaction operations
+  * DB ops:
+    * Read: SELECT
+    * Write: UPDATE
+    * Delete
+    * Insert
+  * transaction ops: Make sure atomic => partial results are not allowed
+    * Begin
+    * End (Commit/Abort)
+      * commit: new value of transaction will become permanent
+      * abort: fail and recover
+  * State: Begin(consistent state) => executing DB operations(maybe inconsistent) => End(consistent state)
+* read/write description => see lecture note
+* Transaction schedule: 
+  * A schedule is defined as a sequence of operations that the relative order of the operations in the same transaction is not changed
+  * concurrent schedule: interleave of different transactions exists
+  * serial schedule: otherwise
+* Consistency problems: 
+  * Lost update problem (write/write conflicts)
+  * Inconsistent retrieval problem (read/write conflicts)
+  * read read don’t have conflict
+* Serializable schedule: A schedule S which is **equivalent** to serial schedule(itself is serializable schedule) => guarantee the consistency and have better performance (serial equivalence)
+* Conflict serializable schedule: A schedule S is conflict equivalent to the serial schedule
+  * conflict  equivalent schedule: RW,WW on same data item are in relatively same order with some serial schedule
+* Serialization Graphs: A direct edge $T_i -> T_j$ can drawn if $j $ is after $i $, and 
+  *  $i $ is write, $j $ is read or
+  * $i$ is read, $j$ is write or
+  * $i$ is write, $j$ is write
+  * It is serializable iff the graph is acyclic(there are 2 nodes represent $i$ & $j$, no bidirectional edge)
+  * all of one node’s operations is before the other one
+* 
