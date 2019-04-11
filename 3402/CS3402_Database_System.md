@@ -1809,7 +1809,6 @@
     * Leaf node => only store pointer to data node
     * Notice $P_{leaf}$ is the degree of the tree minus one
 
-
 -----------------------
 
 ## Lecture 9: Transaction
@@ -1819,6 +1818,7 @@
   * Consistency: A correct execution of a transaction must take the database from one consistent state to another
   * Isolation: Only after a transaction is committed, it can be visible to other transactions
   * Durability: Once a transaction is committed, these changes must never be lost because of subsequent failure
+
 * Transaction = DB operations + transaction operations
   * DB ops:
     * Read: SELECT
@@ -1831,22 +1831,90 @@
       * commit: new value of transaction will become permanent
       * abort: fail and recover
   * State: Begin(consistent state) => executing DB operations(maybe inconsistent) => End(consistent state)
+
 * read/write description => see lecture note
+
 * Transaction schedule: 
   * A schedule is defined as a sequence of operations that the relative order of the operations in the same transaction is not changed
   * concurrent schedule: interleave of different transactions exists
   * serial schedule: otherwise
+
 * Consistency problems: 
   * Lost update problem (write/write conflicts)
   * Inconsistent retrieval problem (read/write conflicts)
   * read read don’t have conflict
+
 * Serializable schedule: A schedule S which is **equivalent** to serial schedule(itself is serializable schedule) => guarantee the consistency and have better performance (serial equivalence)
+
 * Conflict serializable schedule: A schedule S is conflict equivalent to the serial schedule
+
   * conflict  equivalent schedule: RW,WW on same data item are in relatively same order with some serial schedule
+
 * Serialization Graphs: A direct edge $T_i -> T_j$ can drawn if $j $ is after $i $, and 
   *  $i $ is write, $j $ is read or
   * $i$ is read, $j$ is write or
   * $i$ is write, $j$ is write
   * It is serializable iff the graph is acyclic(there are 2 nodes represent $i$ & $j$, no bidirectional edge)
   * all of one node’s operations is before the other one
-* 
+
+* recoverable schedule:  [](https://www.quora.com/How-do-I-find-whether-a-schedule-in-dbms-is-cascadeless-recoverable-or-strict-recoverable-Provide-example)
+
+  * recover: transaction is aborted => need to undo those processed operations of an aborted transaction to maintain consistency and ==all or nothing property==
+
+  * **recoverable schedule**: A recoverable schedule is one where, for each pair of Transaction Ti and Tj such that if Tj  reads data item previously written by Ti , then the commit operation of Ti appears before the commit operation Tj. 
+
+    ![img](main-qimg-27f88451ec74aa9fc6df96df5fc06f3a.png)
+
+    * Suppose after T2 Read(x) operation, it commits. And then somehow T1 fails. So the transaction T2 must be aborted so as to ensure atomicity. However, since T2 is commited , and can't be aborted . Hence a situation arrives where it is impossible to recover.
+
+  * **CASCADELESS SCHEDULE**
+
+    ![img](main-qimg-da4d46b2b67fc104def8192efc1ae8b1.webp)
+
+    * Transaction T1 writes x that is read by Transaction T2. Transaction T2 writes x that is read by Transaction T3. Suppose at this point T1 fails. T1 must be rolled back, since T2 is dependent on T1, T2 must be rolled back,and since T3 is dependent on T2, T3 must be rolled back.
+
+      This phenomenon, in which a single transaction failure leads to a series of transaction rollbacks is called *Cascading rollback.*
+
+      - Cascading rollback is undesirable, since it leads to the undoing of a significant amount of work.
+      - It is desirable to restrict the schedules to those where cascading rollbacks cannot occur, Such schedules are called Cascadeless Schedules.
+      - Formally, a cascadeless schedule is one where for each pair of transaction Ti and Tj  such that Tj  reads data item, previously written by Ti  the **commit operation of Ti appears before the read operation of Tj .**
+
+    * Cascadeless schedules are also recoverable schedules, because recoverable recommend commit of read is after commit of previous write, cascadeless recommends start of read is after commit of previous write
+
+  * **STRICT SCHEDULE**
+
+    ![img](main-qimg-853ca78001b85c149a19a80bec31299e.webp)
+
+    * In this case, the Write(x) of the transaction T2 overwrites the previous value written by T1 , and hence overwrite conflicts arise . This problem is taken care in **Strict Schedule**. Strict Schedule is a schedule in which a transaction can neither Read(x) nor Write(x) until the last transaction that wrote x has committed or aborted.
+
+  * To ensure recoverability: 
+
+    * no dirty read: **reading and commit read** uncommitted data items => read but not commit before write is committed is acceptable
+    * no premature write: no update on a data item if another transaction updated it has not been committed
+    * Strict execution: delay the reading or updating until the previous transaction that has updated the same data item  has committed/aborted
+
+* Primitive Operations of Transactions: 
+
+  * X is the memory block, t is a register
+  * input(X) : copy from the disk, output(X): store to the disk
+  * Read and Write are operation on the memory buffer instead of disk
+
+* Log file for recovery
+
+  * log file: telling something about what some transaction has done, stored in main memory instead of disk
+  * flush-log: copy the log file to the disk
+  * Type of record: see the lecture slide
+    * commit doesn’t means data is already on the disk
+  * undo log: 
+    * if transaction T modifies database element X, the log need to record in the form \<T,X,v\> , where T is the transaction, X is the element before change, v is the original value
+    * \<commit\> log record must be written to disk ONLY after all DB elements changed by the transaction have been written back
+    * order: log records(flush log) => actual changes => commit(flush log)
+  * recover undo log:
+    * If we find \<Start T\> but no commit T => might be error, need undo this transaction
+    * detail can be found on the slide
+  * redo log: Redo the uncertain(not committed) operations
+    * requires COMMIT before write to disk(OUTPUT)
+    * now store \<T, X, v\> and v is the **new value**
+    * order: Log -> COMMIT(flush log) -> change
+  * recover redo log: see the slide
+
