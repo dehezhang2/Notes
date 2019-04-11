@@ -1801,6 +1801,10 @@
 
   * In a B+-tree, all pointers to data records exists at the leaf-level nodes => less levels
 
+    * if full
+      * on the leaf: split and copy the minimum key of second child to upper level
+      * on the internal: split and insert the minimum key of second child to upper level
+
     ![](屏幕快照 2019-04-03 下午9.02.41.png)
 
     ![](屏幕快照 2019-04-03 下午9.03.09.png)
@@ -1808,7 +1812,6 @@
     * Internal node => only store pointer to tree node, no need to store the data pointer => more space to store key => larger capacity and smaller level
     * Leaf node => only store pointer to data node
     * Notice $P_{leaf}$ is the degree of the tree minus one
-
 
 -----------------------
 
