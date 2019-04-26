@@ -1801,10 +1801,6 @@
 
   * In a B+-tree, all pointers to data records exists at the leaf-level nodes => less levels
 
-    * if full
-      * on the leaf: split and copy the minimum key of second child to upper level
-      * on the internal: split and insert the minimum key of second child to upper level
-
     ![](屏幕快照 2019-04-03 下午9.02.41.png)
 
     ![](屏幕快照 2019-04-03 下午9.03.09.png)
@@ -1813,6 +1809,14 @@
     * Leaf node => only store pointer to data node
     * Notice $P_{leaf}$ is the degree of the tree minus one
 
+* Insertion & deletion of B+ tree
+
+  * Insertion: if full
+    - on the leaf: split and copy the minimum key of second child to upper level
+    - on the internal: split and insert the minimum key of second child to upper level, delete the corresponding node of current level
+  * Deletion: if not half full: overall, need to remove the corresponding key in the parent level
+    - if neighbor sibling has more than necessary(if both ok, choose larger one): distribute the key between current node and neighbor, change the corresponding key in the parent
+    - Merge the node with its sibling; if the node is a non-leaf, we will need to **incorporate the “split key” from the parent into our merging**(if a parent have any one child is empty, then one key from parent will be sent back). In either case, we will need to repeat the removal algorithm on the parent node to remove the “split key” that previously separated these merged nodes — unless the parent is the root and we are removing the final key from the root, in which case the merged node becomes the new root (and the tree has become one level shorter than before). 
 -----------------------
 
 ## Lecture 9: Transaction
@@ -1921,4 +1925,26 @@
     * now store \<T, X, v\> and v is the **new value**
     * order: Log -> COMMIT(flush log) -> change
   * recover redo log: see the slide
+
+Final exam
+
+ERModel and Relational Model and normalization is not important
+
+Part A: short(40%)
+
+2 questions
+
+1(30%).similar to midterm(sql & algebra)
+
+2(10%). True and False and reason
+
+Part B: 3/4 long(60%)
+
+**indexing(hashing+B+ tree(deletion is not that important but can exist a simple question) => similar to tutorial&lecture)**
+
+**query optimization**
+
+**transaction(similar to the tutorial)**
+
+concurrency control(understand the question)
 
