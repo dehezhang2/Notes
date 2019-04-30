@@ -1,5 +1,22 @@
 # CS3402 Database system
 
+---------
+
+## Information about the Final Exam
+
+* ERModel and Relational Model and normalization is not important
+* Time is tight
+
+* Part A: short(40%): 2 questions
+  * 1(30%).similar to midterm(sql & algebra)
+  * 2(10%). True and False and reason
+
+* Part B: 3/4 long(60%)
+  * **indexing(hashing+B+ tree(deletion is not that important but can exist a simple question) => similar to tutorial&lecture)**
+  * **query optimization**
+  * **transaction(similar to the tutorial)**
+  * concurrency control(understand the question)
+
 --------
 
 ## Lecture 01: Entity-Relationship (ER) Model
@@ -32,7 +49,7 @@
 
     ![](屏幕快照 2019-01-16 下午12.33.06.png)
 
-  * **Key attribute** : A set of attributes (one or more attributes) that ==uniquely identify an entity==(super keys) 
+  * **Key attribute** : A set of attributes (one or more attributes) that ==uniquely identify an entity==(super keys)  => There might be multiple key attribute that can determine a tuple => different with primary key
 
   * Types of attribute
 
@@ -58,7 +75,7 @@
       * In other words, an entity must exist related to another entity(represented by **double lines** in ER model) => **Key word: A must have at least one B**
     * **Partial participation** means that not all entities are involved in the relationship. (represented by single lines in ER model)
 
-  * **Cardinality constraint**(focus on the map between A and B) : Indicates the ==maximum number== of relationship instances that an entity can participate in(cannot be larger than what) 
+  * **Cardinality constraint**(focus on the map between A and B) : Indicates the ==maximum number== of relationship instances that an entity can participate in(cannot be larger than what, defines the upper bound) 
 
     * A **1:1 or one-to-one relationship** from entity type S to entity type T is one in which an entity from S is related to **at most one** entity from T and vice versa. 
 
@@ -85,9 +102,9 @@
   * A recursive relationship is one in which **the same entity participates more than once** in the relationship. The relationship should be ==marked by the role that an entity takes in the participation==(supervisor). 
   * It is also called a **self-referencing relationship** type. 
 
-* Weak entity type: defined as entity types that **doesn't have super key**, therefore determined by other entity by reference(foreign key)
+* Weak entity type: defined as entity types that **doesn't have super key itself**, therefore determined by other entity by reference(foreign key)
 
-  * A **weak entity** that does not have a key attribute and is identification- dependent on another entity type. It **must** participate in an **identifying relationship** type with an owner or identifying entity type. In other words, weak entity type **must be owned by some owner entity type**. 
+  * A **weak entity** that does not have a key attribute and is identification- dependent on another entity type. It **must** participate in an **identifying relationship** type with an owner or identifying entity type. In other words, weak entity type **must be owned by some owner entity type (total participation)**. 
   * A weak entity is identified by the combination of: (1) its **partial key** and (2) the **identifying entity type** related to the identifying relationship type. 
     * **because partial key may be the same**
   * e.g.: 
@@ -249,7 +266,7 @@
   * The tuple  **are not considered to be ordered**, even though they appear to be in a tabular(列成表的) form (may have dfferent presentation orders)
     - **same relation state can be with different order of tuples** => unordered set
   * Values in a tuple
-    * **All values are considered atomic(indivisible) => the reason of construct a new relation for multivalued attributes**
+    * **All values are considered atomic(indivisible) => the reason of construct a new relation for multivalued attributes and separate composite attribute**
     * Basic unit for manipulation(add or change)
   * Each value in a turple must be from the domain(set of values) of the attribute for that column => data type and size should fulfill the requirements initialized in table schema
   * A special null value is used to represent values that are ==unknown or not available or inapplicable in certain tuples==
@@ -280,12 +297,13 @@
     * Approaches:
       * **Foreign key approah**(let one of the entity remember the relationship) used in the example
         * Choose one of relations(says S, **normally the total participation side**) and include the primary key of T as the foreign key in S
-        * Include all the simple attributes of the relationship as the attributes of S
+        * Include all the **simple attributes of the relationship** as the attributes of S
       * Merged relationship approach: merge the 2 entity types and the relationship(simple attributes) into a single relation (**not efficient**)
       * Cross reference or **relationship relation approach**
         * Set up a third relation **R** for the purpose of cross-referencing(including) the **primary keys of the two relations S and T** representing the entity types
         * Also including the primary key attributes of S and T as foreign keys to S and T respectively
         * primary key of R will be **one of the two foreign keys** (because it is 1: 1 relation, 1 key is enough to identify a relation) 
+        * include the simple attributes of the relationship
 
   * Step 4: Mapping of 1:N Relationship Types(let N-side remember the relation=>more efficient)
 
@@ -1926,25 +1944,5 @@
     * order: Log -> COMMIT(flush log) -> change
   * recover redo log: see the slide
 
-Final exam
 
-ERModel and Relational Model and normalization is not important
-
-Part A: short(40%)
-
-2 questions
-
-1(30%).similar to midterm(sql & algebra)
-
-2(10%). True and False and reason
-
-Part B: 3/4 long(60%)
-
-**indexing(hashing+B+ tree(deletion is not that important but can exist a simple question) => similar to tutorial&lecture)**
-
-**query optimization**
-
-**transaction(similar to the tutorial)**
-
-concurrency control(understand the question)
 
