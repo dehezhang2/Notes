@@ -1209,11 +1209,11 @@
 
 * **Keys** of Relations: Example
 
-  * A **functional dependency (FD)** on a relation R is a statement of the form: if two tuples of R agree on attributes {$A_1, A_2 , ..., A_n$ } (i.e., the tuples have the same values in their respective components for **each of** these attributes), then they **must also** agree on another attribute, “B”, {$A_1, A_2 , ..., A_n​$ }→ B (i.e. B is dependent on the set)
+  * A **functional dependency (FD)** on a relation R is a statement of the form: if two tuples of R agree on attributes {$A_1, A_2 , ..., A_n$ } (i.e., the tuples have the same values in their corresponding components for **each of** these attributes), then they **must also** agree on another attribute, “B”, {$A_1, A_2 , ..., A_n​$ }→ B  (i.e. B is dependent on the set)
   * A set of one or more attributes {$A_1, A_2 , ..., A_n$ } is a key for a relation if:
     * The attributes *functionally determine* **all other** **attributes** of the relation (can be treated as bases of the relation)
-    * Relations are sets. It is **impossible** for two distinct tuples of R to agree on all $A_1 , A_2 , ..., A_n$ (if agree on the set, will agree on the whole tuple, which means duplicate and violate the implicit constraints)
-    * No proper subset of {$A_1, A_2 , ..., A_n$ } functionally determines all other attributes of R, i.e., a **key must be minimal**
+    * Relations are sets. It is **impossible** for ==two distinct tuples== of R to agree on all $A_1 , A_2 , ..., A_n$ (if agree on the set, will agree on the whole tuple, which means duplicate and violate the implicit constraints)
+    * No proper subset of {$A_1, A_2 , ..., A_n​$ } functionally determines all other attributes of R, i.e., a **key must be minimal**
   * e.g. Movies(title, year, length, type, studioName, starName): title, year, starName → length, type, studioName
     * Attributes {title, year, starName} form a key for the relation Movie
     * Suppose two tuples agree on these three attributes: title, year, starName
@@ -1222,20 +1222,20 @@
     * {title, year} does not determine starName since many movies have more than one star
     * {year, starName} is not a key because we could have a star in 2 movies in the same year
 
-* Key Constraints => what is PK(minimal+min size)
+* Key Constraints => what is primary key (minimal+min size)
 
   * **super key**: A **set of attributes that contains a key** is called a superkey
   * It is a set of attributes super key SK, e.g., {A 1 , A2 } of R with the following conditions:
     * No two tuples in any valid relation state r(R) will have the same value for SK
-    *  For any distinct tuples t1 and t2 in r(R), t1[SK] $\neq$ t2[SK] (i.e., different SK)
-  * **Key** is also superkey(minimal superkey): For a key(minimal) remove any attributes, it will not be a superkey
+    *  For any distinct tuples t1 and t2 in r(R), t1[SK] $\neq​$ t2[SK] (i.e., different SK)
+  * **Key** is also superkey (minimal superkey): For a key(minimal) remove any attributes, it will not be a superkey
   * If a relation has several candidate keys(cannot be divided), one is chosen arbitrarily to be the primary key(uniquely identify each tuple in a relation)
   * **General rule**: choose the key with **smallest size** as the primary key
 
-* Entity Integrity(完整性) => PK not null
+* Entity Integrity(完整性) => Primary Key cannot be null
 
   * The primary key attributes PK of each relation schema R **cannot have null values** in any tuple of R
-    * t[PK] $\neq​$ null for any tuple t in R because it need to be used to identify
+    * t[PK] $\neq​$ null for any tuple t in R because it need to be used to identify the tuple
     * if PK has several attributes, null is not allowed in any of these attributes
   * Note: Other attributes of R **may be** constrained to disallow null values, even though they are not members of the primary key (domain constraint)
 
@@ -1251,10 +1251,16 @@
 * Displaying a Relational Database Schema and its Constraints
 
   * Each relation schema can be displayed as **a row of attribute names**
+
   * The name of the relation is **written above the attribute names**
+
   * The primary key attribute (or attributes) will be **underlined**
+
   * A foreign key (referential integrity) constraints is **displayed as a directed** arc (arrow) from the foreign key attributes to the referenced table
+
   * Next slide shows the COMPANY relational schema diagram with referential integrity constraints
+
+    ![image-20190303204441073](image-20190303204441073.png)
 
   ![1550639363932](1550639363932.png)
 
@@ -1262,7 +1268,8 @@
 
   * Referential integrity constraints typically arise from the **relationships among the entities represented by the relation**
   * For example, in the EMPLOYEE relation, the attribute Dno refers to DEPARTMENT for which an employee works. We designate Dno to be a foreign key of EMPLOYEE referencing the DEPARTMENT.
-  * **The constraint**(value matches a tuple in another relation or is null): A value of Dno in any tuple t1 of the EMPLOYEE relation **must match** a value of the primary key of DEPARTMENT, Dnumber, in the same tuple t2 of the DEPARTMENT relation or the **value of Dno can be NULL** if the employee **does not belong to a department** or will be assigned to a department later.
+  * **The constraint** (value matches a tuple in another relation or is null): A value of Dno in any tuple t1 of the EMPLOYEE relation **must match** a value of the primary key of DEPARTMENT, Dnumber, in the same tuple t2 of the DEPARTMENT relation 
+  * The **value of Dno can also be NULL** if the employee **does not belong to a department** or will be assigned to a department later.
 
 * Update Operations on Relations
 
@@ -1273,7 +1280,7 @@
 
 * Possible Violations for Update Operations
 
-  * DELETE may violate only referential integrity: If the primary key value of the tuple being deleted is referenced from other tuples in the database
+  * DELETE may violate only **referential integrity**: If the primary key value of the tuple being deleted is referenced from other tuples in the database
   * INSERT may violate any of the constraints(INSERT any entry break the law)
     * **Domain constraint**: if one of the attribute values provided for the new tuple is not of the specified attribute domain
     * **Key constraint**: if the value of a key attribute in the new tuple **already exists** in another tuple in the relation (can be duplicate)
@@ -1293,7 +1300,8 @@
   CREATE TABLE TOY
   ( 	toy_id NUMBER(10),
   	description VARCHAR(15) NOT NULL,
-  	purchase_date DATE, remaining_qnt NUMBER(6)
+  	purchase_date DATE, 
+   	remaining_qnt NUMBER(6)
   );
   CREATE TABLE TAB1(
   	col1 NUMBER(10) PRIMARY_KEY,
@@ -1328,7 +1336,7 @@
 * Functional Dependency
 
   * Functional dependency is a constraint between two sets of attributes from the database：For example, deptno and dname in DEPARTMENT, if you know the department number, you know the department name 
-  * A functional dependency denoted by X → Y specifies a constraint on the possible tuples between two sets of attributes X and Y that are subsets of a relation R that can form a relation state r of R(R is a relation(table)) 
+  * A functional dependency denoted by X → Y specifies a constraint on the possible tuples between two sets of attributes X and Y that are subsets of a relation R that can form a relation state r of R (R is a relation(table)) 
     - The constraint is that, for any two tuples t1 and t2 in r that have t1[X] = t2[X], they must also have t1[Y] = t2[Y] 
     - The values of the Y component of a tuple in r depend on, or are determined by the values of the X component 
     - If you know his student ID, then I know his name (student ID → student Name) 
@@ -1343,16 +1351,16 @@
     * {year, starName} is not a key because we could have a star in two movies in the same year 
   * Can it be {title, year, starName, length} → type? Yes 
 
-* Candidate Key(minimal super key)
+* Candidate Key (minimal super key)
 
   * If a constraint on R states X is a candidate key of R, then X → Y for any subset  of attributes Y of R 
   * A candidate key **uniquely identifies a tuple** 
   * The values of all remaining attributes are determined 
   * If X → Y in R, this does not say whether or not Y → X in R 
     * {length, type, studioName} → {title, year, starName}? No 
-  * A functional dependency is property of the semantics or meaning of the attributes 
+  * A functional dependency is property of the semantics (語義) or meaning of the attributes 
 
-* Trivial Functional Dependency
+* Trivial Functional Dependency (right hand side is a subset)
 
   * Some functional dependencies are “trivial”, since they are always satisfied by all relations: 
     * E.g.,A→A,AB→A
@@ -1363,7 +1371,7 @@
 
   ![image-20190227123117984](image-20190227123117984.png)
 
-  * IR1, IR2, IR3 form a sound and complete set of inference rules
+  * IR1(trivial FD), IR2(add to both side), IR3(transitivity) form a sound and complete set of inference rules
 
     * Sound: These are true
     * Complete: other true rules can be deducted from these rules
