@@ -1387,9 +1387,11 @@
 
 * Closure of Attribute Sets
 
+  * The set of all FDs logically implied by F using inference rules is the closure of F, denoted by F+, where the F itself is a set of FDs
+
   * ![image-20190227123903949](image-20190227123903949.png)
 
-    * Recall : superkey is the one contains candidate key, but not supposed to be minimal
+    * Recall : super key is the one contains candidate key, but not supposed to be minimal
     * Attribute sets is the set contains all attributes that one attribute can determine
 
   * The algorithm (iteratively add the entry in **second set of FD where first set in FD is already in X** into the closure until nothing can be added)
