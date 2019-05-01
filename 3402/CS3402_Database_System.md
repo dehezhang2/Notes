@@ -6,16 +6,18 @@
 
 * ERModel and Relational Model and normalization is not important
 * Time is tight
-
 * Part A: short(40%): 2 questions
   * 1(30%).similar to midterm(sql & algebra)
   * 2(10%). True and False and reason
-
 * Part B: 3/4 long(60%)
   * **indexing(hashing+B+ tree(deletion is not that important but can exist a simple question) => similar to tutorial&lecture)**
   * **query optimization**
   * **transaction(similar to the tutorial)**
   * concurrency control(understand the question)
+* Plan:
+  * Go through the lecture note
+  * Do the important tutorial (Lab)
+  * practice SQL on W3school
 
 --------
 
@@ -381,20 +383,20 @@
 
 * Relational Query Language :
 
-  * Data Definition Language (DDL): standard commands for defining the different structures in a database. DDL statements create, modify, and remove database objects such as tables, indexes, and users, Common DDL statements ate CREATE, ALTER, and DROP x
+  * Data Definition Language (DDL) : standard commands for defining the different structures in a database. DDL statements **create, modify, and remove** database objects such as tables, indexes, and users, Common DDL statements ate CREATE, ALTER, and DROP x
   * Data Manipulation Language (DML): standard commands for dealing with th**e manipulation of data present in database**. Common DDL statements SELECT, INSERT, UPDATE, and DELETE. 
   * Each statement in SQL ends with a semicolon(;)
 
 * `CREATE SCHEMA ` Statement
 
-  * A schema is a way to **logically group objects in a single collection and provide a unique namespace for objects**. => like a package
+  * A schema is a way to **logically group objects in a single collection and provide a unique namespace for objects**. => like a package (different with the schema in relational model)
 
   * The `CREATE SCHEMA` statement is used to create a schema. A schema name **cannot exceed 128 characters**. Schema names must be **unique within the database**. 
 
   *  Syntax
 
     ```SQL
-    CREATE SCHEMA schemaName AUTHORIZATION user-name 
+    CREATE SCHEMA schemaName AUTHORIZATION user-name；
     ```
 
     
@@ -408,7 +410,7 @@
 * `CREATE TABLE` Statement
 
   * A `CREATE TABLE` statement creates a table. Tables contain **columns and**
-    **constraints(prime-key, foreign key, data type, simple attributes)**, rules to which data must conform. Table-level constraints specify a column or columns. Columns have a data type and can specify column constraints (column-level constraints => **determined the domain of attributes**).
+    **constraints(primary key, foreign key, data type, simple attributes)**, rules to which data must conform. Table-level constraints specify a column or columns. Columns have a data type and can specify column constraints (column-level constraints => **determined the domain of attributes**).
 
     ![image-20190130114238286](image-20190130114238286.png)
 
@@ -419,14 +421,11 @@
 * Table Manipulation
 
   *  The ` ALTER TABLE` statement allows you to => **manipulate columns of table instead of insert an instance into the table**: 
-    - Add a column to a table 
-    - Add a constraint to a table 
-    - Drop a column from a table 
-    - Drop an existing constraint from a table 
+    - Add/Drop a column/constraint to a table 
     - Increase the width of a VARCHAR or VARCHAR FOR BIT DATA column 
     - change the default value for a column 
-  * `DROP TABLE` statement **removes the specified table**.  
-  * The `TRUNCATE TABLE` statement allows you to quickly remove all content from the specified table and return it to its initial empty state. 
+  *  `DROP TABLE` statement **removes the specified table**.  
+  *  The `TRUNCATE TABLE` statement allows you to quickly remove all content from the specified table and return it to its initial empty state. 
 
 * `SELECT` Statement
 
@@ -435,10 +434,12 @@
     ```SQL
     SELECT <attribute list>
     // A list of attrbibute names whose values are to be retrieved by the query
+    // projection in algebra
     FROM <table list> 
     // a list of relation names required to process the query
     WHERE <condition> ;
     // condition is a boolean expression
+    // select in algebra
     ```
 
   * try one of single/double quotation for a string
@@ -553,7 +554,7 @@
     SELECT column_name(s) FROM table2;
     ```
 
-  * INTERSECT` operator 
+  * `INTERSECT` operator 
 
     * The INTERSECT operator is used to return the results of 2 or more SELECT statements.It only returns the rows selected by all queries or data sets. In other words, if a record exists in one query and not in the other, it will be omitted from the INTERSECT results. 
 
@@ -661,7 +662,7 @@
 
 * Nested queries and set comparisons
 
-  * Nested queries
+  * Nested queries : make some trick on `WHERE` closure
 
     * `SELECT-FROM-WHERE` blocks within `WHERE` clause of another query 
     * For example, some queries require that existing values in the database be fetched and then used in a comparison condition 
@@ -1007,9 +1008,9 @@
 
   ![image-20190303204441073](image-20190303204441073.png)
 
-* SELECT: Used to select **a subset of the tuples** from a relation based on a selection conditioin(different with the SQL select, similar to WHERE in SQL)
+* SELECT: Used to select **a subset of the tuples** from a relation based on a selection condition(different with the SQL select, similar to WHERE in SQL)
 
-  * only keep tulples satisfying the condition => horizontal partitioning
+  * only keep tulples satisfying the condition => **horizontal partitioning**
 
   ![image-20190216215059331](image-20190216215059331.png)
 
@@ -1017,11 +1018,11 @@
 
     * (1) selected relation has **the same attrbutes(columns)** with the parent relation; 
     * (2) commutative(order of selected attributes doesn't matter) => A cascade (sequence) of SELECT operation may be applied in any order;
-    * (3) A cascade of SELECT operations may be replaced by a single selection with a conjunction (and) of all the conditions
+    * (3) A cascade of SELECT operations may be replaced by a **single selection with a conjunction (and) of all the conditions**
 
     ![image-20190217120545148](image-20190217120545148.png)
 
-    * The **number of tuples** in the result of a SELECT operation is **less  than (or equal to)** the number of tuples in the input relation R 
+    * The **number of tuples** in the result of a SELECT operation is **less  than (or equal to)** the number of tuples in the input relation R.
     * The fraction of tuples selected by a selection condition is called the **selectivity of the condition** 
 
 * Unary Relational Operations: PROJECT($\pi​$) (similar to SELECT in SQL)
@@ -1062,7 +1063,7 @@
 
   * In the latter case, we must give names to the relations that hold the intermediate results
 
-* Unary relational Operations: RENAME($\rho$) 
+* Unary relational Operations: RENAME($\rho​$) 
 
   * Forms of expression ![image-20190217123837256](image-20190217123837256.png)
 
@@ -1082,7 +1083,7 @@
 
     * R and S have same number of attributes
     * Domains of each corresponding pair of attr must be type compatible
-    * Resulting relation has the same attr names as the **first operand relation** as default
+    * ==Resulting relation has the same attr names as the **first operand relation** as default==
 
   * e.g. Retrieve all employees that are either in Dept 5 or supervise an employee in Dept 5
 
@@ -1092,7 +1093,7 @@
 
 * INTERSECTION and DIFFERENCE ($\cap​$ and -)
 
-  * $R\cap S=(R \cup S)-(R-S)-(S-R)​$
+  * $R\cap S=(R \cup S)-(R-S)-(S-R)$
 
 * Some properties of set operation (3 operations above)
 
@@ -1122,7 +1123,7 @@
 * Binary Relational Operations: **JOIN** (denote by ![image-20190217130524597](image-20190217130524597.png))
 
   * represents a sequence of CROSS PRODUCT followed by SELECT ![image-20190217133458837](image-20190217133458837.png)
-  * similar property with CROSS PRODUCT but has number of tuples is less than or equal to $row_A*row_B$ 
+  * similar property with CROSS PRODUCT but has number of tuples is less than or equal to $row_A*row_B​$ 
   * The general case of JOIN operation is called a **Theta-join**: R S 
   * **The join condition is called theta** 
   * Theta can be any general boolean expression on the attributes of R and S
@@ -1154,7 +1155,7 @@
 
     - The implicit join condition includes each pair of attributes with the same name, 
 
-      “AND”ed together: R.C=S.C AND R.D=S.D 
+      **“AND”ed together: R.C=S.C AND R.D=S.D** 
 
     - Result keeps only one attribute of each such pair: Q(A,B,C,D,E) 
 
@@ -1194,12 +1195,12 @@
 * Three Main Types of Relational Integrity Constraints
 
   * Inherent or Implicit Constraints: characteristics of relations, e.g., no duplicate tuples
-  * **Schema-based** or Explicit Constraints: Expressed in schemas by DDL (i.e., SQL)
+  * **Schema-based** or Explicit Constraints: Expressed in schemas by DDL (i.e., SQL) => added when creating table
   * Application-based or Semantic(语意的) constraints: These are **beyond the expressive power of the model** (i.e., cannot be expressed in the schemas of the data model) and must be specified and enforced by the application programs(business rules, laws, which cannot be checked in the data base)
 
 * Schema-based Constraints
 
-  *  There are three main types of schema-based constraints that can be expressed in the relational mode
+  *  There are three main types of ==schema-based constraints== that can be expressed in the relational mode
     * Key constraints (key must be minimal)
     * Entity integrity constraints (key must be not null)
     * Referential integrity constraints  (between 2 relation R1 and R2 a **foreign key** must be one-to-one , must have same domain with primary key of referenced relation and must match one of the primary key or be NULL)
