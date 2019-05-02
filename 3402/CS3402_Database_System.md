@@ -1,4 +1,4 @@
-# CS3402 Database system
+CS3402 Database system
 
 ---------
 
@@ -2052,17 +2052,20 @@
   * concurrency problem for multiuser system and interleaving/parallel processing
     * high concurrency => better performance, more difficult to maintain ACID properties
 
-* Transaction schedule: 
-  * A schedule is defined as a sequence of operations that the **==relative order of the operations==** in the same transaction is not changed
-  * concurrent schedule: interleave of different transactions exists
-  * serial schedule: otherwise
+* Transaction schedule: When transactions are executing concurrently in an interleaved fashion or serially, the order of execution of operations from the transactions forms a transaction schedule
+  * A schedule S of a sequence of operations is an ordering of the operations of the transactions **if it is under the constraint that the ==relative order of the operations== in the same transaction is not changed**
+  * Concurrent schedule: interleave of different transactions exists => another transaction start BEFORE the other has finished
+  * Serial schedule: otherwise
 
 * Consistency problems: 
-  * Lost update problem (write/write conflicts)
-  * Inconsistent retrieval problem (read/write conflicts)
+  * Lost update problem (write/write conflicts) => Because the effect of a pair of  write  operations  depends on the order of their execution
+  * ![1556799835659](1556799835659.png)
+  * Inconsistent retrieval problem (read/write conflicts) => Because the effect of a read and a write operation depends on the order of their execution
   * read read don’t have conflict
 
-* Serializable schedule: A schedule S which is **equivalent** to serial schedule(itself is serializable schedule) => guarantee the consistency and have better performance (serial equivalence)
+* Serializable schedule: A schedule S which is **equivalent** to serial schedule (no interleaving => itself is serializable schedule) => guarantee the consistency and have better performance (serial equivalence)
+
+  ![1556800145670](1556800145670.png)
 
 * Conflict serializable schedule: A schedule S is conflict equivalent to the serial schedule
 
@@ -2070,12 +2073,12 @@
 
 * Serialization Graphs: A direct edge $T_i -> T_j$ can drawn if $j $ is after $i $, and 
   *  $i $ is write, $j $ is read or
-  * $i$ is read, $j$ is write or
+  * $i$ is read, $j​$ is write or
   * $i$ is write, $j$ is write
   * It is serializable iff the graph is acyclic(there are 2 nodes represent $i$ & $j$, no bidirectional edge)
   * all of one node’s operations is before the other one
 
-* recoverable schedule:  [](https://www.quora.com/How-do-I-find-whether-a-schedule-in-dbms-is-cascadeless-recoverable-or-strict-recoverable-Provide-example)
+* recoverable schedule:  [more information](https://www.quora.com/How-do-I-find-whether-a-schedule-in-dbms-is-cascadeless-recoverable-or-strict-recoverable-Provide-example)
 
   * recover: transaction is aborted => need to undo those processed operations of an aborted transaction to maintain consistency and ==all or nothing property==
 
