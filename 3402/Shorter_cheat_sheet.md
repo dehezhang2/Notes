@@ -1,5 +1,10 @@
 # Short cheat sheet for CS3402
 
+* Questions:
+  * 3NF: why the slide 31 said neither a candidate key nor a subset of any key
+  * The meaning of slide 10
+  * 
+
 --------
 
 ## SQL
@@ -73,6 +78,8 @@
   - Make a list of all **project numbers** for projects that involve an employee whose last name is ’Smith’, either as a **worker or as a manager of the department** that controls the project
 
     ```sql`
+
+    ```
     
     ```
 
