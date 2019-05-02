@@ -1900,32 +1900,56 @@
     * Thus, the total level of indexing is 3
 
     * one accessing for each level and final access for data block
+      $$
+      cost = level\ of\ blocks + 1
+      $$
 
+* Tree index structure: Multiple index actually form a tree => insert into deletion becomes a problem because every level of the index is an *ordered file*
 
-    $$
-    cost = level\ of\ blocks + 1
-    $$
+  * some definitions: 
 
-* Tree index structure: Mutiple index actually form a tree => insert into deletion becomes a problem
+    * except root, each node has a parent and zero or more child
+    * zero child: leaf
+    * non-zero child: internal
+    * sub-tree of a node: itself and all of its descendant
+    * balanced: leaf nodes are at the same level
 
-* Common things of B-tree and B+-tree
+  * Common things of B-tree and B+-tree
 
-  * Each node correspond a disk block
-  * Each node is kept between full(split => which will propagate to higher level) and half full(merge)
+    * Reserve spaces in each tree node to allow new index entries
+    * Each node correspond a disk block
+    * Each node is kept between full(split => which will propagate to higher level) and half full(merge)
+    * insert into non-full or delete into more than half full is efficient
 
-* Difference of B-tree and B+-tree
+  * Difference of B-tree and B+-tree
 
-  * In a B-tree, pointers to data records exist at all levels of the tree ($P_i$ points to the lower level, $K_i$ points to data)
-
-    * at most p tree pointers and at least p/2
-    * Only the middle value is kept in the root node and the rest of the values are split evenly between the other two nodes 
-    * When a non-root node is full and a new entry is inserted into it, that node is split into two nodes at the same level, and the middle entry is moved to the parent node along with two pointers to the new split nodes (parent full also split parent)
+    * In a B-tree, pointers to data records exist at all levels of the tree ($P_i$ points to the lower level, $K_i​$ points to data)
+      * at most p tree pointers and at least p/2
+      * Only the middle value is kept in the root node and the rest of the values are split evenly between the other two nodes 
+      * When a non-root node is full and a new entry is inserted into it, that node is split into two nodes at the same level, and the middle entry is moved to the parent node along with two pointers to the new split nodes (parent full also split parent)
 
     ​	![](屏幕快照 2019-04-03 下午5.47.19.png)
 
+    ![](Capture-1556789321845.PNG)
+
     ![](屏幕快照 2019-04-03 下午5.50.08.png)
 
-  * In a B+-tree, all pointers to data records exists at the leaf-level nodes => less levels
+    * Insertion: Btree starts with a single root node at level 0
+
+      * Once the root is full with p –1 search key values and we attempt to insert another entry into the tree, the root node splits into two nodes at level 1
+      * Only the middle value is kept in the root node and the rest of the values are split evenly between the other two nodes => **==middle node doesn’t stay at previous level anymore==**
+      * When a non-root node is full and a new entry is inserted into it, that node is  split into two nodes at the same level, and the middle entry is moved to the parent node along with two pointers to the new split nodes
+      * If the parent node is full, it is also split
+
+    * index size: suppose the pointer limit is 23 and each of the node is 69% full, thus there are $0.69*23=16$ pointers to next level, therefore on level $k$
+      $$
+      Node\# = {pointer\#}^k \\
+      current\ level\ pointer\# = {pointer\#}^{k+1} \\
+      index\ entries = current\ level\ pointer\# - pointer\#
+      $$
+      ![](Capture-1556790228581.PNG)
+
+  * In a B+-tree, all pointers to data records exists at the leaf-level nodes => less levels because its entry is smaller in size
 
     ![](屏幕快照 2019-04-03 下午9.02.41.png)
 
