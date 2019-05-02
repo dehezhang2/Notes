@@ -1890,8 +1890,6 @@
 
   * block number $b$ is equals to the previous $b$ divide by $bfr$
 
-  * 
-
   * An example from the previous example
     $$
     b_1 = {{\color {red} r*(P_R+V)} \over B} = 30000*15/1024 = 442\ blocks\\
@@ -1903,7 +1901,6 @@
 
     * one accessing for each level and final access for data block
 
-      
 
     $$
     cost = level\ of\ blocks + 1
