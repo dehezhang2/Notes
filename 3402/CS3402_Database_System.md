@@ -1921,7 +1921,7 @@
     * Each node is kept between full(split => which will propagate to higher level) and half full(merge)
     * insert into non-full or delete into more than half full is efficient
 
-  * Difference of B-tree and B+-tree
+  * B-tree
 
     * In a B-tree, pointers to data records exist at all levels of the tree ($P_i$ points to the lower level, $K_i​$ points to data)
       * at most p tree pointers and at least p/2
@@ -1949,24 +1949,58 @@
       $$
       ![](Capture-1556790228581.PNG)
 
-  * In a B+-tree, all pointers to data records exists at the leaf-level nodes => less levels because its entry is smaller in size
+  * B+-tree: all pointers to data records exists at the leaf-level nodes => less levels because its entry is smaller in size (only store pointer to tree node, no need to store the data pointer => more space to store key => larger capacity and smaller level)
+
+    * Notice $P_{leaf}​$ is the degree of the tree minus one
 
     ![](屏幕快照 2019-04-03 下午9.02.41.png)
 
     ![](屏幕快照 2019-04-03 下午9.03.09.png)
 
-    * Internal node => only store pointer to tree node, no need to store the data pointer => more space to store key => larger capacity and smaller level
-    * Leaf node => only store pointer to data node
-    * Notice $P_{leaf}$ is the degree of the tree minus one
+    * Suppose the search key field is $V$ = 9 bytes, block size $B$ = 512 bytes, record pointer (leaf pointer) size $P_r$ = 7 bytes, block pointer is $P$ = 6 bytes => determine the pointer number limit $p$ 
+      $$
+      p*P + (p-1)*V \leq B \\
+      6p + 9p - 9 \leq 512 \\
+      p_{leaf}*(P_r+V) + P \leq B \\
+      p_{leaf} * (7+9) + 6 \leq 512 \\
+      p = 34\\
+      p_{leaf} = 31 \\
+      $$
 
-* Insertion & deletion of B+ tree
+    * The way to calculate the index size is the same => $0.69*34 = 23$
 
-  * Insertion: if full
-    - on the leaf: split and copy the minimum key of second child to upper level
-    - on the internal: split and insert the minimum key of second child to upper level, delete the corresponding node of current level
-  * Deletion: if not half full: overall, need to remove the corresponding key in the parent level
-    - if neighbor sibling has more than necessary(if both ok, choose larger one): distribute the key between current node and neighbor, change the corresponding key in the parent
-    - Merge the node with its sibling; if the node is a non-leaf, we will need to **incorporate the “split key” from the parent into our merging**(if a parent have any one child is empty, then one key from parent will be sent back). In either case, we will need to repeat the removal algorithm on the parent node to remove the “split key” that previously separated these merged nodes — unless the parent is the root and we are removing the final key from the root, in which case the merged node becomes the new root (and the tree has become one level shorter than before). 
+      ![](Capture-1556791251878.PNG)
+
+    * Insertion & deletion of B+ tree
+
+      * Insertion (search corresponding leaf at first): if full
+
+        * split into two, first node have $floor((n+1)/2)​$ keys (where n is the size before insertion)
+
+        - on the leaf: split and copy the minimum key of second child to upper level (also keep the original key)
+        - on the internal: split and insert the minimum key of second child to upper level, delete the corresponding node of current level (don’t need the original key)
+
+      * Example (notice that the P is start with $P_1​$, and the new value is assumed to be inserted into the node and not split at first), the sequence is 8, 5, 1, 7, 3, 12 the number of key in internal and leaf nodes are both 2:
+
+         ![](Capture-1556792563321.PNG)
+
+        ![](Capture-1556792623693.PNG)
+
+        ![](Capture-1556792655057.PNG)
+
+        ![](Capture-1556792720613.PNG)
+
+      * Deletion: if not half full: overall, need to remove the corresponding key in the parent level
+        - if neighbor sibling has more than necessary(if both ok, choose larger one): distribute the key between current node and neighbor, change the corresponding key in the parent => always consider borrow from neighbor at first
+        - Merge the node with its sibling; if the node is a non-leaf, we will need to **incorporate the “split key” from the parent into our merging** (if a parent have any one child is empty, then one key from parent will be sent back). In either case, we will need to repeat the removal algorithm on the parent node to remove the “split key” that previously separated these merged nodes — unless the parent is the root and we are removing the final key from the root, in which case the merged node becomes the new root (and the tree has become one level shorter than before). 
+
+      * Example: 
+
+        ![](Capture-1556792993270.PNG)
+
+        ![](Capture-1556793013598.PNG)
+
+        ![](Capture-1556793102755.PNG)
 -----------------------
 
 ## Lecture 9: Transaction
@@ -1974,26 +2008,52 @@
 * ACID principle, a transaction is : 
   * Atomicity: A transaction is either performed completely or not performed at all
   * Consistency: A correct execution of a transaction must take the database from one consistent state to another
-  * Isolation: Only after a transaction is committed, it can be visible to other transactions
-  * Durability: Once a transaction is committed, these changes must never be lost because of subsequent failure
+  * Isolation: Only after a transaction is committed, it can be visible to other transactions (no partial results)
+  * Durability: Once a transaction is committed, these changes must never be lost because of subsequent failure (committed and permanent results)
 
-* Transaction = DB operations + transaction operations
+* Transaction (the execution of a program/application on behalf of the user to perform a specific user function by accessing data items maintained in a database management system) = DB operations + transaction operations
+
+  * operation : atomic steps within each transaction
   * DB ops:
     * Read: SELECT
     * Write: UPDATE
     * Delete
     * Insert
   * transaction ops: Make sure atomic => partial results are not allowed
-    * Begin
+    * Begin (may have a lock)
     * End (Commit/Abort)
       * commit: new value of transaction will become permanent
       * abort: fail and recover
-  * State: Begin(consistent state) => executing DB operations(maybe inconsistent) => End(consistent state)
+  * State: Begin(consistent state) => executing DB operations (maybe inconsistent temporarily) => End(consistent state)
+    * whole transaction is atomic
+    * multiple steps => single user application
 
-* read/write description => see lecture note
+* read/write description
+
+  * Data are resided on disk and the basic unit of data transferring from the disk to the main memory is one disk block
+  * In general, a data item (what is read or written) will be the field/fields of some records in the database (in a disk block)
+  * read_item(X) command includes the following steps:
+    * Find the address of the disk block that contains item X
+    * Copy that disk block into a buffer in main memory (if that disk block is not already in some main memory buffer)
+    * Search for the required value in the buffer 
+    * Copy item X from the buffer to the program variable named X    
+  * write_item(X) command includes the following steps:
+    * Find the address of the disk block that contains item X
+    * Copy that disk block into a buffer in main memory (if that disk block is not already in some main memory buffer)
+    * Search for the required value in the buffer 
+    * Copy item X from the program variable named X into its correct location in the buffer
+    * Store the updated block from the buffer back to disk (either immediately or at some later point in time)
+    * Note that we DO NOT need to read an item before update it
+
+* Problems of transaction processing performance:
+
+  * slow disk fast CPU
+  * undo redo of long transactions to maintain atomicity in cases of failures
+  * concurrency problem for multiuser system and interleaving/parallel processing
+    * high concurrency => better performance, more difficult to maintain ACID properties
 
 * Transaction schedule: 
-  * A schedule is defined as a sequence of operations that the relative order of the operations in the same transaction is not changed
+  * A schedule is defined as a sequence of operations that the **==relative order of the operations==** in the same transaction is not changed
   * concurrent schedule: interleave of different transactions exists
   * serial schedule: otherwise
 
