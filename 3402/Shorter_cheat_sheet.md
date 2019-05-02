@@ -77,9 +77,7 @@
 
   - Make a list of all **project numbers** for projects that involve an employee whose last name is ’Smith’, either as a **worker or as a manager of the department** that controls the project
 
-    ```sql`
-
-    ```
+    ```sql
     
     ```
 
@@ -155,7 +153,7 @@
     
     ```
 
-  -  For **each department**, retrieve the department number, the  number of employees in the department, and their average salary.
+  - For **each department**, retrieve the department number, the  number of employees in the department, and their average salary.
 
     ```sql
     

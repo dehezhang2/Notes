@@ -1822,7 +1822,7 @@
 
   * Because index is ordered and identical, all the non-first-level index can use primary index
 
-  * $bfr$ is fixed besides the first layer, because record size fixed and equals to size of pointer plus size of key
+  * $bfr​$ is fixed besides the first layer, because record size fixed and equals to size of pointer plus size of key
 
   * block number $b$ is equals to the previous $b$ divide by $bfr$
 
