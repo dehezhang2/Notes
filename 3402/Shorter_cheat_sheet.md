@@ -31,8 +31,6 @@
     CREATE SCHEMA COMPANY AUTHORIZATION ‘Jsmith’; 
     ```
 
-- 
-
 - Practice questions
 
   ![](Screen Shot 2019-04-30 at 5.14.39 PM.png)
@@ -311,3 +309,15 @@
 
 ----------
 
+## Indexing and B+ tree
+
+* Suppose the data record size $R$ is 100 bytes , block size $B$ is 1024 bytes, the number of records $r$ is 30,000, pointer size $P_R$ is 6 bytes, field size $V$ is 9 bytes, calculate the block access number respectively
+  $$
+  b_1 = {{R*r} \over B} = 30000*100/1024 = 3000\ bytes\\
+  b_2 = {{b_1*(P_R+V)} \over B} = 3000*15/1024 = 45\ bytes\\
+  a_1 = log_2b_1 \\
+  a_2 = log_2b_2 + 1 \\
+  $$
+  
+
+* 
