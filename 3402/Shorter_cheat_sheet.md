@@ -2,8 +2,7 @@
 
 * Questions:
   * 3NF: why the slide 31 said neither a candidate key nor a subset of any key
-  * The meaning of slide 10
-  * 
+  * The meaning of slide 10 lecture 7
 
 --------
 
@@ -318,6 +317,5 @@
   a_1 = log_2b_1 \\
   a_2 = log_2b_2 + 1 \\
   $$
-  
 
 * 

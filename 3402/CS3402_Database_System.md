@@ -1590,6 +1590,7 @@ CS3402 Database system
   * Records contains fields (attributes), field can contain **multiple attributes**
   * Fields may be fixed length or variable length: Different with fixed or variable length record, it represents the single field instead of the record
   * **Variable length fields can be mixed** into one record => Separator characters or length fields are needed so that the record can be “parsed” , **specify the variable length**
+    * variable means the length is different among different records instead of meaning it can be changed at run time
     * In (b), there are 2 variable, and three fixed contained in the variable-length fields. Fixed-length fields are fixed because they already have the specific value
     * In (c), the terminate record is a sign of variable record
 
@@ -2069,44 +2070,58 @@ CS3402 Database system
 
 * Conflict serializable schedule: A schedule S is conflict equivalent to the serial schedule
 
-  * conflict  equivalent schedule: RW,WW on same data item are in relatively same order with some serial schedule
+  * conflict  equivalent schedule: RW, WW on same data item are in relatively same order with some serial schedule
 
-* Serialization Graphs: A direct edge $T_i -> T_j$ can drawn if $j $ is after $i $, and 
-  *  $i $ is write, $j $ is read or
-  * $i$ is read, $j​$ is write or
+  * A schedule S is said to be conflict serializable if it is conflict equivalent to some serial schedule S’
+
+    ![1556805696038](1556805696038.png)
+
+* Serialization Graphs: A direct edge $T_i -> T_j$ can drawn if $j $ is after $i $, and
+  * $i $ is write, $j $ is read or
+
+  * $i​$ is read, $j​$ is write or
+
   * $i$ is write, $j$ is write
-  * It is serializable iff the graph is acyclic(there are 2 nodes represent $i$ & $j$, no bidirectional edge)
+
+  * It is serializable iff the graph is acyclic(there are 2 nodes represent $i$ & $j​$, no bidirectional edge)
+
   * all of one node’s operations is before the other one
 
-* recoverable schedule:  [more information](https://www.quora.com/How-do-I-find-whether-a-schedule-in-dbms-is-cascadeless-recoverable-or-strict-recoverable-Provide-example)
+    ![1556806398718](1556806398718.png)
+
+* Recoverable schedule:  [more information](https://www.quora.com/How-do-I-find-whether-a-schedule-in-dbms-is-cascadeless-recoverable-or-strict-recoverable-Provide-example)
 
   * recover: transaction is aborted => need to undo those processed operations of an aborted transaction to maintain consistency and ==all or nothing property==
 
-  * **recoverable schedule**: A recoverable schedule is one where, for each pair of Transaction Ti and Tj such that if Tj  reads data item previously written by Ti , then the commit operation of Ti appears before the commit operation Tj. 
+  * **recoverable schedule** (read commit after write commit): A recoverable schedule is one where, for each pair of Transaction Ti and Tj such that if Tj  reads data item previously written by Ti , then the **==commit operation of Ti appears before the commit operation Tj.==**
 
     ![img](main-qimg-27f88451ec74aa9fc6df96df5fc06f3a.png)
 
     * Suppose after T2 Read(x) operation, it commits. And then somehow T1 fails. So the transaction T2 must be aborted so as to ensure atomicity. However, since T2 is commited , and can't be aborted . Hence a situation arrives where it is impossible to recover.
 
-  * **CASCADELESS SCHEDULE**
+  * **CASCADELESS SCHEDULE** (read start after write commit)
 
     ![img](main-qimg-da4d46b2b67fc104def8192efc1ae8b1.webp)
 
-    * Transaction T1 writes x that is read by Transaction T2. Transaction T2 writes x that is read by Transaction T3. Suppose at this point T1 fails. T1 must be rolled back, since T2 is dependent on T1, T2 must be rolled back,and since T3 is dependent on T2, T3 must be rolled back.
-
-      This phenomenon, in which a single transaction failure leads to a series of transaction rollbacks is called *Cascading rollback.*
+    * Transaction T1 writes x that is read by Transaction T2. Transaction T2 writes x that is read by Transaction T3. Suppose at this point T1 fails. T1 must be rolled back, since T2 is dependent on T1, T2 must be rolled back,and since T3 is dependent on T2, T3 must be rolled back. This phenomenon, in which a single transaction failure leads to a series of transaction rollbacks is called *Cascading rollback.*
 
       - Cascading rollback is undesirable, since it leads to the undoing of a significant amount of work.
       - It is desirable to restrict the schedules to those where cascading rollbacks cannot occur, Such schedules are called Cascadeless Schedules.
       - Formally, a cascadeless schedule is one where for each pair of transaction Ti and Tj  such that Tj  reads data item, previously written by Ti  the **commit operation of Ti appears before the read operation of Tj .**
 
-    * Cascadeless schedules are also recoverable schedules, because recoverable recommend commit of read is after commit of previous write, cascadeless recommends start of read is after commit of previous write
+    * Cascadeless schedules are also recoverable schedules, because recoverable recommend commit of read is after commit of previous write, cascadeless recommends **==start of read is after commit of previous write==** 
 
-  * **STRICT SCHEDULE**
+  * **STRICT SCHEDULE** (write and read start after pre write commit)
 
     ![img](main-qimg-853ca78001b85c149a19a80bec31299e.webp)
 
     * In this case, the Write(x) of the transaction T2 overwrites the previous value written by T1 , and hence overwrite conflicts arise . This problem is taken care in **Strict Schedule**. Strict Schedule is a schedule in which a transaction can neither Read(x) nor Write(x) until the last transaction that wrote x has committed or aborted.
+
+    ![1556807498050](1556807498050.png)
+
+    ![1556807518818](1556807518818.png)
+
+    ![1556807541697](1556807541697.png)
 
   * To ensure recoverability: 
 
@@ -2114,29 +2129,73 @@ CS3402 Database system
     * no premature write: no update on a data item if another transaction updated it has not been committed
     * Strict execution: delay the reading or updating until the previous transaction that has updated the same data item  has committed/aborted
 
+* Reason of recover: 
+
+  * A computer failure (system crash)
+    * A hardware or software error occurs in the computer system during transaction execution
+    * If the hardware crashes, the contents of the computer’s internal memory may be lost.
+  * A transaction error
+    * Some operation in the transaction may cause it to fail, such as integer overflow or
+      division by zero
+    * Transaction failure may also occur because of erroneous parameter values or
+      because of a logical programming error. In addition, the user may interrupt the
+      transaction during its execution.
+  * Local errors or exception conditions detected by the transaction
+    * Certain conditions necessitate cancellation of the transaction. For example, data for the
+      transaction may not be found
+  * Concurrency control enforcement
+    * The concurrency control method may decide to abort the transaction, to be restarted later,
+      because it violates serializability or because several transactions are in a state of deadlock
+  * Disk failure
+    * Some disk blocks may lose their data because of a read or write malfunction or because of a
+      disk read/write head crash. This may happen during a read or a write operation of the transaction.
+  * Physical problems and catastrophes
+    * This refers to an endless list of problems that includes power or air-conditioning failure, fire,
+      theft, overwriting disks
+
+* Transaction state: 
+
+  * atomic unit of work that is either completed in its entirety or not done at all => for recovery need to keep track of states
+
+  * States: Active, Partially committed, committed, failed, terminated
+
+    ![1556807773088](1556807773088.png)
+
 * Primitive Operations of Transactions: 
 
-  * X is the memory block, t is a register
-  * input(X) : copy from the disk, output(X): store to the disk
-  * Read and Write are operation on the memory buffer instead of disk
+  * X is the field in memory block, t is a register
+  * input(X) : copy the disk block contains X from the disk, output(X): store the disk block contains X to the disk
+  * Read(X, t) : run Input(X) and copy the X into local variable t
+  * Write(X, t) : run Input(X) and copy t to X
+
+  ![1556808047086](1556808047086.png)
 
 * Log file for recovery
 
-  * log file: telling something about what some transaction has done, stored in main memory instead of disk
-  * flush-log: copy the log file to the disk
-  * Type of record: see the lecture slide
+  * log file: telling something about what some transaction has done, stored in main memory instead of disk (disk I/O takes a lot of time)
+
+  * flush-log: copy the log file to the disk (when system failure, use the log file in nonvolatile storage to recover)
+
+  * Type of recor
+
+    ![1556808317756](1556808317756.png)
+
     * commit doesn’t means data is already on the disk
+
   * undo log: 
     * if transaction T modifies database element X, the log need to record in the form \<T,X,v\> , where T is the transaction, X is the element before change, v is the original value
     * \<commit\> log record must be written to disk ONLY after all DB elements changed by the transaction have been written back
     * order: log records(flush log) => actual changes => commit(flush log)
+
   * recover undo log:
     * If we find \<Start T\> but no commit T => might be error, need undo this transaction
     * detail can be found on the slide
+
   * redo log: Redo the uncertain(not committed) operations
     * requires COMMIT before write to disk(OUTPUT)
     * now store \<T, X, v\> and v is the **new value**
     * order: Log -> COMMIT(flush log) -> change
+
   * recover redo log: see the slide
 
 
