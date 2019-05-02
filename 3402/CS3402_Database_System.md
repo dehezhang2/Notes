@@ -1727,7 +1727,7 @@
     * difference between the data structure and B-tree: B-tree actually is the truth data structure to store the data, but hash is use the tree to store the bucket of address
     * The depth of the tree for hashing will not be so large since it is actually a bucket
   * **Directory**: The directories can be stored on disk, and they expand or shrink dynamically: Directory entries point to the disk blocks that contain the stored records
-  * Insertion to a full block => split the block
+  * Insertion to a full block => split the block, records are redistributed among the two blocks
   * difference with tree structure: key is a hashed value
 
 * Extendible hashing:
@@ -1736,16 +1736,15 @@
 
   ![](Capture-1553085871556.PNG)
 
-  - A directory consisting of an array of 2d bucket addresses is maintained, d is called the global depth of the directory
-    - At first all directories point to the same bucket
-    - bucket point to the memory address
+  - A directory consisting of an array of $2^d​$ bucket addresses is maintained, d is called the global depth of the directory (maximum possible depth of the trie)
   - The integer value corresponding to the first (high-order) d bits of a hash value is used as an **index to the array** to determine a directory entry and the address in that entry determines the bucket storing the records
-  - **A location d’** (called, local depth stored with each bucket) specifies the
-    number of bits on which the bucket contents are based
-  - The value of d’ can be increased or decreased by one at a time to handle
-    overflow or underflow respectively
+  - **A location d’** (called, local depth stored with each bucket) specifies the number of bits on which the bucket contents are based
+  - The value of d’ can be increased or decreased by one at a time to handle overflow or underflow respectively
+    - At first d’ is 1, there is only 2 buckets
+    - bucket point to the memory address
+    - The size of each bucket is also fixed at first
 
-* e.g.: d = 4, at first d’ = 1 => there are only 2 bucket => if one is full and insert => split to 2
+* e.g.: d = 4, at first d’ = 1 => there are only 2 buckets each have 2 entries => if one is full and insert => split to 2
 
   ![](Capture-1553086217861.PNG)
 
@@ -1757,49 +1756,65 @@
     * Internal nodes that have two pointers: the left pointer corresponding to the 0 bit (in the hash address) and a right pointer corresponding to the 1 bit
     * Leaf nodes: these hold a pointer to the actual bucket with records
 
+  ![](Capture-1556775226307.PNG)
+
 --------
 
 ## Lecture 8: Indexing Techniques
 
 * Indexes as access path: 
 
-  * index file is a file that have partial information of the data file
-  * Entries are ordered in the index file, each entry consists of 2 parts: field value(the index) and pointer to record(address of one entry in the data file)
+  * An index is an auxiliary file to provide fast access to a record in a data file (index file + data file)
+  * index file is a file that have partial information of the data file, it is ==pointers to data sorted by some attributes==
+  * Entries are ordered in the index file, each entry consists of 2 parts: field value(the index) and pointer to record (address of one entry in the data file)
+  * An index is usually specified on one field (called key field which may not be a key) of the data file (although it could be specified on several fields)
   * The operation: 
     * Access index file in the secondary disk (do binary search)
-    * Load the searched block into the main memory
-    * Since it is faster to search in memory, overhead search a certain entry in the loaded block can be ignored
+    * Load the searched block into the main memory, since the size of index file is much smaller that the data file, the delay is shorter
+    * Since it is faster to search in memory, overhead of searching a certain entry in the loaded block can be ignored
+    * Algorithm is still important because there is an overhead when retrieve the data record according to the index file
 
-* Simple level index: only one index file
+* Simple level index: only one index file directly point to data file
 
-  * Primary Index: Use primary key as the base of order and order the data file
+  * Primary Index: Use primary key as the base of sorting order and order the data file
 
-    * Sparse index : The entry is smaller than the number of record (a entry has many records in a block)
+    ![](Capture-1556776697027.PNG)
+
+    * **==the data file itself is physically sorted on primary key==**
+
+    * Sparse index : The entry is smaller than the number of record (a entry has many records in a block), one entry corresponds to one block of records
 
     * Each entry hold the first record of the block in the data file as the key field value(index), we call it **block anchor**
 
     * The way to calculate: The binary search is actually done on the index file and multiple entries of index file are also arranged in blocks. After that, the corresponding block $i$ ==whose block anchor $K(i) < K < K(i+1) $ where $K​$ is the searched value== will be loaded into the main memory 
 
-    * B is block size, R is record size, r is number of records, following is the cost with out the primary index
+    * B is block size, R is record size, r is number of records, following is the cost with out the primary index (load the data file blocks for $log_2b​$ times)
       $$
       Bfr(record\ per\ block)={B\over R}\\
       b(block\#)={r \over Bfr} \\
-      cost = log_2b
+      cost = log_2b \\
       $$
 
     * Following is the cost with primary index
       $$
       r_1 = b \\
       R=size(index)+size(pointer) \\
+      Bfr_1 = {B \over R} \\
       b_1 = {r_1 \over Bfr_1} \\
-      cost = log_2b_1 +1(load\ into\ memory)
+      b_1 = {{(size(index)+size(pointer))*data\ block\#} \over block\ size}\\
+      cost = log_2b_1((load\ index\ file\ into\ memory)) +1(load\ data\ file\ into\ memory)
       $$
 
   * Cluster index: Use the non-key field as the base of order => duplicate possible
 
     * The pointer point to the first **unoccupied** block in the file that includes the first existence of the index value
 
-  * Secondary index: When there is a order design for a existing primary index or cluster index file, we cannot reorder the data file by another key or non-key => use secondary
+  * Secondary index: When there is a order design for a existing primary index or cluster index file, we cannot reorder the data file by another key or non-key => use secondary, the index field is specified on any non-ordering field of a data file
+
+  * dense/sparse indexes
+
+    * dense: An index entry for every search key value in the data file
+    * sparse: One entry for multiple search keys => smaller index size
 
 * Mutiple-level indexes: Index file for the previous index file, the first-level index file is for data file
 
