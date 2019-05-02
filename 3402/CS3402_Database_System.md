@@ -1776,6 +1776,11 @@
 
 * Simple level index: only one index file directly point to data file
 
+  * dense/sparse indexes
+
+    - dense: An index entry for every search key value in the data file
+    - sparse: One entry for multiple search keys => smaller index size
+
   * Primary Index: Use primary key as the base of sorting order and order the data file
 
     ![](Capture-1556776697027.PNG)
@@ -1788,7 +1793,7 @@
 
     * The way to calculate: The binary search is actually done on the index file and multiple entries of index file are also arranged in blocks. After that, the corresponding block $i$ ==whose block anchor $K(i) < K < K(i+1) $ where $K​$ is the searched value== will be loaded into the main memory 
 
-    * B is block size, R is record size, r is number of records, following is the cost with out the primary index (load the data file blocks for $log_2b​$ times)
+    * B is block size, R is record size, r is number of records, following is the cost with out the primary index (load the data file blocks for $log_2b$ times)
       $$
       Bfr(record\ per\ block)={B\over R}\\
       b(block\#)={r \over Bfr} \\
@@ -1805,20 +1810,79 @@
       cost = log_2b_1((load\ index\ file\ into\ memory)) +1(load\ data\ file\ into\ memory)
       $$
 
+    * Suppose the data record size $R$ is 100 bytes , block size $B$ is 1024 bytes, the number of records $r$ is 30,000, pointer size $P_R$ is 6 bytes, field size $V$ is 9 bytes, calculate the block access number respectively
+      $$
+      b_1 = {{R*r} \over B} = 30000*100/1024 = 3000\ bytes\\
+      b_2 = {{b_1*(P_R+V)} \over B} = 3000*15/1024 = 45\ bytes\\
+      a_1 = log_2b_1 = 12\\
+      a_2 = log_2b_2 + 1 = 6 + 1 = 7\\
+      $$
+
   * Cluster index: Use the non-key field as the base of order => duplicate possible
 
-    * The pointer point to the first **unoccupied** block in the file that includes the first existence of the index value
+    * The pointer point to the first **unoccupied** block in the file that includes the first existence of the index value within this block, one pointer for each distinct value of the field
 
-  * Secondary index: When there is a order design for a existing primary index or cluster index file, we cannot reorder the data file by another key or non-key => use secondary, the index field is specified on any non-ordering field of a data file
+      * reason of just pointing to the block => the cost of search within a block is lower than block access
 
-  * dense/sparse indexes
+    * pointer may not point to the first entry of the block because the size of a block is fixed and may not equal to the size of repeated entries
 
-    * dense: An index entry for every search key value in the data file
-    * sparse: One entry for multiple search keys => smaller index size
+    * Another example of sparse index => one index entry for multiple records
 
-* Mutiple-level indexes: Index file for the previous index file, the first-level index file is for data file
+    * each entry = key + block pointer
+
+      ![](Capture-1556785302520.PNG)
+
+    * ordered data file -> overflow problem -> use the overflow pointer point to next block if the current one is full
+
+      ![](Capture-1556785679567.PNG)
+
+  * Secondary index: When the index file is already physically sorted on some key by clustering or primary key, we cannot reorder the data file by another key or non-key => use secondary, the index field is specified on any non-ordering field of a data file
+
+    * may on key or non-key fields
+
+    * entry = index field + a block pointer or a record pointer
+
+    * when the field is key => one to one and dense
+
+      ![](Capture-1556787317005.PNG)
+
+    * several secondary indexes can be applied to the same file when the field is non-key
+
+    ![](Capture-1556786114639.PNG)
+
+    * Have two types of pointers constructs two levels
+
+      * Sparse: Each index entry points to a block of pointershas multiple index pointers pointing to the records with the same value
+      * Dense: Each pointer within a the pointer block
+
+    * Access time with ordered index file: 12 as calculated
+
+    * Access time of unordered without indexing
+      $$
+      b_1 = {{\color {red} r*R} \over B} = 30000*100/1024 = 3000\ blocks\\
+      cost = b_1/2 = 1500
+      $$
+
+    * Access time with index (dense key)
+      $$
+      b_2 = {{\color {red} r*(P_R+V)} \over B} = 30000*15/1024 = 442\ blocks\\
+      cost = log_2b_2 + 1 = 10
+      $$
+
+    * Advantage of secondary index file compare to unordered file
+
+      * smaller entry size: 15 is less than 100
+      * binary search is available
+
+  * summary of simple indexing
+
+    ![](Capture-1556787195451.PNG)
+
+* Multiple-level indexes: Index file for the previous index file, the first-level index file is directly point to the data file
 
   ![IMG_127713678B27-1](IMG_127713678B27-1.jpeg)
+
+  * Multi-level index can be created for any type of first-level index as long as the previous level has multiple blocks
 
   * Because index is ordered and identical, all the non-first-level index can use primary index
 
@@ -1826,11 +1890,24 @@
 
   * block number $b$ is equals to the previous $b$ divide by $bfr$
 
-  * $$
-    cost = level\ of\ blocks + 1
+  * 
+
+  * An example from the previous example
+    $$
+    b_1 = {{\color {red} r*(P_R+V)} \over B} = 30000*15/1024 = 442\ blocks\\
+    b_2 = {{\color {red} b_2*(P_R+V)} \over B} = 442*15/1024 = 7\ blocks\\
+    b_3 = {{\color {red} b_3*(P_R+V)} \over B} = 7*15/1024 = 1\ blocks\\
     $$
 
-    
+    * Thus, the total level of indexing is 3
+
+    * one accessing for each level and final access for data block
+
+      
+
+    $$
+    cost = level\ of\ blocks + 1
+    $$
 
 * Tree index structure: Mutiple index actually form a tree => insert into deletion becomes a problem
 
