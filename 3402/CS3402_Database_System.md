@@ -2314,9 +2314,8 @@
 
     * An array to show the lock entry for each data item
     * Each entry of the array stores the identify of transaction that has set a lock on the data item including the mode
-    * One entry for one database? One record? One field? Lock granularity (粒度) (Coarse
-      granularity vs. fine granularity)
-      * Larger granularity → higher conflict probability but lower locking overhead
+    * The resource or data item is defined for one database? One record? One field? Lock granularity (粒度) (Coarse granularity vs. fine granularity)
+      * Larger granularity (smaller number of locks) → higher conflict probability but lower locking overhead
       * How to detect lock conflict for insertion operations from a transaction?
         * A transaction reads all data items and another one inserts a new item
 
@@ -2399,4 +2398,187 @@
 
 
 * Introduction to Query Optimization
-  * 
+
+  * Query optimization: process of choosing a suitable execution strategy for processing a query
+
+  * May not optimal but is a reasonably efficient strategy
+
+  * Step of executing a query
+
+    * Scan: Scanner identifies the query tokens (keywords, attribute names, relation names)
+    * Parse: Parser checks the query syntax
+    * Validate: Checks that all attributes and relation names are valid
+
+  * two internal representations of a query: Query Tree and Query Graph
+
+  * Code can be 
+
+    * interpreted mode: executed directly
+    * compiled mode: stored and executed later whenever needed
+
+  * Typical steps when processing a high-level query:
+
+    ![1556884579888](1556884579888.png)
+
+* Translating SQL Queries into Relational Algebra
+
+  * Query block is the basic unit that can be translated into the algebraic operators
+  * Query block contains a single SELECT-FROM-WHERE expression as well as GROUP BY and HAVING clause if these are part of the block
+  * Nested queries within a query are identified as separate query blocks
+
+  ![1556884765263](1556884765263.png)
+
+* Select operation
+
+  * Types
+    * simple SELECT: select condition is only one boolean fomula
+    * conjunctive: simple condition connected by AND
+    * disjunctive: simple condition connected by OR
+  * Search methods
+    * S1: Linear search(unordered file): retrieve record sequentially test one by one
+    * S2: Binary search(ordered file): Condition: The file is ordered according to the value of the key
+    * S3: Using a primary index or hash key (which tells the location) to retrieve a single record (comparation on key and directly retrieve): Condition: the selection condition involves an equality comparison on a key attribute with a primary index
+    * S4: Using a primary key to retrieve multiple records (condition: the comparison condition is >, <, >=, <= on a key field with primary index): Compare to find the equal one and retrieve all the preceding or subsequent records
+    * S5: Using a clustering index to retrieve multiple records, condition: the selection condition involves an equality comparison on a non-key attribute with a clustering index
+      * For example , select the employee with department number 5
+    * S6: Using a secondary index or B+-tree
+      * The secondary index may be created on a field that is a candidate key and has a unique value in every record, or a non-key field with duplicated values
+      * The index tells the location of the records
+        * We can retrieve records on conditions involving >,>=, <, or <=. (e.g., range queries)
+        * Range query example: 30000<=salary<=35000 
+    * S7: Conjunctive selection: 
+      * A conjunctive condition contains several simple conditions connected with AND
+      * Use an attribute has an access path that permits the use of one of the methods S2 to S6 to retrieve the records and then check whether each of retrieved record satisfies the remaining simple conditions in the conjunctive condition
+    * S8: Conjunctive selection using a composite index
+      * if an index has been created on the composite key  we can use it directly
+    * S9: Conjunctive selection by intersection of record pointers
+      * Condition: secondary indexes are available on all (or some of because one can be the physical order key) the fields involved in equality comparison conditions in the conjunctive condition and the indexes include record pointers (rather than block pointers)
+      * Index pointing to the records (dense index)
+      * Method:
+        * Each index can be used to retrieve the record pointers that satisfy the individual condition
+        * The intersection (common) of these sets of record pointers gives the record pointers that satisfy the conjunctive condition
+        * E.g., use the indexes to get dno > 5 and salary > 30000
+  * Selection Optimization
+    * Disjunctive condition is much harder to process and optimize
+    * If any one of the conditions does not have an access path, we have to use the brute force linear search approach
+    * If an access path exists on every condition, we can optimize the selection by
+      retrieving the records satisfying each condition and then applying the union
+      operation to remove duplicate records
+    * If the appropriate access paths that provide record pointers exist for every condition, we can union record pointers instead of records => pointer is smaller and the time to get the data block is longer
+
+* Implementing the Join operation
+
+  * The join operation is one of the most time-consuming operations in query processing
+
+  * Background
+
+    * Size of the main memory $n_B$: 7 blocks
+      * 1 block to store the result
+      * 1 block to read one block of inner loop
+      * 5 blocks for out loop
+    * DEPARTMENT file consists of $r_D​$ = 50 records in $b_D​$ = 10 blocks
+    * EMPLOYEE file consists of $r_E$ = 6000 records in $b_E$ = 2000 blocks
+
+  * Join selection factor: The fraction of records in a file that will be joined with records in the other file
+
+    * The join: $DEPARTMENT*_{MGRSSN=SSN}EMPLOYEE​$
+    * Suppose the **secondary index** exist for both of the files on MGR\_\_SSN and SSN with the level $X_{SSN}$ = 4 and $X_{MGRSSN}$ = 2 and the selection factor of SSN = MGR_SSN is 1
+    * First retrieves each EMPLOYEE record and the uses the index on MGR_SSN of DEPARTMENT to find a matching DEPARTMENT record
+      * no. of block access = $b_E + (r_E*(X_{MGRSSN}+1)) = 2000+6000*3=20000​$ 
+    *  Retrieve each DEPARTMENT at first
+      * no. of block access = $b_D + (r_D*(X_{MGRSSN}+1)) = 10+50*5=260$  
+
+  * J1: Nested (inner-outer) loop approach (brute force)
+
+    * For each record t in R (outer loop), retrieve every record s from S (inner loop) and test whether the two records satisfy the join condition t[A] = s[B]
+    * Choice of outer-loop:
+      * choose employee as outer loop: $(n_B-2)$ blocks of employee file each time
+      * No. of times to retrieve  $(n_B-2)$ blocks: $b_E/(n_B - 2)​$ 
+      * No. of time to retrieve inner loop blocks:  $b_D*b_E/(n_B - 2)​$ 
+      * Total number of block read access =  $b_E + b_D*b_E/(n_B - 2)​$
+      * choose the one with less block as the outer loop 
+
+  * J2: Using an access structure to retrieve the matching records
+
+    * if an index exists for one of the two join attr, say, B of S, 
+    * retrieve each record t in R, one at a time
+    * use access structure to get all matching records s from S satisfy s[B] = t[A]
+
+  * J3: Sort-merge join
+
+    * Condition: the records of R and S are physically sorted by value of join attr A and B respectively
+    * Method: 
+      * Both files are scanned in order of the join attributes, matching the records that have the same values for A and B
+      * In this method, if the joining attribute is sorted, the records of each file are scanned only once each for matching with the other file
+      * Otherwise, sort the records first before matching. Sorting cost = O(n log n)
+
+  * J4: Hash join
+
+    * The records of files R and S are hashed by the same function on A and B
+    * Step 1 (partitioning phase). A single pass through the file with fewer records (say, R) hashes its records to the hash file buckets
+    * Step 2 (probing phase). A single pass through the other file (S) then hashes each of its records to the appropriate bucket, where the record is combined with all matching records from R
+
+    ![1556890064238](1556890064238.png)
+
+* Implementing aggregate operation
+
+  * SUM, COUNT, and AVG
+  * Methods
+    * For a dense index: apply the computation to the values in index
+    * for a non-dense index: actual number of records associated with each index entry are used for computation (multiple records indexed by an index entry)
+  * GROUP BY: This operator is applied to subsets of a table. Employee relation is hashed or sorted to partition the file into groups such that each group has the same grouping attribute
+    * With clustering index on the grouping attribute: records are already partitioned (grouped) on that attribute
+
+* Using Heuristics (啟發式) in Query Optimization
+
+  * Heuristic rule may be applied to modify the internal representation of a query (e.g., a query tree) to improve performance
+  * Process for heuristics optimization
+    * The parser generates an initial internal representation
+    * Apply heuristics rules to optimize the internal representation
+    * A query execution plan is generated to execute groups of operations based on the access paths available on the files involved in the query
+  * Main heuristic is to **apply the operations that reduce the size of intermediate results first**
+    * **SELECT and PROJECT** (reduce size operation) before **JOIN** or other binary operations
+    * The size of the resulting file from a binary operation(JOIN) is usually a multiplicative function of the sizes of input files
+
+* Query Tree: A tree data structure that corresponds to a relational algebra expression
+
+  * query as leaf nodes represents the input relations
+
+  * order of execution of operations starts at the leaf and ends at the root node
+
+  * General Transformation Rules for Relational Algebra Operations.
+
+    * There are many rules for transforming relational algebra operations into equivalent ones. (Here we are interested in the meaning of the operations and the resulting relations. Hence, if two relations have the same set of attributes in a different order but the two relations represent the same information, we consider the relations equivalent.)
+
+      ![1556891946810](1556891946810.png)
+
+      ![1556891972892](1556891972892.png)
+
+      ![1556892249015](1556892249015.png)
+
+      ![1556893293597](1556893293597.png)
+
+      ![1556892380086](1556892380086.png)
+
+      ![1556892783953](1556892783953.png)
+
+* Optimization algorithm
+
+  * Using rule 1, break up conjunctive SELECT to cascade(nested) of SELECT operations (permits a greater degree of freedom in moving select operations down different branches of the tree)
+  * Using rules 2, 4, 6, and 10 concerning the commutativity of SELECT with other operations, move each SELECT operation as far down the query tree as possible
+  * Using rule 9 concerning associativity of binary operations, rearrange the leaf nodes of the tree so that the leaf node relations with the most restrictive SELECT operations are executed first in the query tree representation
+  * Combine a CROSS PRODUCT operation with a subsequent select operation whose condition represents a join condition into a join operation
+  * Using rules 3, 4, 8, and 11 concerning the cascading of PROJECT and the commuting of PROJECT with other operations, break down and move lists of projection attributes down the tree as far as possible by creating new PROJECT operations as needed.
+  * Identify subtrees that represent groups of operations that can be executed by a single algorithm
+
+* e.g.: for every project located in “Stafford”, retrieve the project number, the controlling DEPTNO and the manager’s last name, address and birthdate
+
+  ![1556891628700](1556891628700.png)
+
+  ![1556893484667](1556893484667.png)
+
+  ![1556893496475](1556893496475.png)
+
+  ![1556893513819](1556893513819.png)
+
+  ![1556893539611](1556893539611.png)
