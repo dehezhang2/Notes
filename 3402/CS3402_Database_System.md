@@ -2238,7 +2238,165 @@
 
 --------------------------
 
+## Lecture 10: Concurrency Control
+
+* Purposes of Concurrency control: 
+  * Preserve database consistency to ensure all schedules are serializable
+  * Maximize the system performance
+  * e.g.: If in concurrent execution environment, if $T_1$ conflicts with $T_2$ over a data item A, then the existing concurrency control decides whether $T_1$ or $T_2$ should get the A and whether the other transaction is rolled-back or waits 
+
+* Two-Phase Locking tech
+
+  * locking is an operation which secures both permission to read and write a data item for a transaction
+  * unlocking is an operation which removes these permissions from the data item
+  * both are atomic operations
+
+* B2PL (Basic two phase locking)
+
+  * each data item has a lock associated with it (e.g. a lock entry in the lock table)
+
+  * the scheduler creates a lock operation $ol_i[x]$ for each received operation $o_i[x]$
+
+  * Rules: When the scheduler receives an operation $p_i[x]​$, it tests
+
+    * if $pl_i[x]​$ conflicts with some $ql_i[x]​$ that is already set. If so $p_i[x]​$ is delayed and  $T_i​$ is forced to wait until it can get the lock
+    * Else $pl_i[x]$ is set and $P_i[x]$ is sent to DM (data manager)
+    * **==Once the scheduler has released a lock for a transaction, it may not subsequently obtain any more locks for that transaction (on any data item) because other is holding it==**
+
+  * The two phases : growing and shrinking
+
+  * Can guarantee that all pairs of conflicting operations of 2 transactions are scheduled in the same order ($T_1$ -> $T_2$ or $T_2$ -> $T_1$ and No $T_1$ \<-\> $T_2$   )
+
+    * The graph records the number of locks within **one transaction**
+
+    ![1556872890017](1556872890017.png)
+
+* C2PL (Conservative two phase locking) => like the prevention of hold and wait
+
+  * Avoid deadlocks and abort of transactions by requiring each transaction to obtain all of its lock **before any of its operations are submitted to the DM**
+  * Each transaction pre-declares its read-set and write-set of data items to the scheduler
+    * What are the locks (data items) to be accessed by the transaction?
+  * The scheduler tries to set all of the locks needed by the transaction **ALL at ONCE**
+  * Set lock of a transaction in one step and lock release in another step => the graph is like a rectangle
+    * If all the locks can be set, the operations will be submitted to the DM for processing
+    * After the DM acknowledges the processing of Ti’s last database operation, the scheduler may release all of Ti’s locks
+    * If any of the locks cannot be requested => does not grant any of $T_i$‘s lock, and $T_i$ is inserted into a waiting queue, any of the locks of a complete transaction, it examines the waiting queue to see if it can grant all the lock requests of any waiting transactions
+    * In Conservative 2PL, if a transaction Ti is waiting for a lock held by Tj, Ti is holding no locks (no hold and wait situation → no deadlock)
+
+  ![1556873347004](1556873347004.png)
+
+* S2PL (Strict two phase locking) => combination of B2PL and C2PL
+
+  * B2PL only defines the earliest time when the schedule may release a lock for a
+    transaction (i.e. after the operation is finished)
+  * S2PL requires the scheduler to release all of transaction’s locks altogether
+    * The lock is released when the transaction is in state of COMMIT or ABORT
+  * Compare with B2PL => longer holding time of lock and lower concurrency
+  * Compare with C2PL => shorter holding time (don’t need to request at one time) of lock and higher concurrency
+
+  ![1556873699626](1556873699626.png)
+
+  ![1556873759129](1556873759129.png)
+
+* Performance: S2PL is better than C2PL when the transaction workload is not heavy since the lock holding time is shorter in S2PL, but when heavy workload C2PL is better because deadlock may occur in S2PL ($T_1$ locks b in the first operation of the above graph)
+
+* Implementation Issue: Essential Components
+
+  * Lock modes:
+
+    * Shared mode for read: More than one transaction can apply shared lock on X **for reading** its value but **no write lock** can be applied on X by any other transaction
+    * Exclusive mode for write: Only **one write lock on X** can exist at any time and **no shared lock can be applied by any other transactions** on X
+    * Conflict: RW, WR, WW
+
+  * Lock Manager: managing locks on data items
+
+  * Lock table: 
+
+    * An array to show the lock entry for each data item
+    * Each entry of the array stores the identify of transaction that has set a lock on the data item including the mode
+    * One entry for one database? One record? One field? Lock granularity (粒度) (Coarse
+      granularity vs. fine granularity)
+      * Larger granularity → higher conflict probability but lower locking overhead
+      * How to detect lock conflict for insertion operations from a transaction?
+        * A transaction reads all data items and another one inserts a new item
+
+  * Lock and unlock
+
+    ![1556874578430](1556874578430.png)
+
+  * Rules for shared/exclusive locking scheme:
+
+    * read or write lock must be issued before any read operation in T
+    * write lock must be issued before any write operation in T
+    * unlock must be issued after all read operation or one write operation is finished
+    * read and write lock will not be issued if T already holds a read lock or a write lock (this may be relaxed)
+    * unlock is not issued unless it already holds a read lock or a write lock
+
+  * Read lock
+
+    ![1556874833563](1556874833563.png)
+
+  * Write lock
+
+    ![1556874907721](1556874907721.png)
+
+  * Unlock
+
+    ![1556874991336](1556874991336.png)
+
+  * Lock Conversion (read lock to write lock)
+
+    * Rule 4,5 are relaxed to do the lock conversion
+
+    ![1556875050486](1556875050486.png)
+
+* Dead lock
+
+  ![1556876095083](1556876095083.png)
+
+* Dead lock prevention:
+
+  * Hold and wait : locks all items before it begins execution, used in C2PL
+
+  *  cyclic wait => use timestamp 
+
+    * Each transaction is assigned a unique time stamp (its creation time or creation time + site ID for distributed databases)
+
+    * wait(old)-die(young) rule (non-preemptive): A transaction can be allowed to wait for a lock iff it is older than the holder, otherwise it is restarted with **the same timestamp** (second time the lock might be available)
+
+    * wound(old)-wait(young) rule (preemptive): A transaction can be allowed to wait for a lock iff it is younger than the holder, otherwise the holder is restarted with **the same timestamp** and the lock is granted to the requester 
+
+    * cyclic wait is broken by both of two methods ($T_1$->$T_2$->$T_3$->…->$T_n$ -> $T_1$)
+
+      * wait-die => the last request in the chain will restart $T_n$
+      * wound-wait => the older one will always execute at first 
+
+    * Examples:
+
+      ![1556877292499](1556877292499.png)
+
+      ![1556877302748](1556877302748.png)
+
+      ![1556877314923](1556877314923.png)
+
+* Dead lock detection and resolution
+
+  * detection: in some approaches, deadlocks are allowed (e.g. in S2PL), maintain a wait-for-graph, if cycle exists, one transaction involved in the cycle is selected and rolled-back
+
+  * Resolution: A wait-for-graph is created using the lock table. As soon as a transaction is blocked, it is added to the graph. When a chain like: Ti waits for Tj, Tj waits for Tk and Tk waits for Ti occurs, this creates a cycle. One of the transactions will be chosen to abort.
+
+    ![1556876528293](1556876528293.png)
+
+* Starvation
+
+  * Occurs when a particular transaction consistently waits for restarts and never gets a chance to proceed further
+  * For e.g., in dead lock, one of the transaction is always selected to roll back
+
+--------------------
+
+## Lecture 11: Query Optimization
 
 
 
-
+* Introduction to Query Optimization
+  * 
