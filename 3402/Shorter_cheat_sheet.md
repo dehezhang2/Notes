@@ -2,7 +2,7 @@
 
 * Questions:
   * 3NF: why the slide 31 said neither a candidate key nor a subset of any key
-  * The meaning of slide 10 lecture 7
+  * slide 39, 40 => 2 different definition of \<COMMIT T \>
 
 --------
 

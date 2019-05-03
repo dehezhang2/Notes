@@ -1,4 +1,4 @@
-CS3402 Database system
+# CS3402 Database system
 
 ---------
 
@@ -2172,31 +2172,73 @@ CS3402 Database system
 
 * Log file for recovery
 
-  * log file: telling something about what some transaction has done, stored in main memory instead of disk (disk I/O takes a lot of time)
+  * log file: telling something about what some transaction has done by records in the log each important event (e.g. write operations), stored in main memory instead of disk (disk I/O takes a lot of time)
 
   * flush-log: copy the log file to the disk (when system failure, use the log file in nonvolatile storage to recover)
 
-  * Type of recor
+  * Type of record
 
     ![1556808317756](1556808317756.png)
 
-    * commit doesn’t means data is already on the disk
+    * **==Notice that commit doesn’t means data is already on the disk, but different logging will have further requirement==**
 
-  * undo log: 
-    * if transaction T modifies database element X, the log need to record in the form \<T,X,v\> , where T is the transaction, X is the element before change, v is the original value
-    * \<commit\> log record must be written to disk ONLY after all DB elements changed by the transaction have been written back
-    * order: log records(flush log) => actual changes => commit(flush log)
+  * undo-logging rules: 
+    * U1: if transaction T modifies database element X, the log need to record in the form \<T,X,v\> , where
 
-  * recover undo log:
-    * If we find \<Start T\> but no commit T => might be error, need undo this transaction
-    * detail can be found on the slide
+      * T :the transaction
+      * X is the variable to change
+      * v is the original value
 
-  * redo log: Redo the uncertain(not committed) operations
-    * requires COMMIT before write to disk(OUTPUT)
-    * now store \<T, X, v\> and v is the **new value**
-    * order: Log -> COMMIT(flush log) -> change
+    * U2: ==\<commit\> log record must be written to disk ONLY after all DB elements changed by the transaction have been written back to disk==
 
-  * recover redo log: see the slide
+    * order: log records indicating changes( and flush log) => actual changes(only OUTPUT) => commit(and flush log)
+
+    * example:
+
+      ![1556853261170](1556853261170.png)
+
+  * recovery using undo-logging:
+    * When system failure, there might be partial change, which need to be moved during recovery
+    * if we find \<COMMIT T\>, all changes are on the disk before it
+    * If we find \<START T\> but no commit T => might be error, need undo this transaction
+    * Rule U1 assures all changes are recorded as \<T,X,v\>, we can write v to X. 
+    * Steps:
+      * Recovery manager scans the log from the end and remember all transactions T with \<COMMIT T\> record or an \<ABORT T\> record
+      * if it sees \<T,X,v\> 
+        * if there is \<COMMIT T\> after it, do nothing; 
+        * Otherwise, write v to X; 
+        * After making the changes, the manager must write a log record \<ABORT T\> for each incomplete transaction that was not previously aborted and then flush the log. 
+
+  * redo logging: Redo the uncertain(not committed) operations
+
+    * undo logging may have the problem that **we cannot commit a transaction without first writing all changed data to disk**
+
+    * Difference between undo and redo:
+
+      * undo ignore committed ones and cancel incomplete transaction; redo ignores incomplete and repeat the changes made by committed ones (overwrite the possible partial result by the previous operations)
+      * undo requires COMMIT after write to disk; redo requires COMMIT before write to disk(OUTPUT)
+
+    * redo-logging rules:
+
+      * R1: Any change to X must recorded as \<T, X, v \> followed by \<COMMIT T\> where v is the **new value**
+
+      * order: log file indicates changes -> COMMIT(and flush log) -> change (OUTPUT)
+
+      * e.g.
+
+        ![1556854271240](1556854271240.png)
+
+  * recover redo log: 
+
+    * Identify the committed transactions
+    * Scan the log forward from the beginning, if meet \<T, X, v\> 
+      * if T is not a committed transaction, do nothing
+      * if T is a committed transaction, write value v for database element X
+      * For each incomplete transaction T, the manager must write a log record \<ABORT T\> for each incomplete transaction that was not previously aborted and then flush the log.\
+
+--------------------------
+
+
 
 
 
