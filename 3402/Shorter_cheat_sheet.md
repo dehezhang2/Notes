@@ -1,10 +1,5 @@
 # Short cheat sheet for CS3402
 
-* Questions:
-  * 3NF: why the slide 31 said neither a candidate key nor a subset of any key
-  * slide 39, 40 => 2 different definition of \<COMMIT T \>
-  * what is the meaning of lecture 10, slide 14
-
 --------
 
 ## SQL
@@ -31,35 +26,70 @@
     CREATE SCHEMA COMPANY AUTHORIZATION ‘Jsmith’; 
     ```
 
-- Practice questions
+- Clustered practice questions
 
-  ![](Screen Shot 2019-04-30 at 5.14.39 PM.png)
+  - Relations of department
+    - EMPLOYEE(FNAME, MINIT, LNAME, <u>SSN</u>, BDATE, ADDRESS, SEX, SALARY, SUPER_SSN, DNO)
+    - DEPARTMENT(DNAME, <u>DNUMBER</u>, MGR_SSN, MGR_START_DATE)
+    - DEPT_LOCATIONS(<u>DNUMBER</u>, <u>DLOCATION</u>)
+    - WORKS_ON(<u>ESSN</u>, <u>PNO</u>, HOURS)
+    - PROJECTS(PNAME, <u>PNUMBER</u>, PLOCATION, DNUM)
+    - DEPEDENT(<u>ESSN</u>, <u>DEPENDENT_NAME</u>, SEX, BDATE, RELATIONSHIP)
+  - Relations for mid-term
+    - PERSON(<u>PID</u>, PNAME)
+    - EVENT(<u>EID</u>, ENAME, START_TIME, END_TIME)
+    - INVITED(<u>PID, EID</u>, ATTENDED)
 
-  ![](Screen Shot 2019-04-30 at 5.14.46 PM.png)
+  - Type I: Simple retrieve
 
-  - Retrieve the **birth date** and **ddress** of the employee(s) whose name is ‘John B. Smith’.
+    - Retrieve the **birth date** and **address** of the employee(s) whose name is ‘John B. Smith’.
 
-    ```sql
-    
-    ```
+      ```sql
+      SELECT Bdate, Address
+      FROM EMPLOYEE
+      WHERE Fname = 'John'
+      AND 	Minit = 'B'
+      AND		Lname = 'Smith';
+      ```
 
-  - Retrieve the **name** and **address** of all employees of all employees who **work for** the **‘Research’** department
+  - Type II: Retrieve with join condition
 
-    ```sql
-    
-    ```
+    - Retrieve the **name** and **address** of all employees of all employees who **work for** the **‘Research’** department
 
-  - For every project located in ’**Stafford**’, list the **project number**, the controlling **department number**, and the **department manager’s last name** 
+      ```sql
+      SELECT FNAME, Address
+      FROM EMPLOYEE, DEPARTMENT
+      WHERE Ssn = Essn
+      AND		Dname = 'Research';
+      ```
 
-    ```sql
-    
-    ```
+    - For every project located in ’**Stafford**’, list the **project number**, the controlling **department number**, and the **department manager’s last name** 
 
-  - For each employee, retrieve the employee’s **first and last name** and the **first and last name of his or her immediate supervisor.** 
+      ```sql
+      SELECT PNUMBER, DNUMBER, LNAME
+      FROM PROJECT P, DEPARTMENT D, EMPLOYEE E
+      WHERE D.DNUM = P.DNUMBER
+      AND		D.MGR_SSN = E.SSN
+      AND		P.PLOCATION = 'Stanford'
+      ```
 
-    ```sql
-    
-    ```
+  - Type III: Use alias name to retrieve the information of recursive relationship or do the comparation within one relation
+
+    - For each employee, retrieve the employee’s **first and last name** and the **first and last name of his or her immediate supervisor.** 
+
+      ```sql
+      SELECT E1.FNAME, E1.LNAME, E2.FNAME, E2.LNAME
+      FROM EMPLOYEE E1, EMPLOYEE E2
+      WHERE E1.SUPER_SSN = E2.SSN
+      ```
+
+    - Mid-term question: Retrieve the ids and names of all persons who have attended to two distinct events that have the same start time and end time
+
+      ```sql
+      SELECT 
+      ```
+
+      
 
   - Select all EMPLOYEE **Ssns** 
 
@@ -301,11 +331,19 @@
 
 * Select the employee tuples whose department number is 4
 
+  
+
 * Select the employee tuples whose salary is greater than \$30.000
+
+  
 
 * Retrieve the ssn of all employees who either **work in** department 5 or **directly supervise** an employee who works in department 5
 
+  
+
 * Select all name of female employees and their dependents
+
+  
 
 ----------
 
