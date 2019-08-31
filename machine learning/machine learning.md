@@ -10,7 +10,7 @@
 
 -------
 
-### What is Machine Learning?s
+### What is Machine Learning?
 
 * Field of study that gives computer the ability to learn without explicity programmed
 
@@ -97,7 +97,7 @@
 
 
 $$
-  \theta_j := \theta_j - \alpha {\delta\over\delta\theta_j }J(\theta_0 , \theta_1)\  (for\ j=0\ and\ j=1)
+\theta_j := \theta_j - \alpha {\delta\over\delta\theta_j }J(\theta_0 , \theta_1)\  (for\ j=0\ and\ j=1)
 $$
   }
 

@@ -111,7 +111,7 @@
 
   * Hardware part: Done automatically by hardware:
 
-     Processor finish => processor signal ack of interrupt => store the PSW and PC => change the PC according to the interruption
+     issue interrupt => Processor finish => processor signal ack of interrupt => store the PSW and PC => change the PC according to the interruption
 
   * Software part: need to be considered by OS programmers
 
@@ -194,7 +194,7 @@
 
        
        $$
-       h*0.1+(1-h)*\color{red}{(1+0.1)}<=1.5
+       h*0.1+(1-h)*\color{red}{(1+0.1)}<=0.15
        $$
        
 
@@ -231,6 +231,11 @@
 
 ### Operating System Objectives & Functions
 
+* OS: 
+
+  * Program controls execution of application programs
+  * interface between applications and hardware
+
 * Definition of Operating System (OS)
 
   ![](屏幕快照 2019-01-15 上午10.30.37.png)
@@ -251,13 +256,16 @@
 
 * OS Servivces
 
-  * **Program developement** : editors and debuggers
-  * **Program execution** : OS handles steps need to be performed to execute a program, i.e. instructions
-  * **Access I/O devices** : OS provides a uniform interface so that programmers can access I/O devices using simple reads and writes
-  * **Controlled access to files** : In the case of system with multiple users OS provides protection mechanisms to control access to the files
-  * **System access** : Also for shared systems
-  * **Error detection and response** : OS must provide a response that clears the **error condition** with the **least impact on running applications**. 
-  * **Accounting** : A good OS will collect ==usage statistics== for various resources and monitor performance parameters such as response time
+  * Program
+    * **Program developement** : editors and debuggers
+    * **Program execution** : OS handles steps need to be performed to execute a program, i.e. instructions
+  * Access and protection to I/O, file, multiuser system
+    * **Access I/O devices** : OS provides a uniform interface so that programmers can access I/O devices using simple reads and writes
+    * **Controlled access to files** : In the case of system with multiple users OS provides protection mechanisms to control access to the files
+    * **System access** : Also for shared systems
+  * System itself
+    * **Error detection and response** : OS must provide a response that clears the **error condition** with the **least impact on running applications**. 
+    * **Accounting** : A good OS will collect ==usage statistics== for various resources and monitor performance parameters such as response time
 
 * OS as resource manager
 
@@ -281,7 +289,7 @@
   * Computer applications are developed to perform some tasks.
   * It is inefficient for applications to be written directly for a given hardware platform.
   * The OS was developed to provide a convenient, feature-rich, secure, and consistent interface for applications to use.
-  * We can think of the OS as providing a uniform, abstract representation of resources that can be requested and accessed by applications.
+  * We can think of the OS as providing a **uniform, abstract representation of resources that can be requested and accessed by applications.**
 
 ----------------
 
@@ -306,9 +314,7 @@
 
     http://en.wikipedia.org/wiki/Cross-platform 
 
-* What are the interfaces available for users to interact with operating systems? What is
-  the difference between user interface and programming interface to interact with the
-  operating system?
+* What are the interfaces available for users to interact with operating systems? What is the difference between user interface and programming interface to interact with the operating system?
 
   * The user interfaces for users to interact with the operating system can be 
     * command interpreter (MS-DOS as command.com or UNIX as shell) 
@@ -2396,9 +2402,9 @@
 
 ### $\color{red}{From\ now\ on, all\ the\ notes\ are\ supplementary\ of\ lecture\ note} $
 
-Turnaround time($T_r$): finish - submit
+Turnaround time($T_r​$): finish - submit
 
-service time($T_s$): processor time
+service time($T_s​$): processor time
 
 #### FCFS (First-Come-First-Serve)
 
@@ -2486,67 +2492,4 @@ service time($T_s$): processor time
   * groups doing poorly receive higher priority
   * Groups doing well receive lower priority
   * To give ***fewer*** resources to users who have had ***more than their fair share*** and 
-  * To give ***more*** to those who have had ***less than their fair share***
-
---------------------
-
-## Chapter 7&8 Memory Management and Virtual Memory
-
-----
-
-### Basic requirements of Memory Management
-
-#### Page 7
-
-* The meaning of relocation: Change the main memory **location** of the part of the process 
-* **Why we need relocation**: Multiprgramming system, available main memory is generally shared among a number of processes
-* Problem caused by relocation: Address problem => we need to translate the address at runtime => need a relative address inside the code and a translate mechanism to translate the relative address to physical address
-* The physical addresses are determined when program is loaded into memory.
-* Reason of compaction: There might be some hole between different process image => shift to occupy the hole and make the use of memory efficient
-
-### Basic blocks of memory management
-
-#### Paging
-
-##### Page 17
-
-* Frame size == page size
-* each page has a unit of identification (byte or word)
-* A process is loaded by loading all of its pages into available, but ***not necessarily contiguous*** frames.
-* Internal fragment
-
-##### Page 19
-
-* logical address in paging = page# + offset
-* relative address(treat the some known point of as 0) and logical address are the same => need to use page size (number of entries insize the pages) as power of **2** 
-
-#### Segmentation
-
-##### Page 24
-
-* A process is loaded by loading all of its segments that ***need not be contiguous***.
-* Each segmentation correspond to a module in the process, each module must be contiguous
-* Need relocation when allocate new space for a module (like linked list) => make the external fragmentation becomes smaller
-  * Extend to the neighbor empty fragment => make it smaller
-  * Occupy another bigger fragment(when neighbor is another process => use one of the big fragment reduce the average size of fragment
-* External fragment
-
-##### Page 26
-
-* The relative address is no longer same as logical address => because the size is not identical anymore
-* segment table: 
-  * Key : segment id
-  * Value: the starting point in physical memory base, and the length of the fragment limit
-* Need to compare the offset value and the limit, if offset is larger, segmentation fault exist
-
-### Virtual Memory (VM) Basics
-
-### Hardware and Control Structures of VM
-
-#### Paging
-
-#### Segmentation
-
-#### Combined Paging and Segmentation
-
-### VM Management
+  * To give ***more*** to those who have had ***less than their fair share

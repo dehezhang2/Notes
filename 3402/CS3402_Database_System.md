@@ -1031,7 +1031,7 @@
 
     ![image-20190217121018846](image-20190217121018846.png)
 
-  * General form of the project operation is ${\pi}_{<attribute\ list>}(R)​$ 
+  * General form of the project operation is ${\pi}_{<attribute\ list>}(R)$ 
 
   * **Removes duplicate tuples**: Result of the project operation must be a mathmetical set(do not allow duplicate) of tuples => equivalent to `SELECT DISTINCT` in SQL
 
@@ -1075,7 +1075,7 @@
 
     ![image-20190303211829228](image-20190303211829228.png)
 
-* Set Theory : UNION Operation (R$\cup$S)
+* Set Theory : UNION Operation (R$\cup​$S)
 
   * Either in R or S; remove duplicate
 
@@ -1093,7 +1093,7 @@
 
 * INTERSECTION and DIFFERENCE ($\cap​$ and -)
 
-  * $R\cap S=(R \cup S)-(R-S)-(S-R)$
+  * $R\cap S=(R \cup S)-(R-S)-(S-R)​$
 
 * Some properties of set operation (3 operations above)
 
@@ -1102,11 +1102,11 @@
 
 * CARTESIAN (or CROSS) PRODUCT
 
-  * $R(A_1,A_2,...,A_n) \ X\  S(B_1,B_2,...,B_m)$)
+  * $R(A_1,A_2,...,A_n) \ X\  S(B_1,B_2,...,B_m)​$)
 
   * In order take all the possible combination
 
-  * result is a relation Q with degree $col_A+col_B$ attributes and $row_A*row_B$ tuples
+  * result is a relation Q with degree $col_A+col_B​$ attributes and $row_A*row_B​$ tuples
 
   * R and S **do not have to be compatible**
 
@@ -1811,7 +1811,7 @@
       cost = log_2b_1((load\ index\ file\ into\ memory)) +1(load\ data\ file\ into\ memory)
       $$
 
-    * Suppose the data record size $R$ is 100 bytes , block size $B$ is 1024 bytes, the number of records $r$ is 30,000, pointer size $P_R$ is 6 bytes, field size $V$ is 9 bytes, calculate the block access number respectively
+    * Suppose the data record size $R​$ is 100 bytes , block size $B​$ is 1024 bytes, the number of records $r​$ is 30,000, pointer size $P_R​$ is 6 bytes, field size $V​$ is 9 bytes, calculate the block access number respectively
       $$
       b_1 = {{R*r} \over B} = 30000*100/1024 = 3000\ bytes\\
       b_2 = {{b_1*(P_R+V)} \over B} = 3000*15/1024 = 45\ bytes\\
@@ -1889,7 +1889,7 @@
 
   * $bfr​$ is fixed besides the first layer, because record size fixed and equals to size of pointer plus size of key
 
-  * block number $b$ is equals to the previous $b$ divide by $bfr$
+  * block number $b​$ is equals to the previous $b​$ divide by $bfr​$
 
   * An example from the previous example
     $$
@@ -1924,7 +1924,7 @@
 
   * B-tree
 
-    * In a B-tree, pointers to data records exist at all levels of the tree ($P_i$ points to the lower level, $K_i​$ points to data)
+    * In a B-tree, pointers to data records exist at all levels of the tree ($P_i​$ points to the lower level, $K_i​$ points to data)
       * at most p tree pointers and at least p/2
       * Only the middle value is kept in the root node and the rest of the values are split evenly between the other two nodes 
       * When a non-root node is full and a new entry is inserted into it, that node is split into two nodes at the same level, and the middle entry is moved to the parent node along with two pointers to the new split nodes (parent full also split parent)
@@ -1935,14 +1935,14 @@
 
     ![](屏幕快照 2019-04-03 下午5.50.08.png)
 
-    * Insertion: Btree starts with a single root node at level 0
+    * Insertion: B-tree starts with a single root node at level 0
 
       * Once the root is full with p –1 search key values and we attempt to insert another entry into the tree, the root node splits into two nodes at level 1
       * Only the middle value is kept in the root node and the rest of the values are split evenly between the other two nodes => **==middle node doesn’t stay at previous level anymore==**
       * When a non-root node is full and a new entry is inserted into it, that node is  split into two nodes at the same level, and the middle entry is moved to the parent node along with two pointers to the new split nodes
       * If the parent node is full, it is also split
 
-    * index size: suppose the pointer limit is 23 and each of the node is 69% full, thus there are $0.69*23=16$ pointers to next level, therefore on level $k$
+    * index size: suppose the pointer limit is 23 and each of the node is 69% full, thus there are $0.69*23=16​$ pointers to next level, therefore on level $k​$
       $$
       Node\# = {pointer\#}^k \\
       current\ level\ pointer\# = {pointer\#}^{k+1} \\
@@ -1952,13 +1952,13 @@
 
   * B+-tree: all pointers to data records exists at the leaf-level nodes => less levels because its entry is smaller in size (only store pointer to tree node, no need to store the data pointer => more space to store key => larger capacity and smaller level)
 
-    * Notice $P_{leaf}​$ is the degree of the tree minus one
+    * Notice $P_{leaf}$ is the order of the tree minus one
 
     ![](屏幕快照 2019-04-03 下午9.02.41.png)
 
     ![](屏幕快照 2019-04-03 下午9.03.09.png)
 
-    * Suppose the search key field is $V$ = 9 bytes, block size $B$ = 512 bytes, record pointer (leaf pointer) size $P_r$ = 7 bytes, block pointer is $P$ = 6 bytes => determine the pointer number limit $p$ 
+    * Suppose the search key field is $V​$ = 9 bytes, block size $B​$ = 512 bytes, record pointer (leaf pointer) size $P_r​$ = 7 bytes, block pointer is $P​$ = 6 bytes => determine the pointer number limit $p​$ 
       $$
       p*P + (p-1)*V \leq B \\
       6p + 9p - 9 \leq 512 \\
@@ -2076,14 +2076,14 @@
 
     ![1556805696038](1556805696038.png)
 
-* Serialization Graphs: A direct edge $T_i -> T_j$ can drawn if $j $ is after $i $, and
+* Serialization Graphs: A direct edge $T_i -> T_j​$ can drawn if $j ​$ is after $i ​$, and
   * $i $ is write, $j $ is read or
 
   * $i​$ is read, $j​$ is write or
 
-  * $i$ is write, $j$ is write
+  * $i​$ is write, $j​$ is write
 
-  * It is serializable iff the graph is acyclic(there are 2 nodes represent $i$ & $j​$, no bidirectional edge)
+  * It is serializable iff the graph is acyclic(there are 2 nodes represent $i​$ & $j​$, no bidirectional edge)
 
   * all of one node’s operations is before the other one
 
@@ -2243,7 +2243,7 @@
 * Purposes of Concurrency control: 
   * Preserve database consistency to ensure all schedules are serializable
   * Maximize the system performance
-  * e.g.: If in concurrent execution environment, if $T_1$ conflicts with $T_2$ over a data item A, then the existing concurrency control decides whether $T_1$ or $T_2$ should get the A and whether the other transaction is rolled-back or waits 
+  * e.g.: If in concurrent execution environment, if $T_1​$ conflicts with $T_2​$ over a data item A, then the existing concurrency control decides whether $T_1​$ or $T_2​$ should get the A and whether the other transaction is rolled-back or waits 
 
 * Two-Phase Locking tech
 
@@ -2255,12 +2255,12 @@
 
   * each data item has a lock associated with it (e.g. a lock entry in the lock table)
 
-  * the scheduler creates a lock operation $ol_i[x]$ for each received operation $o_i[x]$
+  * the scheduler creates a lock operation $ol_i[x]​$ for each received operation $o_i[x]​$
 
   * Rules: When the scheduler receives an operation $p_i[x]​$, it tests
 
     * if $pl_i[x]​$ conflicts with some $ql_i[x]​$ that is already set. If so $p_i[x]​$ is delayed and  $T_i​$ is forced to wait until it can get the lock
-    * Else $pl_i[x]$ is set and $P_i[x]$ is sent to DM (data manager)
+    * Else $pl_i[x]​$ is set and $P_i[x]​$ is sent to DM (data manager)
     * **==Once the scheduler has released a lock for a transaction, it may not subsequently obtain any more locks for that transaction (on any data item) because other is holding it==**
 
   * The two phases : growing and shrinking
@@ -2280,7 +2280,7 @@
   * Set lock of a transaction in one step and lock release in another step => the graph is like a rectangle
     * If all the locks can be set, the operations will be submitted to the DM for processing
     * After the DM acknowledges the processing of Ti’s last database operation, the scheduler may release all of Ti’s locks
-    * If any of the locks cannot be requested => does not grant any of $T_i$‘s lock, and $T_i$ is inserted into a waiting queue, any of the locks of a complete transaction, it examines the waiting queue to see if it can grant all the lock requests of any waiting transactions
+    * If any of the locks cannot be requested => does not grant any of $T_i​$‘s lock, and $T_i​$ is inserted into a waiting queue, any of the locks of a complete transaction, it examines the waiting queue to see if it can grant all the lock requests of any waiting transactions
     * In Conservative 2PL, if a transaction Ti is waiting for a lock held by Tj, Ti is holding no locks (no hold and wait situation → no deadlock)
 
   ![1556873347004](1556873347004.png)
@@ -2298,7 +2298,7 @@
 
   ![1556873759129](1556873759129.png)
 
-* Performance: S2PL is better than C2PL when the transaction workload is not heavy since the lock holding time is shorter in S2PL, but when heavy workload C2PL is better because deadlock may occur in S2PL ($T_1$ locks b in the first operation of the above graph)
+* Performance: S2PL is better than C2PL when the transaction workload is not heavy since the lock holding time is shorter in S2PL, but when heavy workload C2PL is better because deadlock may occur in S2PL ($T_1​$ locks b in the first operation of the above graph)
 
 * Implementation Issue: Essential Components
 
@@ -2314,7 +2314,7 @@
 
     * An array to show the lock entry for each data item
     * Each entry of the array stores the identify of transaction that has set a lock on the data item including the mode
-    * The resource or data item is defined for one database? One record? One field? Lock granularity (粒度) (Coarse granularity vs. fine granularity)
+    * The resource or data item is defined for one database? One record? One field? Lock granularity (粒度) (Coarse granularity vs. fine granularity) => how to define common resource
       * Larger granularity (smaller number of locks) → higher conflict probability but lower locking overhead
       * How to detect lock conflict for insertion operations from a transaction?
         * A transaction reads all data items and another one inserts a new item
@@ -2357,7 +2357,7 @@
 
   * Hold and wait : locks all items before it begins execution, used in C2PL
 
-  *  cyclic wait => use timestamp 
+  *  cyclic wait => use timestamp
 
     * Each transaction is assigned a unique time stamp (its creation time or creation time + site ID for distributed databases)
 
