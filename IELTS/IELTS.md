@@ -143,7 +143,7 @@
   * How write the introduction(Quite formulaic)
     * Information given by IELTS and paraphrase it
     * Add dates, countries etc.
-    * No more than 2 sentences, for e.g. “The graph illustrates the number of people travelling abroad from the UOK over a ten year period from 2000 to 2010.”
+    * No more than 2 sentences, for e.g. “The graph illustrates the number of people travelling abroad from the UK over a ten year period from 2000 to 2010.”
     * can also add the information about the units: “Units are measured in ...”
   * Should I write a conclusion: 
     * Task1: No
@@ -153,7 +153,6 @@
   * Don’t give opinion if it is not asked
   * Shouldn’t write the title of the essay
   * Difference between an opinion essay and an argumentative essay: no difference
-  * 
 
 ------------
 
