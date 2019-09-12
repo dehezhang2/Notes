@@ -153,6 +153,28 @@
   * Don’t give opinion if it is not asked
   * Shouldn’t write the title of the essay
   * Difference between an opinion essay and an argumentative essay: no difference
+* Marking Criteria:
+  * Task Achievement
+    * Analyse the chart and identify all the features
+    * highlight key features in an overview
+    * Supporting your body paragraph by data
+    * avoid wrong info
+    * avoid opinion
+    * write a factual report
+    * 170-190 words
+  * Coherence and Cohesion
+    * plan where to put information
+    * have 4 body paragraphs
+    * use a range of linking devices
+    * avoid mistakes with linking words
+    * use referencing (this, it, etc)
+  * Lexical Resource
+    * use a range of vocabulary ([ref](<https://ieltsliz.com/ielts-line-graph-vocabulary/>))
+    * use vocabulary for presenting accurate data
+    * Understand collocations (verb<—matching—>noun)
+    * avoid spelling mistakes
+    * don’t use the wrong words or informal language
+  * Grammatical Range and Accuracy
 
 ------------
 
