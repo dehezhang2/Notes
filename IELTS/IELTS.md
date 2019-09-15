@@ -117,20 +117,29 @@
 -----------
 
 * Format
+
   * Two parts in total
   * Task 1: Report for the academic test (150 words, 170-190 words recommended)
   * Task 2: Essay for both tests (250 words, 270-290 words recommended, 4-5 paragraphs)
   * Recommend: always write over the word count
   * Extra paper are not usually offered
   * Not necessary to leave space at the start of a paragraph, better to leave one empty line between your paragraphs to help the examiner identify the paragraphs
+
 * Time
+
   * Takes 1 hour => 20 minutes on writing task 1 and 40 minutes on writing task 2
+
 * Score
+
   * Task1: one third of writing task
+
 * FAQ
+
   * Task 1: Diagrams, maps, building plans, bar charts, line graphs, pie charts and tables
   * Task 2: Opinion, Discussion, Advantage/Disadvantage, Solution and Direct Question (see [100 Esay Questions](<https://ieltsliz.com/100-ielts-essay-questions/>) and [Common Topics](<https://ieltsliz.com/common-essay-topics-for-ielts/>))
+
 * Tips
+
   * Don’t write too much, aim for quality rather than quantity => focus on writing excellent English and organising your information rather than writing a long essay
   * How to organize the information in task 1:
     * Introduction
@@ -139,7 +148,7 @@
     * Body Paragraph B (accurate detail in a logical order)
     * Learn the formula (for different types) of task 1
   * Do I need to compare and contrast data in each body paragraph
-    * No, decide decide if the data should be compared and contrasted when you look at the chart and plan your writing
+    * No, decide if the data should be compared and contrasted when you look at the chart and plan your writing
   * How write the introduction(Quite formulaic)
     * Information given by IELTS and paraphrase it
     * Add dates, countries etc.
@@ -153,7 +162,9 @@
   * Don’t give opinion if it is not asked
   * Shouldn’t write the title of the essay
   * Difference between an opinion essay and an argumentative essay: no difference
-* Marking Criteria:
+
+* Marking Criteria for task 1:
+
   * Task Achievement
     * Analyse the chart and identify all the features
     * highlight key features in an overview
@@ -175,6 +186,182 @@
     * avoid spelling mistakes
     * don’t use the wrong words or informal language
   * Grammatical Range and Accuracy
+
+* Marking Criteria for task 2
+
+  * Task response
+    * pay attention to **ALL issues** in the essay question
+    * write about **the issues** rather than just the general topic
+    * answer the essay question with relevant main points
+    * plan your supporting points so they don’t go off the topic
+    * Over 250 words
+  * Coherence and Cohesion
+    * just one central topic in each body 
+    * organise your ideas logically
+    * use a range of linking words
+    * avoid errors in linking words
+  * Lexical Resource
+  * Grammatical Range and Accuracy
+
+* Task 1
+
+  * **overview & introduction**: [ref](<http://ieltsliz.com/ielts-chart-practice-for-writing-task-1/>)
+
+    Introduction: The …(what chart) illustrates …(what information) in …(period). Units are mearsured in ...
+
+    Overview: Overall, the largest…., while(whereas, in comparison to) the least …. 
+
+  * **divide to two different type in body 1 and body 2**
+
+  * describe tendency:
+
+    * The number of … increased steadily to reach about … in … In …, there was a decline in the number to below 50 before climbing to reach a peak of approximately … in … After that date, the figure dropped to about … in the final year
+
+* Task2
+
+  * Planning before writing is important because your concentration might be low (at least 5 mins, write on question paper)
+    * identify the issues in the essay question
+    * brainstorming main points
+    * choosing the best main points
+    * planning supporting points
+    * organising paragraphs
+  * Structure
+    * Introduction
+    * different body paragraphs (usually either 2 or 3 => 4 or 5 in total)
+      * each body paragraphs must contain enough supporting points
+    * Conclusion
+  * types
+    * Opinion
+    * Discussion
+    * Adv/Disadv
+    * Direct Questions
+    * Solutions
+
+* Vocabulary for task 1
+
+  * useful short sentence & vocabulary:
+    - divided by
+    - overall
+    - significant <=> considerably
+    - While, Whereas, in comparision to
+    - With regards to,  in terms of
+    - as opposed to, similarly, respectively, on the other hand
+    - approximately
+  * Upward trend
+    * Rise / a rise
+    * Increase/ an increase
+    * Climb / a climb
+    * grow / a growth
+    * go up
+  * downward trend
+    * Decrease / a decrease
+    * Drop / a drop
+    * Fall / a fall
+    * Decline / a decline
+  * Other
+    * **Fluctuate / a fluctuation** (波动)
+    * **Dip / a dip** (下降)
+    * remain steady
+    * remain stable
+    * remain unchanged
+    * **level off（平稳的）**
+    * peak at
+    * reach a peak of
+    * hit a high of
+    * bottom out
+    * plateau
+  * Adverbs & Adjectives
+    * adv: steadily, gradually, sharply(突然的), rapidly, steeply(陡直的), slightly(略微的), dramatically, significantly, considerably
+    * adj: steady, gradual, sharp, rapid, steep, slight, dramatical, significant, considerable
+    * e.g.: a steady rise <=> increased steadily
+  * Time
+    * over the next three days
+    * Three days later
+    * in the following three days
+    * the next three days show
+    * over the period
+    * from … to …/ between … and ...
+    * the last/final/first year
+    * at the beginning of the period
+    * at the end of the period
+
+* Vocabulary for task 2
+
+  * The most important aspect… or One of the key issues is ...
+  * For instance, the majority of … (avoid use a recent study or research indicates that...)
+  * developing deeper understanding of something is better than broaden one’s horizons
+  * listing
+    * firstly
+    * secondly
+    * thirdly
+    * fourthly
+    * Lastly/ last but not least/ finally
+  * adding information
+    * In addition
+    * additionaly
+    * furthermore
+    * moreover
+    * also
+    * not only … but also
+    * as well as
+    * and
+  * giving examples
+    * for example
+    * one clear example is
+    * for instance
+    * such as
+    * namely
+    * to illustrate
+    * in other words
+  * results and consequences
+    * as a result
+    * **consequently**
+    * therefore
+    * thus
+    * hence
+    * so 
+    * for this reason
+  * Highlighting and Stressing
+    * particularly
+    * in particular
+    * specifically
+    * especially
+    * obviously
+    * of  course
+    * clearly
+  * concessions and contrasts
+    * admittedly
+    * however
+    * nevertheless
+    * even though
+    * although
+    * but
+    * despite
+    * in spite of
+    * still
+    * on the other hand
+    * by contrast
+    * in comparison
+    * alternatively
+    * Another option could be
+  * reasons and causes
+    * because
+    * owing to
+    * due to
+    * since
+    * as
+  * Giving your opinion
+    * in my opinion
+    * i think
+    * i believe
+    * i admit
+    * in my view
+    * i concur/agree
+    * i disagree / i cannot accept
+  * Conclusion
+    * in conclusion
+    * to conclude
+    * to sum up
 
 ------------
 
