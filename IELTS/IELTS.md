@@ -120,6 +120,10 @@
 
   * Two parts in total
   * Task 1: Report for the academic test (150 words, 170-190 words recommended)
+    * vocabulary
+    * grammar
+    * structure
+    * linking devices
   * Task 2: Essay for both tests (250 words, 270-290 words recommended, 4-5 paragraphs)
   * Recommend: always write over the word count
   * Extra paper are not usually offered
@@ -213,9 +217,32 @@
 
   * **divide to two different type in body 1 and body 2**
 
+  * grammar
+
+    * tense to use: 
+      * no dates: present tense
+      * dates in the past: past tense
+      * dates in the future: future forms
+      * dates spanning both past and future = both past tense and future tense
+    * passive voice vs. active voice
+      * only use passive voice when it’s appropriate and correct
+      * diagram will give this opportunity to use passive voice
+
   * describe tendency:
 
     * The number of … increased steadily to reach about … in … In …, there was a decline in the number to below 50 before climbing to reach a peak of approximately … in … After that date, the figure dropped to about … in the final year
+
+  * Change of centence:
+
+    * between .. and .. can be put in front of the sentence or at the end of the sentence
+    * xyz be increased steadily <=> there is a steady increase in xyz <=> xyz experienced a steady increase
+    * support by data, add date and number to the sentence
+
+  * Focus on:
+
+    * max value
+    * second max
+    * Min value
 
 * Task2
 
@@ -226,7 +253,9 @@
     * planning supporting points
     * organising paragraphs
   * Structure
-    * Introduction
+    * Introduction (40 - 50 words)
+      * background statement (paraphrase of the essay question)
+      * thesis statement (direct answer to the essay question and task)
     * different body paragraphs (usually either 2 or 3 => 4 or 5 in total)
       * each body paragraphs must contain enough supporting points
     * Conclusion
@@ -358,10 +387,12 @@
     * in my view
     * i concur/agree
     * i disagree / i cannot accept
+    * I would argue that
   * Conclusion
     * in conclusion
     * to conclude
     * to sum up
+    * to summarise
 
 ------------
 
@@ -380,7 +411,6 @@
 - Score
   - Mark on fluency, vocabulary, grammar and pronunciation
 - FAQ
-  - 
 - Tips
   - **aim for long, detailed answers in part 3**
   - follow the prompts of the cue card given in part 2
@@ -398,6 +428,121 @@
   -  [Practice by video](<https://ieltsliz.com/ielts-speaking-practice-test-video/>)
   - Ok to correct some mistakes but make sure it doesn’t affect your fluency
   - Part 0: try to use my name’s instead of my name is, short answer for this part
+
+--------------
+
+## IELTS 13
+
+### Test 1
+
+#### Section 1
+
+* choose
+* Private
+* 20%
+* healthy
+* bones
+* lecture
+* Arretsa
+* Vegetiran
+* market
+* knife
+
+#### Section 2
+
+* B
+* C
+* B
+* E
+* D
+* B
+* G
+* C
+* H
+* I
+
+#### Section 3
+
+* A
+* C
+* B
+* A (C)
+* B
+* G
+* C
+* H
+* A
+* E
+
+#### Section 4
+
+* crow
+* claves(cliffs)
+* speed
+* brain
+* food
+* behaviour
+* new
+* stress
+* tails
+* permanent
+
+------------------------
+
+### Test 2
+
+* Section 1
+  1. races
+  2. insurance
+  3. Jerriz
+  4. 25
+  5. stadium
+  6. park
+  7. coffee
+  8. leader
+  9. route
+  10. **lights**
+* Section 2
+  11. C
+  12. A(**B**)
+  13. C
+  14. B
+  15. B
+  16. A
+  17. C
+  18. E
+  19. B
+  20. D
+* Section 3
+  21. C(**B**)
+  22. A
+  23. C
+  24. C
+  25. A
+  26. A
+  27. C
+  28. D
+  29. G
+  30. F(**B**)
+* Section 4
+  31. location
+  32. world
+  33. personal
+  34. attention
+  35. event(**name**)
+  36. network
+  37. frequency
+  38. color
+  39. past(**brain**)
+  40. self
+
+-------------
+
+
+
+
+
+
 
 
 
