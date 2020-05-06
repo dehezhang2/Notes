@@ -30,9 +30,9 @@
   * Scheme II
     $$
     (1)\ Alice \leftarrow Email\ Server: PK, Cert_{server} \\
-    (2)\ Alice \color{red}{\rightarrow} Email\ Server: E_{PK}(Username, password) (secure\ channel) \\
+    (2)\ Alice {\color{red}{\rightarrow}} Email\ Server: E_{PK}(Username, password) (secure\ channel) \\
     or \\
-    (1)\ Alice \color{red}{\rightarrow} Email\ Server: Username, h(password) \\
+    (1)\ Alice {\color{red}{\rightarrow}} Email\ Server: Username, h(password) \\
     $$
 
     * **Replay Attack**: Adversary replays $E_{PK}$ or $h$ 
@@ -339,4 +339,491 @@
 
  
 
-## Lecture 09: 
+## Lecture 09: Network Security
+
+### Web (TLS/SSL & IPSec)
+
+#### Secure Socket Layer (Transport Layer Security)
+
+* Socket layer (HTTP**S**): Between application layer and transport layer (SSL usually between HTTP and TCP)
+
+* Service provided: 
+
+  * One-way authentication: authenticate server to client
+    * Mutual authentication version does exist but not necessary
+  * Data confidentiality: Encryption by shared key
+
+* Basic idea of SSL Protocol: Authentication + key establishment + encrypted data channel
+  $$
+  A \rightarrow B: I'd\ like\ to\ talk\ to\ you\ securely \\
+  A \leftarrow B: Cert_B \\
+  A \rightarrow B: \{K_{AB}\}_{Bob} \\
+  A \leftrightarrow B: encrypted\ HTTP\ using\ K_{AB} \\
+  $$
+
+  * Bob is authenticated to Alice
+    * freshness: $K_{AB}$
+    * Origin authentication: Public key encryption
+  * key transfer, Alice has key control
+  * Data confidentiality provided by symmetric encryption
+
+* Simplified SSL Handshake Protocol
+  $$
+  A \rightarrow B: Cipher\ suites,\ TLS\ version,\ R_A \\
+  A \leftarrow B: Cipher\ suite\ used,\ Cert_B, R_B \\
+  A \rightarrow B: \{S\}_B,\ PRF(K,h(msgs))\\
+  A \leftarrow B:PRF(K,h(msgs))\\
+  A \leftrightarrow B: Data\ encrypted\ under\ K
+  $$
+
+  * Assumptions
+    * Alice knows Bob(server)’s public key
+    * The public key is certified by trusted CA
+    * $S$ is randomly chosen by Alice
+    * $K = h(S, R_A, R_B)$
+    * $msgs =$ all previous messages
+    * $PRF$ is also a hash function, we can also use $PRF(K, PRF(msgs))$ 
+  * Bob is authenticated by Alice
+    * freshness: $S$
+    * Origin authentication: Public key encryption
+  * Key agreement, no one has key control
+  * Explicit key authentication
+  
+* SSL Sessions vs Connections
+
+  * SSL designed for use with HTTP 1.0, which usually opens multiple simultaneous (parallel) connections
+  * It takes a long time to decrypt public key encryption => use SSL connection protocol to construct new connections efficiently between authenticated entities.
+
+* SSL Connection
+  $$
+  A \rightarrow B: R_A \\
+  A \leftarrow B: R_B, PRF(K, h(msgs)) \\
+  A \rightarrow B: PRF(K, h(msgs)) \\
+  A \leftrightarrow B: Data\ encrypted\ under\ K \\
+  $$
+
+  * Assumptions
+    * SSL session exists (handshake is done)
+    * $S$ is already known to Alice and Bob
+    * $K = h(S, R_A, R_B)$ with new $R_A, R_B$ 
+    * $msgs =$ all previous messages
+    * $PRF$ is also a hash function, we can also use $PRF(K, PRF(msgs))$ 
+  * No public key operations
+
+#### IPSec (Network Layer Security)
+
+* IPSec and SSL: IPSec lives at the network layer and transparent to applications, which contains two parts:
+
+  * Internet key exchange (IKE): Establish a session key
+    * phase I: master session key setup => comparable to SSL session (**6 variants in total**)
+      * Three ways: All based on Diffie-Hellman. The three ways are used to provide original authentication for Diffie-Hellman (i.e. how the proof are calculated)
+        * Public key encryption based
+        * Signature based
+        * Symmetric key based
+      * Two modes:
+        * Main mode: try to protect user identity => must be implemented
+        * Aggressive mode: try to use the fewest number of messages => should be implemented
+    * phase II: ESP and/or AH **key setup** => comparable to SSL connection (do not cover)
+  * Encapsulating Security Payload (ESP) or Authentication Header (AH): How a secure channel works
+
+* IKE phase I: signature based
+
+  * Main mode
+    $$
+    A \rightarrow B: CP \\
+    A \leftarrow B: CS \\
+    A \rightarrow B: g^a\ mod\ p, R_A\\
+    A \leftarrow B: g^b\ mod\ p, R_B\\
+    A \rightarrow B: E(K, "Alice"||proof_A)\\
+    A \leftarrow B: E(K, "Bob"||proof_B)\\
+    $$
+
+    * Assumption
+      * The public keys are known by each other and certified by trusted CA
+      * $CP$ = crypto proposed, $CS$ = crypto selected
+      * $K = h(g^{ab}\ mod\ p, R_A, R_B)$
+      * $SKEYID$ =  $h(R_A, R_B, g^{ab}\ mod\ p)$  (enlarge the hash space to avoid dictionary attack)
+      * $proof_A = [h(SKEYID, g^a\ mod\ p, g^b\ mod\ p, CP, "Alice")]_{Alice}$
+    * How does Bob know Alice (now who he is talking to)
+      * The identifier $“Alice”$ is appended in the encryption, Bob can use Alice’s identifier to choose public key to verify the signature
+    * Alice and Bob are mutually authenticated
+    * No one has key control
+    * Explicit key authentication
+
+  * Aggressive mode
+    $$
+    A \rightarrow B: "Alice", g^a\ mod\ p, R_A,CP\\
+    A \leftarrow B: "Bob", g^b\ mod\ p, R_B, CS, proof_B\\
+    A \rightarrow B: proof_A\\
+    $$
+
+    * Identity of Alice and Bob are not protected
+    * Cannot negotiate $g$ or $p$ => since less message required
+
+* IKE phase I: Symmetric Key Based 
+
+  * Main mode (same format)
+    $$
+    A \rightarrow B: CP \\
+    A \leftarrow B: CS \\
+    A \rightarrow B: g^a\ mod\ p, R_A\\
+    A \leftarrow B: g^b\ mod\ p, R_B\\
+    A \rightarrow B: E(K, "Alice"||proof_A)\\
+    A \leftarrow B: E(K, "Bob"||proof_B)\\
+    $$
+
+    * Assumption
+      * There is a shared $K_{AB}$ between Alice and Bob in advance
+      * $CP$ = crypto proposed, $CS$ = crypto selected
+      * $K = h(g^{ab}\ mod\ p, R_A, R_B, {\color {red} K_{AB}})$ 
+      * $SKEYID$ =  $h(K, g^{ab}\ mod\ p)$  (enlarge the hash space to avoid dictionary attack)
+      * $proof_A = h(SKEYID, g^a\ mod\ p, g^b\ mod\ p, CP, "Alice")$
+    * Problem: 
+      * Notice that $K_{AB}$ is necessary to be included in the construction of $K$ to prevent man-in-the-middle attack (otherwise anyone can generate the proof)
+      * Different from the signature based protocol, we cannot get $K$ without knowing the identity of the message
+      * Therefore, Alice’s ID must be IP address (and it is static)
+
+  * Aggressive mode (same format)
+    $$
+    A \rightarrow B: "Alice", g^a\ mod\ p, R_A,CP\\
+    A \leftarrow B: "Bob", g^b\ mod\ p, R_B, CS, proof_B\\
+    A \rightarrow B: proof_A\\
+    $$
+
+    * No identity protection
+    * Does not have problems of main mode
+
+* IKE phase I: Public key encryption Based 
+
+  * Main mode
+    $$
+    A \rightarrow B: CP \\
+    A \leftarrow B: CS \\
+    A \rightarrow B: g^a\ mod\ p, \{R_A\}_{Bob}, \{"Alice"\}_{Bob}\\
+    A \leftarrow B: g^b\ mod\ p, \{R_B\}_{Alice}, \{"Bob"\}_{Alice}\\
+    A \rightarrow B: E(K, proof_A)\\
+    A \leftarrow B: E(K, proof_B)\\
+    $$
+
+    * Assumption
+      * There is a shared $K_{AB}$ between Alice and Bob in advance
+      * $CP$ = crypto proposed, $CS$ = crypto selected
+      * $K = h(g^{ab}\ mod\ p, R_A, R_B)$  
+      * $SKEYID$ =  $h(R_A, R_B, g^{ab}\ mod\ p)$ 
+      * $proof_A = h(SKEYID, g^a\ mod\ p, g^b\ mod\ p, CP, "Alice")$
+    * Only Alice and Bob can get the random numbers
+
+  * Aggressive mode
+    $$
+    A \rightarrow B: \{"Alice"\}_{Bob}, g^a\ mod\ p, \{R_A\}_{Bob},CP\\
+    A \leftarrow B: \{"Bob"\}_{Alice}, g^b\ mod\ p, \{R_B\}_{Alice}, CS, proof_B\\
+    A \rightarrow B: proof_A\\
+    $$
+
+    * Identities are hidden in this case
+    * The only difference with main mode is that we don’t encrypt the proof
+
+  * Issue for this mode
+
+    * Trudy can generates exponents $a,b$ and nonces $R_A, R_B$ and computes “valid” keys and proofs
+    * The signatures can be reused by intercepting the previous communication
+    * It means that a fake communication can be constructed
+    * This protocol does not provide non-repudiation
+      * A feature instead of a failure in IPSec => plausible deniability
+      * Can be a failure in some cases
+
+* ESP and AH
+
+  * Two encapsulation modes
+
+    * Transport mode: 
+
+      * designed for host-to-host
+      * Original IP header remains for both ESP and AH mode, other data are protected (including TCP header, HTTP header, Application level data)
+      * passive attacker can see who is talking
+
+    * Tunnel mode
+
+      ![image-20200506222655479](assets/image-20200506222655479.png)
+
+      * designed for gateway to gateway VPN
+      * Original IP packet encapsulated in IPSec (not visible to attacker), new header rom firewall to firewall
+      * Process
+        * Host A generates a packet
+        * The RA GW encapsulate the packet adding a new IP header
+        * The RB GW decapsulate the packet (strip extra headers) and injects the packet to B’s network
+        * Host B receives the packet
+        * Note that the routing tables for A and B needs to direct the packets to the GWs so these could be directed
+      * Can be extended to host-to-gateway connection (use VPN to work from home). In this case, the host will imitate(模仿) the role of a SGW rouer
+
+  * Two protocols
+
+    * AH - Authentication Header - support message authentication only 
+    * ESP – Encapsulating Security Payload 
+      * Encryption only 
+      * Encryption with message authentication
+
+* Authentication Header (AH) protocol
+
+  ![image-20200506223251492](assets/image-20200506223251492.png)
+
+  * Notice that in both mode does not provide authenticity for mutable field
+  * At first AH tunnel mode looks a bit useless – the original IP header is replaced but then you keep it plaintext
+  * **Benefit of AH with tunnel mode**: entire original IP header is integrity protected – not only the immutable fields. In the new IP header the mutable fields (variable that change during transmission are not protected). => provide more authentication
+
+* Encapsulating Security Payload (ESP) Protocol
+
+  ![image-20200506224108286](assets/image-20200506224108286.png)
+
+  * Note that the IP header is not protected in any way here. However, the original IP header in tunnel mode is now confidential
+
+### Mobile Networks
+
+* GSM (Global System for Mobile Communications) Mobile System Overview
+
+  ![image-20200506230316606](assets/image-20200506230316606.png)
+
+  * Mobile phone: contains a SIM (subscriber identity module), SIM has following property
+    * IMSI (International Mobile Subscriber ID)
+    * User key $Ki$ (128 bits)
+    * Tamper resistant (smart card)
+  * Home network, which you paid for very month: “home” of the mobile
+    * HLR: home location register => keeps track of most recent location of mobile
+    * AuC: authentication center => one of the security management, contains IMSI/Ki
+  * Visiting Nework: network where mobile is currently located
+    * base station: one “cell”
+    * base station controller: manages many “cell”s, send your request to your home network
+    * VLR: visiting location register => info on all visiting mobiles currently in the network
+
+* Services of GSM (2G)
+
+  * Anonymity
+    * IMSI used to initially identify caller 
+    * Then TMSI (Temporary Mobile Subscriber ID) used. TMSI changed frequently and encrypted when sent
+    * Not a strong form of anonymity, but probably sufficient for most uses
+  * Authentication
+    * Caller authenticated to the base station, not mutual
+    * via challenge-response
+      * AuC generates $RAND$ and computes $XRES = A3(RAND, Ki)$ where $A3$ is a hash
+      * Then $(RAND, XRES)$ are sent to base station 
+      * Base station sends challenge $RAND$ to mobile 
+      * Mobile’s response is $SRES = A3(RAND, Ki)$ 
+      * Base station verifies $SRES = XRES$
+    * Note: 
+      * $Ki$ never leaves AuC, only send hashed $Ki$
+      * Length of the random number should be long enough
+      * Response (hash) length should be long enough
+  * Confidentiality: Triplet $ Kc, XRES, RAND$
+    * Data encrypted by stream cipher, $A5$
+    * Encryption key $Kc$ 
+      * AuC computes $Kc = A8(RAND, Ki)$, where $A8$ is a hash 
+      * Then $Kc$ is sent to base station with $RAND$ 
+      * Mobile computes $Kc = A8(RAND, Ki)$ after receiving $RAND$ 
+      * The value of $RAND$ is the same as the one used for authentication 
+      * Keystream generated from $A5(Kc)$
+    * Note: $Ki$ never leaves home network!
+
+* GSM performance
+
+  * Benefit: Eliminate cloning mobiles => authenticated mobile
+
+  * Insecurity of GSM
+
+    * Algorithm
+
+      * Hash used can be broken: Broken after 160,000 chosen plain texts. With SIM, can get Ki in 2 to 10 hours
+      * Encryption between mobile and base station but no encryption from base station to base station controller
+      * Encryption algorithm can be broken 2 seconds of known plain text
+      * no integrity checking
+
+    * Fake base station exploits two flaws 
+
+      ![image-20200506232157378](assets/image-20200506232157378.png)
+
+      * Encryption not automatic 
+      * Base station not authenticated
+
+    * Vulnerable to replay triplet
+
+    * No integrity check
+
+* 3GPP(3rd Generation Partnership Project) : fixes known GSM security problems
+
+  * Mutual authentication 
+  * Keys (encryption/integrity) cannot be reused 
+  * Triples ($ Kc, XRES, RAND$) cannot be replayed (freshness)
+  * Strong encryption algorithm (AES) 
+  * Message authentication 
+  * Encryption extended to base station controller
+
+* 3GPP - AKA (Authentication and Key Agreement)
+
+  ![image-20200506232910580](assets/image-20200506232910580.png)
+
+  * The green box shows the connection between AuC, base station, and mobile from left to right
+  * Send AV to base station according to following fields
+    * SQN: increment by one (counter)
+    * XRES: expected response 
+    * CK: encryption key
+    * IK: integrity key
+    * AK: authentication key
+    * AMF: authentication management field (configurations)
+  * **important: use AES for encryption**
+
+### WLAN Security
+
+* Authentication Scheme: one-way authentication (simple challenge-response)
+
+* Confidentiality: Three protocols
+
+  * WEP: long term key, RC4, bad integrity measures and was pretty insecure
+  * WPA: Improvement on key reuse (key distributed by a TTP) but still RC4
+  * WPA2: started using AES
+
+* WEP (Wired Equivalent Privacy) algorithm
+
+  * WEP encipherment block diagram
+
+    ![image-20200507014039634](assets/image-20200507014039634.png)
+
+    * Secret Key (40 bits or 104 bits): Distributed to communicating entities (wireless stations and access points) via external key management service (e.g. manually key in)
+    * Integrity Algorithm: CRC-32 (an error check algorithm => does not provide integrity well)
+    * WEP PRNG: 
+      * RC4
+      * Initialized by Seed
+      * Outputs a long binary stream called key sequence
+
+  * WEP weakness: 
+
+    * RC4 is not good: By analyze pattern, it can be broken
+      * 24 bits IV can be iterated
+    * CRC: weak linear integrity, easy to construct (linear combination of bit stream)
+      * You can change the CRC as well as the ciphertext
+
+  * Solutions:
+
+    * Higher protocol level solutions
+      * Application layer authentication 
+      * Encryption with IPSec or PPTP (use VPN) 
+      * Important websites should have HTTPS
+    * Improve Wi-Fi Protected Access
+      * Dynamically varying encryption keys => WPA
+      * Use stronger encryption algorithm => WPA2
+
+* WPA/WPA2 (Wi-Fi Protected Access) systems
+
+  * WPA
+    * Integrity algorithm: Change CRC to Proprietary Michael integrity check algorithm
+    * Key management
+      * Extensible Authentication Protocol (EAP) for authentication => allows session keys
+      * Temporal key integrity protocol (TKIP) for encryption => still use RC4 but generate key dynamically
+  * WPA2
+    * CCMP
+      * AES (operating like stream cipher in counter mode)
+      * CBC-MAC for integrity
+    * GCMP
+      * AES in GCM mode (Galio/Counter mode)
+      * GHASH for integrity
+    * Allows alternative to have a password shared between an AP and a user  (Preshared key “WPA2-PSK” mode)
+  * Protocol is safe, but some implementations are not
+    * WPA2 has a four-way key establishment handshake 
+      * Pairwise Transient Key (PTK) 
+      * Groupwise Transient Key (GTK)
+    * CCMP/GCMP only secure if IV does not repeat 
+      * CCMP (IV = MAC/48-bit Nonce) 
+      * GCMP (IV = MAC/48-bit Nonce)
+
+### Tutorial
+
+* T10 Q4:  $K = h(S, R_A, R_B)$ 
+  $$
+  A \rightarrow B: R_A \\
+  A \leftarrow B: Cert_B, R_B \\
+  A \rightarrow B: \{S\}_B, E(K, h(msgs||K)) \\
+  A \leftarrow B:h(msgs||K) \\
+  A \leftrightarrow B: Data\ encrypted\ under\ K
+  $$
+
+  * (a) What is the purpose of the message $E(K, h(msgs || K))$ sent in step 3?
+    * Confirms $A$ actually knows $K$ => explicit key authentication
+    * **Only Bob can decrypt $\{S\}_B$, it authenticate Bob to Alice**
+  * (b) If we remove this part in step 3, i.e., if we changed step 3 to $A \rightarrow B : \{S\}_B$ Would the protocol still be secure?
+    * **Depends what we mean by ‘secure’…the protocol would still be secure from authentication/key establishment viewpoint**
+    * **It could be more vulnerable to denial-of-service attacks. If this message is removed, an attacker can simply send a random number to Bob in step 3 and then abandoning the connection, forcing Bob to keep it open until it times out, wasting resources on Bob's side. If the attacker repeats this many times from different sources until a limit is reached, Bob will stop accepting new connections and the DoS attack is successful.**
+
+* T11 Q1
+
+  * (a) How many different methods are there if two hosts would like to authenticate packets between them? **In tutorial 11 q1, why doesn’t the different methods to authenticate packets include 6 phase I of IKE methods** => authenticate packet means already share a session key, we focus on the protocol  
+
+    * **4 methods**
+
+    * **AH + transport****Depends what we mean by ‘secure’…the protocol would still be secure from authentication/key establishment viewpoint**
+
+      **It could be more vulnerable to denial-of-service attacks. If this message is removed, an attacker can simply send a random number to Bob in step 3 and then abandoning the connection, forcing Bob to keep it open until it times out, wasting resources on Bob's side. If the attacker repeats this many times from different sources until a limit is reached, Bob will stop accepting new connections and the DoS attack is successful.**
+
+    * **AH + tunnel**
+
+    * **ESP + transport**
+
+    * **ESP + tunnel**
+
+  * (b) Can you think of an advantage of transport mode over tunnel mode if only authentication is required? 
+
+    * Transport mode: Easy to implement, less time consumption
+      * **Transport mode has a slightly lower bandwidth overhead over tunnel mode. **
+    * Tunnel mode: Prevent interception of IP address, more secure
+
+  * (c) Can you think of a reason why in transport mode AH could be slightly better for authentication than ESP? 
+
+    * The immutable fields in the IP header is also protected
+
+  * (d) What is the purpose of padding when using ESP?
+
+    * ESP provides confidentiality. Block cipher requires padding
+    * **Padding may also be used to conceal(隐藏) the actual length of the payload by adding a certain amount of padding.** 
+
+* T11 Q2
+
+  * a) You are using WEP to secure your WiFi connection. 
+    * i) Attackers can gain knowledge about the plain text of the message if the key stream happens to repeat. You are sending 10,000 new WEP messages, on average, every second. How long does the attacker need to wait for the key stream to repeat?
+      * **Key is fixed, need iterate 24 bit IV =>( 2^24 / 10000) seconds 0.466 hours**
+    *  ii) An attacker knows the plain text of one of your messages. How can he modify the message so the receiver receives and accepts his new message? 
+      * Standard stream cipher problem 
+      * $M= text||CRC_M$, attacker has $A= attack_{text}||CRC_A$ 
+      * RC4 generates key stream $KS $
+      * $C= M\ XOR\ KS$, attacker recovers $KS $ by $KS = C\ XOR\ M $
+      * Attacker makes $C’ = A\ XOR\ KS $
+      * Receiver recovers $M’= C’\ XOR\ KS$ instead of $M$
+  * b) You wish to use public WiFi at the shopping mall but it is set up to use WEP. What can you do to ensure you have improved security for you connection?
+    * **Use a Virtual Private Network using something like IPSec (safest)** 
+    * **Make sure of TLS/SSL (https) connection (not guaranteed as some traffic can still be seen – like initial visit to website)**
+
+* T11 Q3
+
+  * a) What basic security services does a 2nd generation mobile network provide? 
+
+    * Anonymity, Confidentiality for **phone and base station** and authenticity for mobile phone
+
+  * b) What basic security services does a 3rd generation mobile network provide? 
+
+    * mutual authentication
+    * Integrity
+    * Confidentiality for base station controller
+    * **Note: Uses standard cryptography based on AES**
+
+  * c) **Consider the simplified 3G system shown below. Construct a suitable protocol and explain how mutual authentication is achieved.**
+
+    ![image-20200507024513904](assets/image-20200507024513904.png)
+    $$
+    Auth\ center \rightarrow Mobile station: MAC, RAND \\
+    Auth\ center \leftarrow Mobile station: RES \\
+    $$
+
+    * SQN is a counter kept by AuC and MS as a logical time stamp
+    * MAC contains SQN as timestamp
+    * AuC authenticated to Base station: Mobile station use its own sequence number and the given random number to calculate expected MAC and compare with MAC
+      * Freshness: SQN 
+      * Origin auth: MAC (f1)
+    * Base station authenticated to AuC: The response takes the RAND as a nonce
+      * Freshness: RAND 
+      * Origin auth: encryption (f2)
