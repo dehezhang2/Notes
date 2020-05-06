@@ -5,7 +5,7 @@
 ## Questions
 
 * In Lecture 6, why do we use identifier in Example 4 (nonce & signature)
-* 
+* In Lecture 9, why do we need SSL over IPSec
 
 ## Lecture 06: Authentication
 
@@ -338,3 +338,5 @@
 ## Lecture 07: Key Management
 
  
+
+## Lecture 09: 
