@@ -148,7 +148,7 @@
   * prevent code execution
   * add run time integrity checking
 
-* Countermeasure I: non-executable stack
+* Countermeasure I: non-executable stack (overflow protection)
 
   * marking heap and stack as non-executable
   * limitations
@@ -176,18 +176,134 @@
 
     ![1588869073536](assets/1588869073536.png)
 
-* Countermeasure II: Address randomization
+* Countermeasure II: Address randomization (overflow protection)
   * Idea: 
     * ASLR(Address Space Layout Randomization): start both heap and stack at random location and map shared libraries to rand location in process memory
     * Sys-call randomization: randomize sys-call id’s
     * Instruction Set Randomization (ISR)
   * Limitation: Randomness can still be limited (only shift by a random value)
-* Countermeasure III: StackGuard
-  * 
+  
+* Countermeasure III: StackGuard (overflow detection) => notice that this method only protect stack
 
+  * Canary: Embed “canaries (金丝雀)” between the local variable and the exception handler, stack frame pointer, return address and the arguments and verify their integrity prior to function return
+    * Canary Types
+      * Random canary: 
+        * insert random string to the stack, check it when return from the function
+          * if change, exist program
+          * vulnerable to DoS attack
+        * Attacker must guess the random string to lauch attack
+      * Terminator canary:
+        * Insert canary = `{0, newline, linefeed, EOF}` 
+        * String function will not copy beyond terminator
+    * Canary don’t provide full proof protection => some techniques can leave canary unchanged
+      * integer overflow still possible
+      * /GS cannot protect exception handler without /SAFESEH and /SEHOP
+      * heap-based attack still possible
+  * Heap protection: PointGuard
+    * **Function pointers and setjmp buffers** are protected by one-time pad encryption (XOR random cookie) (when call the function, XOR the cookie again)
+    * Less effective, more noticeable performance effects
+  * ProPolice: Canary only protect the SFP, return address, arguments … If there is a function pointer in the local variables, it can still overflow it
+    * Rearrange stack layout to prevent ptr overflow, make sure local string buffers are the first one in the local variables => new stack structure (from high to low)
+      * args
+      * ret addr
+      * SFP
+      * CANARY
+      * **local string buffers**
+      * local non-buffer variables (pointers but not array (not constant pointer))
+      * copy of pointer args
+  * /GS: Combination of ProPolice and Random canary (becomes mandatory after Visual Studio 2010)
+  * Limitations: Cannot protect exception handler
 
+* Countermeasure IV: SAFESEH and SEHOP
+
+  * Evading /GS with exception handlers: 
+    * When exception is thrown, dispatcher walks up exception list until handler is found (handler may point to attacker’s code after overflow)
+    * Canary doesn’t work since it is only checked after returning, exception is triggered before that
+  * /SAFESEH: linker flag
+    * linker produce whitelist of exception handlers, system will not jump to exception handler not on the list
+  * /SEHOP: platform defense
+    * Corrupt SEH: corrupt the “next” entry in SEH list
+    * SEHOP: add a dummy recored at top of SEH list => check the integrity
+    * When exception occurs, dispatcher walks up list and verifies dummy record is there, if not, terminates process
+  * Limitation: require recompilation
+
+* Countermeasure V: Libsafe (format string => not overflow)
+
+  * Dynamically loaded library (replace library by safe version) => for the cases cannot recompile the entire code base
+  * Intercepts calls to `strcpy(dest, src)` 
+    * Validates sufficient space in current stack frame `|frame_pointer - dest|>strlen(src)` 
+    * If so do copy, otherwise, terminates the application
+    * But there might be funciton pointer in the local variables => cannot protect
+  * Limitation: limited protection (see the strcpy case)
+
+* Countermeasure VI: StackShield & Control Flow Integrity
+
+  * StackShield
+    * At function prologue, copy return address RET and SFP to “safe” location (beginning of data segment)
+    * Upon return, check that RET and SFP is equal to copy
+    * Implemented as assembler file processor (GCC) 
+  * CFI: Combination of static and dynamic checking
+    * statically determine program control flow
+    * dynamically enforce control flow integrity
+  * Limitation: many different kinds of attacks. Not one silver bullet defense
+
+* Summary
+
+  | Defenses/Mitigations | Code Injection                                               | Arc Injection                                                |
+  | -------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+  | Stack                | Non-executable (NX)*, ASLR, StackGuard(Canaries), ProPolice, /GS, Libsafe, StackShield | ASLR, StackGuard(Canaries), ProPolice, /GS, Libsafe, StackShield |
+  | Heap                 | Non-executable (NX)*, ASLR, PointGuard                       | ASLR, PointGuard                                             |
+  | Exception Handler    | Non-executable (NX)*, ASLR, /SAFESEH, /SEHOP                 | ASLR, /SAFESEH, /SEHOP                                       |
+
+### Heap Spray Attacks
+
+* Problem of previous mentioned attack: attacker does not know where the shell code is on the heap even if they can overflow the vtable
+* Attack method: use JS to spray (place shellcode among the heap as much as possible) heap with shell code (and NOP slides), then point vtable ptr anywhere in spray area
+* Ehancement: Heap Feng Shui (lauch attack with out spraying)
+* Countermeasures
+  * PointGuard
+  * Better browser architecture (store the JS string in a separate heap from browser heap) (browser sandbox)
+  * OpenBSD heap overflow protection (non-writable pages in the heap (cannot passover the pages))
+  * Nozzel: detect sprays by prevalence of code (code density is higher than a threshold)
 
 ### Race Condition Vulnerabilities
+
+* When does it happen: Two concurrent threads of execution access a shared resource and may have different result upon different order of the execution
+
+  * Concurrency property: Two control flows executing concurrently
+  * Shared object property: Concurrent flows must access a common shared *race object*
+  * Change state property: At least one control flow must alter the state of the *race object*
+  * There is a gap between Time-of-Check and Time-of-Use
+  * attacker may change the output by putting influence on the uncontrollable events
+
+* Specific attack
+
+  ![Screen Shot 2020-05-08 at 11.37.11 AM](assets/Screen Shot 2020-05-08 at 11.37.11 AM.png)
+
+  * This is a root-owned set-uid program with effective UID root and Real UID seed
+    * `access` check the real uid
+    * `open` check the effective uid
+    * only allow user change their own files 
+  * Vulnerable between `acess` and `open`, another program can link the `/tmp/x` to some important root owned files (attacker keep running this until CPU arrange the process as the order he wanted)
+
+* Countermeasures
+
+  * Atomic Operations: elimate the window of the check and use
+
+    * `open(file, O_WRITE | O_REAL_USER_ID)` 
+    * with this option, only check real uid => check and use on the function `open` its own
+    * just idea, not implemented in any OS
+
+  * Repeating Check and Use: Make it difficult to win the “race” => Raise the bar
+
+  * Sticky Symlink Protection: To prevent creating symbolic links (system level)
+
+    * When enabled, only create link when the owner of the symlink matches either the **follower** or the **directory owner**
+    * In our example, `/tmp` is also owned by the root, follower is also the root
+
+  * Principles of Least Privilege: To prevcent the damage after race is won (usage level)
+
+    ![Screen Shot 2020-05-08 at 11.49.22 AM](assets/Screen Shot 2020-05-08 at 11.49.22 AM.png)
 
 ## Chapter 6: Web Security
 
