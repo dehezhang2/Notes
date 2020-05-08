@@ -2,14 +2,12 @@
 
 [TOC]
 
-
-
 ## Question
 
 * In chapter 7, TCP connection Spoofing, why it cannot be prevent by IPSec?
 * In chapter 7, what is the difference between the Bot net and normal DDoS
 
-## Overview of Practical Seucrity
+## Overview of Practical Security
 
 * Web attacker 
   * least privilege
@@ -25,228 +23,418 @@
 
 ## Chapter 5: Operating System Security
 
-![image-20200507044657442](assets/image-20200507044657442.png)
+### Buffer-overflow and Memory Safety
+
+* What is needed
+  * C functions
+  * Memory manager: stack & heap
+  * System call, `execve`
+  * Which CPU and OS used on the target machine
+    * e.g. X86 Linux => little endian (reverse order in memory)
+* **Memory layout (from high to low)**
+  * Reserved for kernel
+  * Stack (growth from high to low) => function call (%esp register stores the top of the stack)
+  * Library => shared libraries
+  * Heap => dynamically generate data (malloc)
+  * Static **data segment** => static variables initialized in the source code
+  * **text segment** => machine code
+  * unused
+* **Stack frame (from high to low)**
+  * arguments of the function (4 bytes each)
+  * return address (4 bytes)
+  * pointer of the previous stack frame (4 bytes)
+  * **expectation handlers**
+  * local variables initialized in the function
+* When does buffer overflow happen:  
+  * buffer overflow happens when there is a function that fails to check the boundary for memory copy task. 
+  * An input to the running process exceeds the length of the buffer
+  * The memory will be overwritten
+* Effect of a buffer overflow
+  * It will cause segmentation fault in the normal cases
+  * If the return address overwritten is well designed, it will point to malicious code
+  * If the current process is run in root privilege, attacker may get the root shell. 
+* How to get a root shell by using buffer overflow
+  * prepare shell code: 
+    * write code in C
+    * compile and find the compilation code
+    * format instructions as characters in a string
+  * Stack Exploit
+    * insert the shell code in a proper position in the copied string
+    * also calculate the return address and put it in the corresponding position in the string
+  * The NOP slide
+    * It is difficult for attackers to get the specific address
+    * Use rough address, add NOP slides between the return address position and the start of the shell code
+    * Perform fuzzy testing on the position
+  * Important details
+    * Do not include `\0` in the shellcode, which will end the string copy
+    * Make sure there will not be segmentation fault before the shell code is called
+* Unsafe (vulnerable) libc functions and safe functions
+  * unsafe: `strcpy`, `strcat`, `gets`, `scanf`
+  * safe libc versions: `strncpy`, `strncat` etc.
+    * require use input the length of the copied array
+    * cause unterminated array since it is possible that the source array is too long
+    * need manually add `\0`
+* Vulnerabilities of Buffer overflow except return address
+  * Function pointer (stack or heap) => e.g. heap and object function
+    * method 1
+      * Overwrite the vtable of an object, point it to shell code
+      * Call any function of the object
+    * method 2
+      * Overwrite the vtable of an object, point it to corrupted vtable
+      * Call any function of the object
+  * Exception handler (stack)
+    * overwrite the handler
+    * make exception
+  * Longjmp buffers: `longjmp(pos)` 
+    * overflowing buf next to pos overrides value of pos
+* Step of general control Hijacking
+  * overwrite step: find some way to modify a control flow pointer to point to **shellcode, library entry point**
+  * activate step: activate the modified control flow pointer
+* How to find overflows
+  * run server code on local machine
+  * use software to generate malform input
+  * find out crash cases
+
+### More Control Hijacking Attacks
+
+* Integer overflows: 
+  * overflowed integer could be negative or zero
+  * if the boundary checking use the overflowed integer, it will run the memory copy code
+* Double free
+  * memory manager will write data to the specific position
+  * By overwriting particular registers or memory spaces, an attacker can trick the program into executing code of his/her own choosing, often resulting in an interactive shell with elevated permissions.
+
+### Format String Vulnerabilities
+
+* important format : `%n` => instead of printing, it writes number of bytes printed
+
+* `printf` property
+
+  * maintain a pointer point to the first parameter
+  * move the pointer to construct new string
+
+* Miss-match case situation => will `printf` be executed?
+
+  * Compiler => `printf `is designed to have multiple parameters
+  * Run time => `printf `will automatically move the pointer
+
+* Vulnerabilities
+
+  * crash the program: DoS/segmentation fault =>  use a list of `%s` without parameter
+
+  * view memory at any location => construct `%s` and `%x` format tokens
+
+    * e.g. `printf(“\x10\x01\x48\x08_%x_%x_%x_%x_%s")` 
+    * want print `\x10\x01\x48\x08`
+    * if we want to print string, the address of format string is stored in a parameter, and the address of the target string is stored in another parameter
+    * two parameters of `printf ` are next to each other, therefore, the address of output parameters are next to the address of format string
+    * we need to figure out the distance between the address of format string and the content of the format string. 
+    * each `%x` is four bytes (one slot in memory)
+
+    ![1588864149180](assets/1588864149180.png)
+
+  * write to memory at any location
+
+    * replace `%s` by `%n`, write the string length to the target address
+    * control the value written `printf(“%08x.%08x.%08x.%08x.%n”)`
+
+### Defenses and Return-to-libc
+
+* Guideline
+
+  * fix bugs
+    * audit software
+    * rewrite in java which is safe language
+  * prevent code execution
+  * add run time integrity checking
+
+* Countermeasure I: non-executable stack
+
+  * marking heap and stack as non-executable
+  * limitations
+    * does not prevent return-to-libc
+    * some apps need executable heap
+
+* Return-to-libc attack
+
+  ![1588865634640](assets/1588865634640.png)
+
+  * change the return address to the corresponding function in the library
+
+  * change the argument to the function parameter you want to use (this can be set by the environment variable)
+
+    * Notice that the program used to find the address of the environment variable need to have the same length of program name (which is also an environment variable).
+
+  * find the addresses of library function and argument using GDB
+
+  * Important registers: ebp (frame pointer), esp (stack pointer)
+
+    * notice that the return address points to the machine code part (in lower address)
+    * for machine code, if there is no corresponding stack frame, a new one will be created
+    * `system` will create new frame, and the content of the half of the new frame is from the overflowed memory. 
+    * put `exit` function in the position 2
+
+    ![1588869073536](assets/1588869073536.png)
+
+* Countermeasure II: Address randomization
+  * Idea: 
+    * ASLR(Address Space Layout Randomization): start both heap and stack at random location and map shared libraries to rand location in process memory
+    * Sys-call randomization: randomize sys-call id’s
+    * Instruction Set Randomization (ISR)
+  * Limitation: Randomness can still be limited (only shift by a random value)
+* Countermeasure III: StackGuard
+  * 
+
+
+
+### Race Condition Vulnerabilities
 
 ## Chapter 6: Web Security
 
-![image-20200507044608726](assets/image-20200507044608726.png)
-
 ### Introduction
 
-* Notice that for URL, special characters are encoded as hex
-* Image tag security issues
-  * Many embedded links in the web page for rendering, which might be some bad things, image is an example
-  * Communicate with other site by adding the url of bad website to the src field
-  * Make the height and width of the image small to hide it
-  * Spoof other sites by adding logos that fool a user
-  * **A web page can send information to any site**
-* PKI certificate: used to identify the public keys
-  * Challenges
-    * Hash collisions => SHA-1 used before signature (difficult to change old hash function or CAs)
-    * Weak security at CAs: allow bad certificates issued
-    * User don’t notice when attacks happen
-  * Consequences of compromised CA
-    * Attacker use DNS to poison the mapping of the legitimate domain name to the correct IP address
-    * Authenticate the bad site as real site by the compromised CA
-    * Decrypt all data sent by users
-  * Countermeasures or CA problem
+* Image tag problem
+  * How to inject bad link
+  * How to hide images
+  * How to attract victims
+  * What is the vulnerability from the perspective of browser if we use bad image
+* PKI
+  * Challenges: hash, bad CA, cannot find by user
+  * Consequence of compromised CA: how to attack if you have a CA? 
+  * Counter measures
     * Certificate Transparency
-      * Problem: browsers will think nothing is wrong with a rogue(流氓) certificate until revoked(撤销)
-      * Goal: make it impossible for a CA to issue a bad certificate for a domain without the owner of that domain knowing
-      * Approach: auditable certificate logs => if CA wants to issue some `google.com` certificates, we want Google knows it
-      * Need extra auditing system: 
-        * what if it is compromised again? **Attacker can change the log**  => cat and mouse
-        * May use block chain?
     * Certificate Pinning
-      * Trust on first access: tells browser how to act on subsequent connections (assume the very first connection is not attacked)
-        * Record the public key of the first time
-        * Always check whether the public key is changed
-      * HPKP – HTTP Public Key Pinning 
-        * Use these keys!
-        * HTTP response header field “Public-Key-Pins” 
-      * HSTS – HTTP Strict Transport Security 
-        * **Only** access server via **HTTPS** 
-        * HTTP response header field "Strict-Transport-Security"
-    * Keys for People: Keybase => use other trusted account to prove untrusted account for a person
-      * Rely on existing trust of a person’s ownership of other accounts (e.g., Twitter, GitHub,website) 
-      * Each user publishes signed proofs to their linked account
+      * HPKP - HTTP Public Key Pinning 
+      * HSTS - HTTP Strict Transport Security 
+    * Keys for people => key base
 
 ### Web Security Goals and Threat Model
 
 * Goals of web security
-  * Safely browse the web: Users should be able to visit a variety of web sites, without incurring harm:
-    * User-site: No stolen information (without user’s permission)
-    * Site-site: Site A cannot compromise session at Site B
-  * Secure web applications: Applications delivered over the web should have the **same security properties we require for stand-alone applications** => should not jump out the box and compromise other privilege
-* Threats
-  * Web defacement 
-    * loss of reputation (clients, shareholders) 
-    * fear, uncertainty and doubt 
-  * information disclosure (lost data confidentiality) e.g. business secrets, financial information, client database, medical data, government documents
-  * data loss (or lost data integrity) 
-  * unauthorized access: functionality of the application abused 
-  * denial of service: loss of availability or functionality (and revenue) 
-  * “foot in the door” (attacker inside the firewall)
-* Two important open web application security project
+  * site - site
+  * user - site
+* Threats => what if we didn’t achieve the goals
+* Two open web application security projects
   * Broken authentication & session management
-    * Understand session hijacking techniques, e.g.: 
-      * session fixation (attacker sets victim’s session id) 
-      * stealing session id: eavesdropping (if not https), XSS 
-    * Trust the solution offered by the platform / language and follow its recommendations (for code, configuration etc.)
-    * Additionally: 
-      * generate new session ID on login (do not reuse old ones) 
-      * use cookies for storing session id 
-      * set session timeout and provide logout possibility 
-      * consider enabling “same IP” policy (not always possible) => website from same IP shares information (separate origin)
-      * check referer (previous URL), user agent (browser version) 
-      * require https (at least for the login / password transfer)
+    * session hijacking techniques
+    * solutions
   * Broken Access Control (CSRF, XSS, SQL injection)
-    * Attacker manipulates the URL or form values to get unauthorized access 
-      * to objects (data in a database, objects in memory etc.):
-        *  http://shop.com/cart?id=413246 (your cart)
-        *  http://shop.com/cart?id=123456 (someone else’s cart ?) 
-      * to files:
-        *  http://s.ch/?page=home -> home.php
-        *  http://s.ch/?page=/etc/passwd%00 -> /etc/passwd 
-    * Solution: 
-      * avoid exposing IDs, keys, filenames to users if possible 
-      * validate input, accept only correct values 
-      * verify authorization to all accessed objects (files, data etc.)
+    * how does attacker manipulate the url
+      * object in DB
+      * files
+    * solutions
 
 ### Isolation
 
-* Principles
-  * Isolation: Separate web applications from each other, and separate browser components from each other
-  * Principal of Least Privilege: Give components only the permissions they need to operate
-* Target
-  * Should-be-safe activities
-    * Safe to visit an evil website
-    * Safe to visit two pages at the same time
-    * Safe delegation
+* Principals
+  * what is isolation
+  * what is least privilege principle
+* Targets
+  * Should-be-safe activities (3) 
   * Goals
-    * Browser Sandbox: Protect local system from web attacker
-      * No direct file access, limited access to OS,network, browser data, content from other websites
-      * Tabs (new: also iframes!) in their ownprocesses
-      * Implementation is browser and OS specific*
-    * Same Origin Policy: Protect/isolate web content from other web content
-      * Websites from the same origin can share information, otherwise cannot
-      * definition of the “same origin” is different for different resource
-        * cookies (Websites can only read/receive/set cookies from the same domain): domain and path of setting cookie URL
-        * javascript (When a website includes a script, that scriptruns in the context of the embedding website.): 
-          * imported: same origin as that **page or frame**
-          * embedded: same origin as that **page or frame**
-        * DOM (Only code fromsame origin can access HTML elements on another site (or in an iframe).): `protocol://host:port` defines origin
-* Attack example: cookie theft
-  * Cookie:
-    * Contains authentication information => steal cookie = steal account
-    * Can be theft with malicious JS
-    * Btw: Cookie theft via network eavesdropping (use HTTPS over HTTP)
-  * Cookie types
-    * Simple Cookie: Can be read by anyone and go everywhere
-    * HttpOnly Cookie: Can’t be read by JS
-    * Secure Cookie: Can only sent by secure connection
+    * user-site: Browser SandBox
+    * site-site: Same origin policy
+      * cookie: 
+        * website can read: same domain and path
+        * set: same domain suffix => vulnerable
+      * script: same as page / frame (once imported/embedded, treated as the same origin => vulnerable)
+      * DOM: protocol + domain + port
+* Example: cookie theft
+  * what does cookie do (2 uses)
+  * what is the most common technique to still cookie
+  * what application layer protocol should be used to avoid cookie theft
+  * extra protections => types of cookies
+* Cross-Origin Communication (sometimes enable): what are the methods to achieve and drawbacks of these methods
+  * access control white list
+  * html5 postMessages between frames
+* Browser Plugin
+  * Examples
+  * Goal
+  * Problem
+  * Good news
+* Browser Extensions
+  * Examples
+  * Goal
+  * How to protect from malicious websites
+    * privilege separation
+    * least privilege
+  * Problem: malicious extensions
+
+### Cross-Site Request Forgery
+
+* What is CSRF (bad website, cookie, link, form)
+* Main reason: separate origin policy does not control export
+* Steps of CSRF between client, server, and attacker(4 steps)
+
+* How to launch
+  * GET: hidden image
+  * POST: JavaScript
+* Countermeasure: 
+  * origin headers validation (new headers)
+    * why not use refer header => it might be changed for some reasons
+  * freshness (token) => nonce based request form
+
+### Cross-Site Scripting
+
+* What is XSS (script, injection, worm)
+* Types of XSS
+  * reflected: 
+    * steps
+      * attacker sends bad link
+      * victim clicks bad link and connected to the server
+      * server reflect back the webpage containing the script
+      * victim execute the script
+  * stored
+    * steps
+      * attacker stores bad link in the server
+      * victim visits the corresponding page and request the content from server
+      * victim execute the script
+    * types
+      * store self introduction
+      * upload “image” which is actually script
+  * DOM-based: instead of vulnerable server side code, the JS on client side is vulnerable (document.write())
+    * attacker send bad link with malicious input
+    * victim click the link, and JS is executed
+* Countermeasures
+  * input validation: white list a pattern, only allow this pattern
+  * input Escaping or Sanitization: switch ‘special characters’
+  * use less powerful API (most important): 
+    * disable inline script, restrict imported scripts if possible
+    * prefer `innterText` over `innerHTML`
+
+### Command Injection
+
+* What is command injection
+  * the php file may call `system `function to execute command
+  * inject new command by appending `;`
+  * notice we need to encode url
+* Countermeasures
+  * input validation:
+    * black list: easy to bypass (semi-colon => pipes => backticks => dollar sign ...)
+    * white list a pattern, only allow this pattern (use regular expression)
+  * input Escaping or Sanitization: switch ‘special characters’
+  * use less powerful API (most important): 
+    - `system` is too powerful
+
+### SQL Injection
+
+* What is SQL injection (SQL, multiple command)
+  * in the `WHERE` phrase, attacker my use bad input such as `admin'--` to comment following sentences
+  * New command can be appended by using `admin';DROP ...;--`
+* Countermeasures
+  - input validation: white list a pattern, only allow this pattern (use regular expression) 
+    - e.g. only allow ‘a-z, A-Z, .’ for username => still can be bypassed by using malicious password input `‘OR 1=1;--` 
+  - input Escaping or Sanitization: switch ‘special characters’, pairwise `‘` 
+  - use less powerful API (most important): 
+    - Use SQL template
+    - All the user inputs are treated as data
+
+### Web Privacy
+
+* why web tracking: 
+  * website makes money
+  * analyze your behavior, recommend ads, personalized content
+* Third-party web tracking: Amazon API makes sure you are tracked even if you didn’t click third party link
+* Understand tracking
+  * first party (you visit), third party (iframes, ads)
+  * third party cookie can invite any number of other third-parties
+  * types
+    - anonymous tracking: third-party cookies containing unique identifiers
+      - re-identify a user
+      - send the communication id + visited site back to the tracker
+    - other tracking: there is a facebook link under a website, you can comment or share
+      - user click tracker’s website in the visited website
+* Measure tracking
+  * How prevalent: 
+    * method: use web crawler based on our taxonomy
+    * result: very prevalent
+  * How much browsing history tracked
+    * Challenges
+      * Privacy concerns.
+      * Users may not browse realistically while monitored
+    * Method: Use public AOL search logs to create 30
+      hypothetical browsing histories.
+    * Result: a large fraction
+* Defenses
+  * Do not track header => not technical defense: trackers must honor the request
+  * Private browsing mode
+  * Third-party cookie blocking => only block set cookie not send cookie in some browser, if already set, can still send
+  * Browser add-ons => based on blacklist
 
 ## Chapter 7: Network Protocol Security and Defenses
 
-![image-20200507044539900](assets/image-20200507044539900.png)
-
 ### Networks: IP and TCP
 
-* IP
-  * Vulnerability: IP and TCP headers are not protected well, easy to override using raw packets
-    * No encryption and for confidentiality (Eavesdropping)
-    * No source authentication (spoof source address)
-    * No integrity checking ( content forgeries, redirections, and man-in-the-middle
-      attacks)
-    * No bandwidth constraints (DoS)
-  * Countermeasure: IPSec (AH (integrity) , ESP (integrity + confidentiality) headers), Tunnel Mode
+* IP:
+  * How does it work
+    * routing
+    * fragmentation and reassembly
+    * error reporting
+    * TTL field
+  * Vulnerabilities
+    * Confidentiality => eavesdropping
+    * Integrity => forge
+    * Availability => bandwidth / censoring
+    * Authenticity => spoofing
+  * Countermeasure
+    * IPSec
+      * IKE
+      * AH/ESP
+    * Two modes
 * TCP
-  * Vulnerability:
-    * packets pass by untrusted hosts => eavesdropping. packet sniffing 
-    * TCP state can be easy to guess  (guess the sequence number)
-      * Attack: After victim setting up a TCP connection with server, an attacker pretends to be the victim by changing the IP address of his packet
-    * DoS vulnerabilities: DDoS
-      * Attacker can send Reset packet to close connection
-      * TCP allows a large window of sequence number, which makes it easier to guess the sequence number
-    * Optimistic ACK Attack
-      * Takes advantage of the TCP congestion control
-      * It begins with a client sending out ACKs for data segments it hasn’t yet received
-      * makes the servers TCP stack believe that there is a large amount of bandwidth available and thus increase cwnd
-      * This leads to the attacker providing more optimistic ACKs, and eventually bandwidth use beyond what the server has available
-      * This can also be played out across multiple servers, with enough congestion that a certain section of the network is no longer reachable
-      * no practical solutions to this problem
-  * Countermeasure: 
-    * SSL protocol => packet sniffing (confidentiality)
-    * Random initial TCP sequence numbers (should be unpredictable) => TCP states and DoS
+  * How does it work
+    * three-way handshake
+    * acknowledgement
+    * congestion control
+  * Vulnerabilities
+    * passed by untrusted host => eavesdropping
+    * easy guess sqn => spoofing
+    * congestion control => DoS
+  * Countermeasures
+    * TLS/SSL
+    * Random initialize SQN
+    * no solution to congestion control problem
 
 ### Routing Vulnerabilities
 
-* ARP (address resolution protocol): IP address => ethernet address
-  - Used to find the physical connected neighbors in the network
-* OSPF: used for routing **within** an anonymous system (e.g. CityU network)
-* BGP: routing between the anonymous systems
-  * Protocol
-    * Different router learns information from each other
-  * Vulnerability: BGP packets are un-authenticated
-    - Attacker cause entire Internet to send traffic for a victim IP to attacker’s address => DoS
-    - In the interdomain routing, one point failure will be populated to all the network
-  * Countermeasure: S-BGP (raise the bar of fake advertisement)
-    - **IPsec**: secure point-to-point router communication
-    - **PKI**: authorization frame for all S-BGP entities
-    - Attestations: **digitally-signed** authorizations
-      - Address: authorization to advertise specified address blocks
-      - Route: Validation of UPDATEs based on a new path attribute, using PKI certificates and attestations
+* BGP:
+  * what is BGP
+  * Vulnerability: 
+    * authenticity
+    * DoS
+  * Countermeasure: SBGP
+    * IPSec
+    * PKI & validation => BGP message
 
 ### Domain Name System
 
-* DNS query:
+* DNS
   * Protocol
-    * Client send request to local DNS resolver (e.g. CityU resolver), and local DNS resolver sends query to the higher level resolver
-    * Sometimes, DNS responses and negative queries(nonexistent sites e.g. misspelling) are cached for a quicker response. The data cached also has TTL(time to live)
-  * Packet: application level protocol using UDP/IP
-    * UDP header, IP header
-    * DNS header including query ID (16 bit random value, link response to query)
-  * Vulnerability: No protocol widely used to protect DNS request packet
-    * Interception of requests or compromise of DNS server can result in incorrect or malicious response 
-    * DNS poison attack
-      * Attacker can keep sending (guessing the QID) bad mapping from domain name and IP address to a local DNS resolver. It will get a probability to success.
-  * Countermeasure: 
-    * authenticated requests/responses => provided by DNSsec ... but few use
-      * Provides origin authentication and integrity
-      * New Resource Records, PKI
-    * Increase Query ID size: 
-      * randomize src port, add another 11 bits to guess => turn to several hours to attack
-      * ask every query twice => raise the bar for attack, but DNS system cannot handle the load
+  * Packet
+    * UDP + IP with query ID (can be guessed)
+  * Vulnerability
+    * poisoning => keep send bad DNS-IP mapping
+  * Countermeasure
+    * entity authentication
+    * Increase query ID size
 
 ### DoS and DDoS
 
-* Definition: A transient or persistent set of actions by a third party preventing authorized users from access to or use of a resource or service => need not be launched by malicious third party, for malicious party it is called DoS **attack**
+* What is DOS
+* Main vulnerability => effort amplification
 * Mode of attack
-  * Consumption of resources
-    * types
-      * Network connectivity
-      * bandwidth consumption
-    * Vulnerability (Effort Amplification(放大)): Once your it takes less effort for attacker than the server for a message, it is vulnerable to DoS attack. e.g.:
-      - ping of death => attacker construct data frames that appear to be fragments of the same application layer data. The sum of the sizes of the data frames is greater than the limit, which will cause buffer overflow. 
-      - Smurf Attack: Send request to gateway with echo function and set the echo back IP address to victim’s address
-      - TCP SYN Flooding: Server allocate memory for the coming TCP handshake. Attacker send the request that spoofing the clients, server save the request state and run out of resource.  
-  * Disruption or deletion of configuration information
-    * An improperly configured computer may not perform well or may not operate at all
-    * Vulnerability: An intruder may be able to alter or destroy configuration information that prevents you from using your computer or network (BGP example)
-  * Disruption of physical resources
-    * cutting cables, power cuts for wired network
-    * physical jammers for wireless network (exist for a number of frequencies and protocols)
-* Countermeasure
-  * Monitoring
-  * Right limiting: don’t want to many request from the same user
-* DDoS: use multiple attackers on a network
-  * Master program installed on one computer, which communicates to a number of agent programs installed on compromised computers. Agents initiate attack simultaneously
-  * Can be injected to legitimate softwares and uploaded to network
-* Bot Networks
-  * Infection Mechanisms: web download, mail attachments, scan/exploit
-  * Command and Control (C&C): Centralized, P2P, unstructured
-  * Communication Protocols: IRC, HTTP, P2P, proprietary
-  * Payload/Actions: Spam, DDoS, Keyloggers, Clickfraud
-  * Counter measure: 
-    * Building one could be a one man job
-    * Easier to disable than to destroy (the attacked system can solve the problem but cannot destroy the bot net)
+  * Consumption of resource
+    * ping of death
+    * smurf attack
+    * TCP SYN flooding (handshake)
+  * Disruption or deletion of configuration information => BGP
+  * Disruption of physical resource
+    * cut cables
+    * physical jammers
+* Countermeasures of DoS
+  * monitoring
+  * right limiting
+* what is DDoS
+* what is Bot Net
+* Countermeasures of DDoS
+  * is it easy to dismantling?
