@@ -13,6 +13,7 @@
 ## Questions
 
 * In Lecture 6, why do we use identifier in Example 4 (nonce & signature)
+* In lecture 7, is mech 6. and mech 9. vulnerable to reflection attack since identifier is not used.  
 * In Lecture 9, why do we need SSL over IPSec
 
 ## Lecture 06: Authentication
@@ -348,14 +349,147 @@
 ### Key Establishment Protocols
 
 * Three types for symmetric key encryption based Key establishment protocols
-  * Directly communicating entities (there is already a shared key => each pairs have a key => not efficient)
-  * Key Distribution Centre (KDC)
-  *  Key Translation Centre (KTC)
-* 
+  * Directly communicating entities (there is already a shared key => each pairs have a key => not efficient, KDC & KTC => each user only needs one key shared)
+  * Key Translation Centre (KTC): TTP transport key (key transport)
+    * Case 1: KTC receive the key encrypted by key shared with user 1, decrypt it and encrypt it by key shared with user 2, and send to user 2
+    * Case 2: Alternatively, send the encrypted key back to user 1, and user 1 send to user 2 (key forwarding)
+      * Advantage: user 2 is not human (a smart card), we cannot directly send message to it
+  * Key Distribution Centre (KDC): TTP generate and distribute key (argubably key agreement)
+    * Case 1: KTC receive the request, send encrypted request to user1 and user2 with shared key
+    * Case 2: Alternatively, send all to user1
+
+* Terms
+
+  * Key establishment: Process of making a secret key available to multiple entities.
+  * Key control: Ability to fully choose a key’s value
+  * Key agreement: Process of establishing a key in such a way that **neither entity has key control**.
+  * Key transport: Process of securely transferring a key from one entity to another. (one has control)
+  * Key confirmation (authentication): Assurance that another entity has a particular key.
+    * Implict key authentication: The assurance for A that only another identified entity **can** possess a key. This is the **basic security requirement**.
+    * Explicit key authentication:  The assurance for A that only another identified entity **possesses** a key. This is a more stringent security requirement. 
+      * Key is directly sent (sender has key authentication)
+      * Key is directly used for encryption/decryption (sender has key authentication)
+
+* Key establishment mech. 6 ($F_A, F_B$ contains key materials, $K_{AB}$ is already shared)
+  $$
+  A \leftarrow B: M_1 = R_B \\
+  A \rightarrow B: M_2 = Enc_{K_{AB}}(R_A || R_B||B||F_A||Text_1) \\
+  A \leftarrow B: M_3 = Enc_{K_{AB}}(R_B||R_A||F_B||Text_4)
+  $$
+
+  * Authentication: mutually authenticated
+  * Key control: Neither, key agreement protocol
+  * Implicit key authentication
+
+* Key establishment mech. 9
+
+  ![Screen Shot 2020-05-08 at 8.01.20 PM](assets/Screen Shot 2020-05-08 at 8.01.20 PM.png)
+
+  * Authentication: 
+    * S is authenticated to A
+    * S is authenticated to B
+    * A and B has mutual authentication
+      * why switch the order of $R_A$ and $R_B$ => otherwise M5 is the same as part of M4
+  * Explicit key authentication
+  * Key agreement / Key distribution
+
+* Public-key protocols: use public key to produce a shared symmetric secret key
+
+  * Key transport protocols: public key encryption, digital signatures
+  * Key agreement protocols: Diffie-Hellman
+  * Why we can’t use an MDC to provide origin authentication when using public key encryption ? => hash function is needed before encryption
+
+* Key transport mech. 4 (Enc is public key encryption)
+  $$
+  A \rightarrow B: M_1 = R_B \\
+  A \leftarrow B: M_2 = B||R_A||R_B||Enc_B(A||K)||\\Sig_A(B||R_A||\\
+  R_B||Enc_B(A||K))
+  $$
+
+  * A authenticated to B by using signature and nonce
+  * Key transport, A has key control
+  * Implicity key authentication
+
+* Key hierarchies
+
+  * Key are organized in a hierarchy => one level protect or generate keys in next layer down
+  * Only lowest layer keys (session keys) used for data security (used more, short life)
+  * Top layer key is master key. Must be protected with care (used less, longer life)
+  * Higher layer key must be stronger than lower layer keys
 
 ### Public Key (Certificate) Management
 
+* Digital Certificates
 
+  * Certificatin Authority (CA) has a public key which is ASSUMED to be well known. 
+  * He issues a certificate with
+    * Public key owner’s identity
+    * public key
+    * Valid period
+    * CA’s signature
+  * $Cert_A = (ID_A, PK_A, expiry-date, sign_{CA}(ID_A, PK_A, expiry-date))$ 
+  * Only CA can sign. Anyone can verify the certificate
+  * **Notice that giving someone a certificate does not proof anything about the person who gave it to you. The certificate only links the ID on it to the key on it.**
+
+* CA’s responsibilities
+
+  * identifying entities before certificate generation 
+  * Generating user key or verifying user key 
+    * before generating a certificate, ought to check that a user knows the private key corresponding to its claimed public key. => avoid attacker use other’s public key to apply for a certificate
+  * ensuring the quality of its own key pair, 
+  * keeping its private key secret.
+
+* Entities involved in the PKI
+
+  ![Screen Shot 2020-05-08 at 8.57.23 PM](assets/Screen Shot 2020-05-08 at 8.57.23 PM.png)
+
+  * All the functional entities may be performed by the same actual entity
+  * Process
+    * A user decided that it wants a key and a certificate. It get the key generation facility to generate it a key-pair. (CA or TTP can be the key generation facility)
+    * KGF sends key pair to user, and public key to CA
+    * Meanwhile the user proves its identity to the RA, which then forwards this guarantee to the CA.
+      * The user might communicate with the CA directly, proof of possession
+    * The CA generates the certificate and  publishes the certificate in a directory (can be accessed)
+
+* Certificate Revocation (取消)
+
+  * A CA is responsible for the lifetime management of certificates, including renewal, update and revocation.
+  *  Certification Revocation Lists： Lists of recvoked certificates signed by CA
+  * Why? As the keys might become compromised, user got new keypair
+
+* PKI (Public key infrastructure): consists of all pieces needed to securely use public key cryptography (key generation, certification authorities, digital certificates, CRLs)
+
+  * No general standard
+
+* Trust models
+
+  * Monopoly: One universally trusted organization is the CA
+
+  * Anarchy: Everyone is CA
+
+  * Unstructured: Alice’s identity signed by multiple CAs (cannot transfer trust)
+
+    ![Screen Shot 2020-05-08 at 9.14.13 PM](assets/Screen Shot 2020-05-08 at 9.14.13 PM.png)
+
+  * Structured: Mutiple trusted CAs, used today, user can decide which CAs to trust
+
+    * Idea:  used the certificate of the CA who signed it, until we get to the root CA
+
+    * Root CA (self signed or cross certification)
+
+      ![Screen Shot 2020-05-08 at 9.19.25 PM](assets/Screen Shot 2020-05-08 at 9.19.25 PM.png)
+
+    * Other CA (certificate hierarchy)
+
+      ![Screen Shot 2020-05-08 at 9.19.58 PM](assets/Screen Shot 2020-05-08 at 9.19.58 PM.png)
+
+    * Certificate Chains: verify the certificate use the higher level certificate until meet the trusted certificate
+
+      ![Screen Shot 2020-05-08 at 9.21.24 PM](assets/Screen Shot 2020-05-08 at 9.21.24 PM.png)
+
+* PKI in practice: 
+
+  * Web broswer has the CA’s public key built in => The legitimacy of the web browser software becomes crucial for ensuring the security of digital certificates
 
 ## Lecture 08: Computer Security
 
