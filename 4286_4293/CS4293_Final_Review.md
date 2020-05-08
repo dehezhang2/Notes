@@ -2,6 +2,13 @@
 
 [TOC]
 
+## Tasks
+
+* Lectures
+* Tutorials
+* Assignments
+* Mid-term questions
+
 ## Question
 
 * In chapter 7, TCP connection Spoofing, why it cannot be prevent by IPSec?
