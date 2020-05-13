@@ -4,15 +4,19 @@
 
 ## Tasks
 
-* Lectures
-* Tutorials
-* Assignments
-* Mid-term questions
+* Lectures (finished)
+* Assignments (finished)
+* Tutorials (finished)
+* Mid-term questions (finished)
+* 15 problems (time is more limited)
+  * 10 short problems (one hour)
+  * 5 big problems (one hour) (long description, find keywords, don’t need to read all, focus on the question)
 
 ## Question
 
 * In chapter 7, TCP connection Spoofing, why it cannot be prevent by IPSec?
 * In chapter 7, what is the difference between the Bot net and normal DDoS
+* 
 
 ## Overview of Practical Security
 
@@ -404,7 +408,7 @@
   * reflected: 
     * steps
       * attacker sends bad link
-      * victim clicks bad link and connected to the server
+      * victim clicks bad link and connects to the server
       * server reflect back the webpage containing the script
       * victim execute the script
   * stored

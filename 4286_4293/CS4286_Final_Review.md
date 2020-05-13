@@ -4,17 +4,33 @@
 
 ## Tasks
 
-* Lectures
-* Tutorials
+* Lectures (finished)
+* Tutorials (finished)
 * Assignments
-* Optional Questions
+* Optional Questions (finished)
 * Mid-term questions
 
 ## Questions
 
-* In Lecture 6, why do we use identifier in Example 4 (nonce & signature)
+* In Lecture 6, why do we use identifier in Example 4 (nonce & signature) => still needed
+  *  The identifier is still useful. Otherwise if I record  Sig_A(RA,RB) then I can go off to C and wait for RC to equal RB and then I can authenticate as A.
 * In lecture 7, is mech 6. and mech 9. vulnerable to reflection attack since identifier is not used.  
+  *  I am not sure reflection would really work for these (generally getting it right for mutual authentication is hard, because you are challenged with RA, you reflect back RA but then the response has the nonces in wrong order). For Mech 9, you cannot start authentication before you have the new key KAB so if you are an attacker this is not possible. For key establishment even if the attacker can circumvent the authentication it still does not have the key, so it can go no further after the protocol finishes.
 * In Lecture 9, why do we need SSL over IPSec
+  * We could do TLS/SSL over IPSec, but generally this is not the intention. These are two different methods to provide network security – one mostly used in web context, and the other in conventional networks. TLS is now also being used in networks for server to server links (with mutual authentication).
+* Are there any space reserved in the exam paper?
+* No identifier. It is better to add identifier in all the messages when we design our own protocol, but what should we assess the given protocol? 
+  * questions
+    * Tutorial 7 Q1 (a): Is it the case that timestamp does not account reflection attack? 
+    * optional questions answer: no identifier for encryption
+    * T7 Q2: no identifier for signature
+    * Lecture note for SSL: no identifier for hash
+    * Lecture 7 mech 6& 9 replay: no identifier for encryption (what if we analyze it from mutual authentication perspective?)
+  * types
+    * nonce + symmetric key (encryption, MAC, hash)
+    * timestamp + symmetric key
+    * nonce/timestamp + signature
+    * nonce + public key encryption
 
 ## Lecture 06: Authentication
 
@@ -264,7 +280,7 @@
     * Origin auth: Provided by signature
     * Why $R_B$ is in the last message: Protect them from poor random number generation => two nonce has less chance to be both repeat
     * Why flip $R_A$ and $R_B$: shown in example 5
-    * Why identifier
+    * Why identifier: Make sure not replay if C use the same $R_B$ 
 
   * Example 5
     $$
@@ -757,7 +773,7 @@
 
   * Internet key exchange (IKE): Establish a session key
     * phase I: master session key setup => comparable to SSL session (**6 variants in total**)
-      * Three ways: All based on Diffie-Hellman. The three ways are used to provide original authentication for Diffie-Hellman (i.e. how the proof are calculated)
+      * Three ways: All based on Diffie-Hellman. The three ways are used to provide original authentication for Diffie-Hellman (i.e. how the proof are calculated) => protect the key material which combined with Diffie Hellman
         * Public key encryption based
         * Signature based
         * Symmetric key based
