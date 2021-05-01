@@ -145,6 +145,11 @@
   * matching cost
 * Structure from motion: problem definition
 
+## Optical Flow
+
+* Assumptions in Lucas-Kanade method
+* Lucas-Kanade Algorithm (brightness Constancy Equation)
+
 
 
 
