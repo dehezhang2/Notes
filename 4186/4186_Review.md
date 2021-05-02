@@ -150,6 +150,7 @@
   e.g.\ linear\ transform:p'=Tp
   $$
 
+
 ### All 2D Linear Transformations: 
 
 * including **scale, rotation, shear and mirror**
@@ -236,6 +237,7 @@
     {x \over z} = {x' \over f}, {y \over z} = {y' \over f}  \\
     P' = (x',y') = (f{x \over z}, f{y \over z})
     $$
+
 
 ### Camera parameters
 
@@ -336,15 +338,63 @@ $$
 ### Stereo Matching
 
 * Calculate the disparity
-  * Rectify the two stereo images to transform epipolar lines into scanlines
+  * Rectify the two stereo images to transform Epipolar lines into scanlines
   * For each pixel $x_l$ in the left image
     * find corresponding epipolar scanline
-    * search and pick the best match $x_r$ (compare the patch in the neiborhood)
+    * search and pick the best match $x_r$ (compare the patch in the neighborhood)
     * compute the disparity $x_l - x_r$ and the depth
-* horizontal
-* matching cost
 
-### Structure from motion: problem definition
+* Stereo Image Rectification
+
+  * Make the camera in parallel => epipolar lines can be represented as horizontal lines
+  * Use the homography
+
+* Matching Cost
+
+  * Slide a window along the right scanline and compare contents of that window with the reference window in the left image
+  * Matching cost: SSD, SAD, or normalized cross correlation
+  * Window size:
+    * Smaller: more detail but more noise
+    * Larger: Smoother disparity maps but less detail and fails near boundaries
+
+* Stereo Constraints /Priors
+
+  * **Uniqueness**: For any point in one image, there should be at most one matching point in the other image
+
+    ![1619966846474](assets/1619966846474.png)
+
+  * **Ordering**: Corresponding points should be in the same order in both views (not always true, but for most cases)
+
+    ![1619966867424](assets/1619966867424.png)
+
+  * **Smoothness**: We expect disparity values to change slowly => disparity change for adjacent pixels are the similar
+
+* Pipeline
+
+  * Steps
+    * calibrate cameras
+    * rectify images
+    * compute disparity
+    * estimate depth
+  * Error cases=>use more than two images may improve the performance
+    * camera calibration errors
+    * poor image resolution
+    * occlusions
+    * violations of brightness constancy
+    * low-contrast image regions
+
+## Structure from motion: problem definition
+
+* Problem
+  * Images => 3D point cloud
+  * Figure out camera position
+  * Build a 3D model of the scene
+* Applications
+  * object recognition
+  * Robotics
+  * Computer Graphics
+  * Image Retrieval
+  * Localization
 
 ## Optical Flow
 
