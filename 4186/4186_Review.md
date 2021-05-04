@@ -451,22 +451,69 @@ Pipeline:
   * large values for ambiguous matches (1 is the largest value)  
   * **drop the match if the ratio distance has large value, cannot change the best match**
 
-## Bag of Words
+## 7 Bag of Words
 
-### The BoW representation
+* Brute force image matching vs BoW
 
-### TF-IDF weighting
+  * Brute force: many pairs of images for large dataset => high computational cost
 
-* TF-IDF
+  * BoW: only consider likely matches by using fast global similarity measures (concept of histogram)
 
-### Inverted File
+    ![Screen Shot 2021-05-04 at 11.46.22 AM](assets/Screen%20Shot%202021-05-04%20at%2011.46.22%20AM.png)
 
-* Sparse histogram
-* Mapping from words to the document
+    * a histogram of local feature vectors in an image
+    * reduce the computational complexity
 
-## Transformation and Alignment
+### 7.1 The BoW representation
 
-### Image Warping
+* Pipeline
+  * Extract features
+  * Learn “visual vocabulary” (clustering)
+  * Quantize features using visual vocabulary
+  * Represent images by frequencies of “visual words” (get the histogram for the images)
+
+* Extract features: e.g. use SIFT to extract $n$ 128 dimension vectors
+
+* Visual vocabulary learning: K-means to cluster the feature vectors
+  $$
+  D(X,M) = \sum_{cluster\ k\ \ \ \ } \sum_{i\ in\ cluster\ k} (x_i-m_k)^2
+  $$
+
+  * randomly initialize $K$ cluster centers
+  * interate until convergence (minimize the total distance)
+    * Assign each data point to the nearest center
+    * Recompute each cluster centre as the mean of all points assigned to it
+
+* Quantize features using visual vocabulary: map the image to the codebook (dictionary) to get the histogram
+
+  * extract 128-D vectors from the image
+  * Compare each vector of the image with the codebook vectors and find the minimum distance
+
+* Spatial Pyramid: divide the image into different region, and compute BoW histogram for each region
+
+### 7.2 TF-IDF weighting
+
+* Weight: weight of each word could be adjusted (some visual words are more discriminative than others) e.g. the, and, or have lower weight
+
+* TF-IDF (term frequency - inverse document frequency)
+  $$
+  IDF(word\ j) = log({number\ of\ documents\over number\ of\ documents\ in\ which\ j\ appears}) \\
+  Weight(word\ j) = TF(j) * IDF(j)
+  $$
+  
+
+  * Instead of computing a regular histogram distance, we'll weight each word by it's inverse document frequency (increase the weight for unique words)
+
+### 7.3 Inverted File
+
+* Sparse histogram: the image may not include most of features
+* Mapping from words to the document: record a list of documents (images) for each word (feature)
+* Can quickly use the inverted file to compute similarity between a new image and all the images in the database
+  * Only consider database images whose bins overlap the query image
+
+## 8 Transformation and Alignment
+
+### 8.1 Image Warping
 
 * Image filtering changes the range of the image, while image warping changes the domain of the image. 
 
@@ -496,12 +543,12 @@ Pipeline:
   $$
 
 
-### All 2D Linear Transformations: 
+### 8.2 All 2D Linear Transformations: 
 
 * including **scale, rotation, shear and mirror**
 * Can be represented by a $2 \times 2$ matrix
 
-### Homogeneous Coordinates
+### 8.3 Homogeneous Coordinates
 
 * Represented by $3\times3$ matrix
 
@@ -515,17 +562,17 @@ Pipeline:
 
   ![image-20210503000433764](assets/image-20210503000433764.png)
 
-### Affine Transformations
+### 8.4 Affine Transformations
 
 * $T^{(3)}=[0,0,1]$ (the last dimension is always 1 after transformation)
 * Including linear transformations and translations
 
-### Homography: 
+### 8.5 Homography: 
 
 * $T^{(3)}=[g,h,1]$ (we can always divide the other eight parameters by $T^{(3)}_3$
 * Use the 3D matrix two rotate the homography plane
 
-### Image Alignment
+### 8.6 Image Alignment
 
 * Simple case: translation match 2 equations per match, 2 unknowns => one match needed
   $$
@@ -536,7 +583,7 @@ Pipeline:
 
 * Homography match: 2 equations per match, 8 unknowns => 4 matches needed
 
-### RANSAC (no calculation)
+### 8.7 RANSAC (no calculation)
 
 * Problem of least square: outliers will affect the accuracy
 
@@ -551,9 +598,9 @@ Pipeline:
   * choose the model with the most number of inliers
   * After finding the vector with the most number of inliers, can also take the average of inliers
 
-## Camera
+## 9 Camera
 
-### Pinhole camera
+### 9.1 Pinhole camera
 
 * Add a barrier to block off most of the ray
 
@@ -584,7 +631,7 @@ Pipeline:
     $$
 
 
-### Camera parameters
+### 9.2 Camera parameters
 
 * world vs. camera coordinate
 
@@ -633,7 +680,7 @@ Pipeline:
   
   * Camera position & orientation => rotation + translation matrix ($4\times4$)
 
-### Modeling projection
+### 9.3 Modeling projection
 
 $$
 P' = MP 
@@ -654,9 +701,9 @@ $$
 * Use homogeneous coordinates for camera and world coordinates $(x,y,z) => (x,y,z,1)$
 * Estimation of intrinsic and extrinsic parameters: camera calibration
 
-## Stereo Vision and Structure from Motion
+## 10 Stereo Vision and Structure from Motion
 
-### Depth and Disparity
+### 10.1 Depth and Disparity
 
 ![image-20210503050006419](assets/image-20210503050006419.png)
 
@@ -674,13 +721,13 @@ $$
   * Calibration: Recover the relation (baseline) of the cameras (translation)
   * Correspondence: search for the matching point $x_r$ for $x_l$ 
 
-### Epipolar Geometry 
+### 10.2 Epipolar Geometry 
 
 ![image-20210503052107234](assets/image-20210503052107234.png)
 
 * Reduce searching scale to the **Epipolar lines** for correspondence problem
 
-### Stereo Matching
+### 10.3 Stereo Matching
 
 * Calculate the disparity
   * Rectify the two stereo images to transform Epipolar lines into scanlines
@@ -728,7 +775,7 @@ $$
     * violations of brightness constancy
     * low-contrast image regions
 
-## Structure from motion: problem definition
+## 10.4 Structure from motion: problem definition
 
 * Problem
   * Images => 3D point cloud
@@ -771,9 +818,9 @@ $$
       =argmin_{\bf R,T, \hat X}\{ ||M \hat X - p ||^2 + ||M' \hat X - p' ||^2\
       $$
 
-## Optical Flow
+## 11 Optical Flow
 
-### Video & Optical Flow
+### 11.1 Video & Optical Flow
 
 * Image vs. video
   * Image: pixels * channels
@@ -795,7 +842,7 @@ $$
       * Definition: a ==velocity field== in the image which ==transforms one image into the next image== in a sequence
       * Ambiguity: two flow may have the same result
 
-### Assumptions in Lucas-Kanade method
+### 11.2 Assumptions in Lucas-Kanade method
 
 * Task: given two subsequent frames, estimate the point translation 
 
@@ -807,7 +854,7 @@ $$
   * **Small Motion**: points do not move very far (alows first order Taylor expansion)
   * **Spatial Coherence**: points move like their neighbors
 
-### Lucas-Kanade Algorithm (brightness Constancy Equation)
+### 11.3 Lucas-Kanade Algorithm (brightness Constancy Equation)
 
 $$
 I(x,y,t) = I(x+u, y+v,t+1) \\
